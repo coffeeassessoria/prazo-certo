@@ -1,0 +1,13 @@
+services:
+  prazo-certo:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_APP_NOME: ${NEXT_PUBLIC_APP_NOME}
+        NEXT_PUBLIC_WHATSAPP_BOT: ${NEXT_PUBLIC_WHATSAPP_BOT}
+    env_file: .env
+    restart: unless-stopped
+    ports:
+      - "3010:3000"
