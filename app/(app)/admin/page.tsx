@@ -109,12 +109,20 @@ export default async function Admin() {
             </tbody>
           </table>
         </div>
-        {!empresas?.length && <p className="muted">Nenhuma empresa ainda. Cadastre a primeira abaixo.</p>}
+        {!empresas?.length && (
+          <ol className="passos-inicio" style={{ marginTop: 8 }}>
+            <li><span className="marca-passo">1</span>Preencha "Nova empresa" abaixo com o nome e o e-mail do responsável.</li>
+            <li><span className="marca-passo">2</span>Envie o acesso gerado pelo WhatsApp (botão aparece após criar).</li>
+            <li><span className="marca-passo">3</span>No primeiro login, o responsável responde o quiz de configuração.</li>
+            <li><span className="marca-passo">4</span>Para configurar por ele, clique em "Visualizar" na empresa criada.</li>
+          </ol>
+        )}
       </div>
 
       <div className="grade" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', marginTop: 16 }}>
         <FormResultado acao={criarEmpresa}>
           <h2>Nova empresa</h2>
+          <p className="muted">Crie o acesso do responsável. No primeiro login ele responde um quiz rápido que configura empresa, lembretes e clientes.</p>
           <div className="campo"><label>Nome da empresa *</label><input name="empresa" required /></div>
           <div className="linha">
             <div className="campo"><label>CNPJ</label><input name="documento" /></div>

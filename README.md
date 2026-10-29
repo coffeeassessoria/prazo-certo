@@ -62,7 +62,22 @@ docker compose up -d --build
 ```
 O app sobe na porta 3010. Aponte um subdomínio para ele no seu proxy (Nginx/Traefik/Caddy) com HTTPS.
 
-## 4. WhatsApp (Evolution API)
+## 4. Lembretes por e-mail
+
+Todo dia às 7h (horário de Cuiabá) a Vercel chama `/api/cron/lembretes` (configurado em `vercel.json`)
+e cada empresa recebe **um e-mail-resumo** com o que precisa de atenção.
+
+Quando cada item é avisado (uma vez cada):
+- ao entrar no prazo de aviso do item (ex.: 30 dias antes)
+- 7 dias antes, 1 dia antes e no dia
+- depois de vencido, uma vez por semana até ser renovado ou concluído
+
+Configuração:
+1. Na Hostinger, crie a caixa `lembretes@coffeeassessoria.com.br` (Emails → Criar conta).
+2. Na Vercel, cadastre `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `EMAIL_FROM` e `CRON_SECRET` (ver `.env.example`).
+3. Em **Configurações → Lembretes por e-mail**, use **Enviar e-mail de teste agora**.
+
+## 5. WhatsApp (Evolution API)
 
 Configure o webhook da instância para chamar o sistema quando chegar mensagem:
 
@@ -85,12 +100,14 @@ Regras de segurança do bot:
 
 Comandos: `vencimentos` · `vencidos` · `hoje` · `semana` · `mes` (ou `60`, `90`) · `cliente nome` · `ajuda`
 
-## 5. Primeiro uso
+## 6. Primeiro uso
 
 1. Entre com o seu usuário → **Admin** → *Nova empresa* (ex.: empresa do seu irmão), com o e-mail dele e o WhatsApp.
 2. O sistema gera a senha e um texto pronto para enviar no WhatsApp.
-3. Ele entra, conecta a Google Agenda em **Configurações**, cadastra clientes e vencimentos.
-4. No celular: abrir o site no Chrome/Safari → *Adicionar à tela inicial*.
+3. No primeiro login ele responde o **quiz de boas-vindas** (empresa, área, o que controla, antecedência,
+   quem recebe os lembretes, clientes) e cai direto no cadastro do primeiro vencimento.
+4. O painel mostra uma lista de **primeiros passos** até ele ter 3 vencimentos cadastrados.
+5. No celular: abrir o site no Chrome/Safari → *Adicionar à tela inicial*.
 
 No Admin você também pode: suspender/reativar empresas (bloqueia o acesso, útil para mensalidade em atraso),
 gerar nova senha para um usuário e **Visualizar** os dados de uma empresa para dar suporte.

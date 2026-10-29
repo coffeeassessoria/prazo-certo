@@ -2,12 +2,26 @@ import 'server-only'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+import type { Modelo } from '@/lib/modelos'
+
 export type Empresa = {
   id: string
   nome: string
   ativo: boolean
   whatsapp_numeros: string[]
+  documento: string | null
+  cidade: string | null
+  segmento: string | null
+  responsavel: string | null
+  emails_lembrete: string[]
+  antecedencia_padrao: number
+  modelos: Modelo[]
+  lembrete_email_ativo: boolean
+  onboarding_concluido: boolean
 }
+
+const CAMPOS_EMPRESA =
+  'id, nome, ativo, whatsapp_numeros, documento, cidade, segmento, responsavel, emails_lembrete, antecedencia_padrao, modelos, lembrete_email_ativo, onboarding_concluido'
 
 export type Contexto = {
   userId: string
@@ -35,7 +49,7 @@ export async function getContexto(): Promise<Contexto> {
   if (perfil?.empresa_id) {
     const { data } = await supabase
       .from('empresas')
-      .select('id, nome, ativo, whatsapp_numeros')
+      .select(CAMPOS_EMPRESA)
       .eq('id', perfil.empresa_id)
       .maybeSingle()
     empresa = (data as Empresa) ?? null
@@ -51,11 +65,15 @@ export async function getContexto(): Promise<Contexto> {
   }
 }
 
-/** Para telas da operação: exige empresa vinculada e ativa. */
-export async function exigirEmpresa(): Promise<Contexto & { empresa: Empresa }> {
+/**
+ * Para telas da operação: exige empresa vinculada e ativa.
+ * Se a empresa ainda não respondeu o quiz de boas-vindas, manda para /bem-vindo.
+ */
+export async function exigirEmpresa(opts: { noOnboarding?: boolean } = {}): Promise<Contexto & { empresa: Empresa }> {
   const ctx = await getContexto()
   if (!ctx.empresa) redirect(ctx.superadmin ? '/admin' : '/sem-acesso')
   if (!ctx.empresa.ativo) redirect('/sem-acesso?motivo=bloqueado')
+  if (!opts.noOnboarding && !ctx.empresa.onboarding_concluido) redirect('/bem-vindo')
   return ctx as Contexto & { empresa: Empresa }
 }
 

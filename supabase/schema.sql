@@ -139,3 +139,32 @@ create policy anexos_rw on storage.objects
   for all to authenticated
   using (bucket_id = 'anexos' and (storage.foldername(name))[1] = (select privado.minha_empresa())::text)
   with check (bucket_id = 'anexos' and (storage.foldername(name))[1] = (select privado.minha_empresa())::text);
+
+-- =====================================================================
+-- Migração 2: onboarding (quiz de boas-vindas) e lembretes por e-mail
+-- =====================================================================
+alter table public.empresas
+  add column if not exists cidade text,
+  add column if not exists segmento text,
+  add column if not exists responsavel text,
+  add column if not exists emails_lembrete text[] not null default '{}',
+  add column if not exists antecedencia_padrao int not null default 30 check (antecedencia_padrao between 0 and 365),
+  add column if not exists modelos jsonb not null default '[]'::jsonb,
+  add column if not exists lembrete_email_ativo boolean not null default true,
+  add column if not exists onboarding_concluido boolean not null default false;
+
+create table if not exists public.lembretes_enviados (
+  id uuid primary key default gen_random_uuid(),
+  empresa_id uuid not null references public.empresas(id) on delete cascade,
+  item_id uuid not null references public.itens(id) on delete cascade,
+  marco text not null,
+  canal text not null default 'email',
+  destinatarios text[] not null default '{}',
+  enviado_em timestamptz not null default now(),
+  unique (item_id, marco, canal)
+);
+create index if not exists lembretes_empresa_idx on public.lembretes_enviados(empresa_id, enviado_em desc);
+alter table public.lembretes_enviados enable row level security;
+drop policy if exists lembretes_select on public.lembretes_enviados;
+create policy lembretes_select on public.lembretes_enviados
+  for select to authenticated using (empresa_id = (select privado.minha_empresa()));

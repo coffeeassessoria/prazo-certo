@@ -37,7 +37,7 @@ export default async function DetalheItem({
           <h1>Editar</h1>
           <Link href={`/itens/${id}`} className="btn sec">Cancelar</Link>
         </div>
-        <ItemForm acao={salvarItem} clientes={clientes ?? []} item={item} />
+        <ItemForm acao={salvarItem} clientes={clientes ?? []} item={item} modelos={ctx.empresa.modelos} antecedenciaPadrao={ctx.empresa.antecedencia_padrao} />
       </>
     )
   }

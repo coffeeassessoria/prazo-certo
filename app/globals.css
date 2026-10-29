@@ -299,3 +299,76 @@ th { color: var(--text-secondary); font-weight: 500; }
 
 code.cmd { background: var(--surface-strong); border: 1px solid var(--border-default); padding: 1px 8px; border-radius: var(--radius-xs); font: 500 var(--fs-xs)/20px var(--font); white-space: nowrap; }
 details summary { cursor: pointer; font-weight: 500; color: var(--surface-raised); min-height: 32px; display: flex; align-items: center; }
+
+/* =====================  Quiz de boas-vindas  ===================== */
+.quiz { min-height: 100vh; min-height: 100dvh; background: var(--surface-muted); display: flex; flex-direction: column; }
+.quiz-topo { display: flex; align-items: center; gap: var(--s5); padding: calc(env(safe-area-inset-top) + var(--s6)) var(--s7) var(--s6); }
+.quiz-topo img { width: 32px; height: 32px; border-radius: var(--radius-xs); }
+.quiz-marca { font-weight: 600; font-size: var(--fs-md); }
+.quiz-contador { margin-left: auto; color: var(--text-secondary); font-size: var(--fs-sm); }
+.quiz-progresso { height: 4px; background: var(--surface-strong); }
+.quiz-progresso span { display: block; height: 100%; background: var(--surface-raised); transition: width var(--dur-fast); }
+.quiz-corpo { width: 100%; max-width: 620px; margin: 0 auto; padding: var(--s8) var(--s7) 0; flex: 1; display: flex; flex-direction: column; }
+.quiz-corpo h1 { font-size: 28px; line-height: 34px; margin-bottom: var(--s4); }
+.quiz-sub { color: var(--text-secondary); font-size: var(--fs-md); line-height: 24px; margin-bottom: var(--s7); }
+.quiz-lista { margin: 0 0 var(--s7); padding-left: 20px; font-size: var(--fs-md); line-height: 28px; }
+.quiz-rodape {
+  display: flex; justify-content: space-between; gap: var(--s4); margin-top: auto;
+  padding: var(--s7) 0 calc(env(safe-area-inset-bottom) + var(--s7));
+  position: sticky; bottom: 0; background: linear-gradient(to top, var(--surface-muted) 75%, transparent);
+}
+.opcional { font-weight: 400; color: var(--text-secondary); }
+
+.opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s5); }
+@media (max-width: 560px) { .opcoes { grid-template-columns: 1fr; } }
+.opcao {
+  display: flex; flex-direction: column; gap: var(--s3); text-align: left; cursor: pointer;
+  font: inherit; color: var(--text-primary); background: var(--surface-muted);
+  border: 1.5px solid var(--border-default); border-radius: var(--radius-sm); padding: var(--s6);
+  min-height: 76px; transition: border-color var(--dur-instant), background var(--dur-instant);
+}
+.opcao strong { font-size: var(--fs-md); font-weight: 600; }
+.opcao span { color: var(--text-secondary); font-size: var(--fs-sm); }
+.opcao:hover { border-color: var(--border-strong); }
+.opcao.marcada { border-color: var(--surface-raised); background: #eef4f9; box-shadow: 0 0 0 1px var(--surface-raised); }
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--s4); }
+.chip {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0; cursor: pointer; font: inherit; text-align: left;
+  background: var(--surface-muted); color: var(--text-primary); border: 1.5px solid var(--border-default);
+  border-radius: var(--radius-sm); padding: var(--s4) var(--s5); min-height: var(--touch);
+  transition: border-color var(--dur-instant), background var(--dur-instant);
+}
+.chip:hover { border-color: var(--border-strong); }
+.chip.marcado { border-color: var(--surface-raised); background: #eef4f9; }
+.chip-titulo { font-weight: 500; }
+.chip.marcado .chip-titulo::before { content: "✓ "; color: var(--surface-raised); }
+.chip-meta { font-size: var(--fs-xs); color: var(--text-secondary); }
+
+.revisao { display: grid; grid-template-columns: 180px 1fr; gap: var(--s5) var(--s6); margin: var(--s4) 0 var(--s7); padding: var(--s6); border: 1px solid var(--border-default); border-radius: var(--radius-sm); }
+.revisao dt { color: var(--text-secondary); }
+.revisao dd { margin: 0; font-weight: 500; }
+@media (max-width: 560px) {
+  .quiz-corpo { padding: var(--s7) var(--s6) 0; }
+  .quiz-corpo h1 { font-size: 24px; line-height: 30px; }
+  .revisao { grid-template-columns: 1fr; gap: 2px; }
+  .revisao dd { margin-bottom: var(--s4); }
+  .quiz-rodape .btn { flex: 1; }
+}
+
+/* Modelos rápidos no cadastro */
+.modelos-rapidos { display: flex; flex-wrap: wrap; gap: var(--s4); margin-bottom: var(--s6); }
+.modelos-rapidos .chip { padding: var(--s3) var(--s5); min-height: 36px; }
+.ajuda { display: block; font-size: var(--fs-xs); color: var(--text-secondary); line-height: 16px; }
+.passos-inicio { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--s4); }
+.passos-inicio li { display: flex; align-items: center; gap: var(--s5); }
+.passos-inicio .marca-passo { width: 26px; height: 26px; border-radius: var(--radius-pill); border: 1.5px solid var(--border-strong); display: grid; place-items: center; font-size: var(--fs-xs); font-weight: 600; flex: none; }
+.passos-inicio .feito .marca-passo { background: var(--status-ok); border-color: var(--status-ok); color: #fff; }
+.passos-inicio .feito .texto { color: var(--text-secondary); text-decoration: line-through; }
+
+/* Formulário guiado */
+.form-guiado .etapa { padding-bottom: var(--s7); margin-bottom: var(--s7); border-bottom: 1px solid var(--border-default); }
+.form-guiado .etapa:last-of-type { border-bottom: 0; margin-bottom: var(--s5); padding-bottom: 0; }
+.form-guiado h2 { display: flex; align-items: center; gap: var(--s4); }
+.num-etapa { width: 24px; height: 24px; border-radius: var(--radius-pill); background: var(--surface-raised); color: var(--text-on-raised); font-size: var(--fs-xs); display: grid; place-items: center; flex: none; }
+.previa-avisos { display: flex; flex-direction: column; gap: var(--s3); background: var(--surface-strong); border-radius: var(--radius-xs); padding: var(--s5) var(--s6); }

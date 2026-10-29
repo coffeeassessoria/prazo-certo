@@ -4,8 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 import { ItemForm } from '@/components/ItemForm'
 import { salvarItem } from '../actions'
 
-export default async function NovoItem({ searchParams }: { searchParams: Promise<{ cliente?: string }> }) {
-  const { cliente } = await searchParams
+export default async function NovoItem({ searchParams }: { searchParams: Promise<{ cliente?: string; primeiro?: string }> }) {
+  const { cliente, primeiro } = await searchParams
   const ctx = await exigirEmpresa()
   const supabase = await createClient()
   const { data: clientes } = await supabase
@@ -15,12 +15,14 @@ export default async function NovoItem({ searchParams }: { searchParams: Promise
     <>
       <div className="cabecalho">
         <div>
-          <h1>Novo vencimento</h1>
-          <div className="muted">Documento, contrato ou manutenção que precisa ser renovado</div>
+          <h1>{primeiro ? 'Cadastre seu primeiro vencimento' : 'Novo vencimento'}</h1>
+          <div className="muted">Responda as 4 perguntas abaixo. O sistema cuida dos lembretes.</div>
         </div>
         <Link href="/" className="btn sec so-desktop">Voltar</Link>
       </div>
-      <ItemForm acao={salvarItem} clientes={clientes ?? []} clientePadrao={cliente} />
+      {primeiro && <div className="aviso ok">Configuração concluída. Agora cadastre um documento, contrato ou manutenção que você precisa acompanhar.</div>}
+      <ItemForm acao={salvarItem} clientes={clientes ?? []} clientePadrao={cliente}
+        modelos={ctx.empresa.modelos} antecedenciaPadrao={ctx.empresa.antecedencia_padrao} />
     </>
   )
 }

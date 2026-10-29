@@ -55,3 +55,41 @@ export async function trocarSenha(_prev: Resultado, fd: FormData): Promise<Resul
   const { error } = await supabase.auth.updateUser({ password: senha })
   return error ? { ok: false, msg: error.message } : { ok: true, msg: 'Senha alterada.' }
 }
+
+export async function salvarLembretes(fd: FormData) {
+  const ctx = await exigirAdminEmpresa()
+  const emails = [...new Set(String(fd.get('emails') ?? '').split(/[\n,;]+/).map((e) => e.trim().toLowerCase()).filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)))]
+  const antecedencia = Math.min(Math.max(Number(fd.get('antecedencia') || 30), 0), 365)
+  await createAdminClient()
+    .from('empresas')
+    .update({ emails_lembrete: emails, antecedencia_padrao: antecedencia, lembrete_email_ativo: fd.get('ativo') === 'on' })
+    .eq('id', ctx.empresa.id)
+  revalidatePath('/config')
+  redirect('/config?ok=lembretes')
+}
+
+/** Envia agora um e-mail com tudo que está vencido ou vencendo, sem registrar como enviado. */
+export async function emailTeste(_prev: Resultado, _fd: FormData): Promise<Resultado> {
+  try {
+    const ctx = await exigirAdminEmpresa()
+    const { emailConfigurado, enviarEmail } = await import('@/lib/email')
+    const { montarEmail } = await import('@/lib/lembretes')
+    const { hojeISO, somarDias } = await import('@/lib/datas')
+    if (!emailConfigurado()) return { ok: false, msg: 'O envio de e-mail ainda não foi configurado no servidor.' }
+    const para = ctx.empresa.emails_lembrete
+    if (!para.length) return { ok: false, msg: 'Cadastre pelo menos um e-mail e salve antes de testar.' }
+    const hoje = hojeISO()
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('itens').select('id, titulo, tipo, vencimento, antecedencia_dias, clientes(nome)')
+      .eq('empresa_id', ctx.empresa.id).eq('status', 'ativo').lte('vencimento', somarDias(hoje, ctx.empresa.antecedencia_padrao))
+      .order('vencimento').limit(30)
+    const itens = (data ?? []).map((i: any) => ({ ...i, cliente_nome: (Array.isArray(i.clientes) ? i.clientes[0]?.nome : i.clientes?.nome) ?? null }))
+    const exemplo = itens.length ? itens : [{ id: 'exemplo', titulo: 'Exemplo: PMOC', tipo: 'documento', vencimento: somarDias(hoje, 7), antecedencia_dias: 30, cliente_nome: 'Cliente de exemplo' }]
+    const email = montarEmail(ctx.empresa.nome, exemplo, hoje, process.env.APP_URL ?? '', process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo')
+    await enviarEmail({ para, ...email, assunto: `[Teste] ${email.assunto}` })
+    return { ok: true, msg: `E-mail de teste enviado para ${para.join(', ')}. Confira também a caixa de spam.` }
+  } catch (e: any) {
+    return { ok: false, msg: `Não foi possível enviar: ${e.message}` }
+  }
+}

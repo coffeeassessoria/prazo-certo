@@ -65,7 +65,7 @@ export async function salvarItem(fd: FormData) {
     descricao: txt(fd, 'descricao') || null,
     vencimento: txt(fd, 'vencimento'),
     recorrencia_meses: numOuNull(txt(fd, 'recorrencia_meses')),
-    antecedencia_dias: Number(txt(fd, 'antecedencia_dias') || 15),
+    antecedencia_dias: Number(txt(fd, 'antecedencia_dias') || ctx.empresa.antecedencia_padrao || 30),
     cliente_id: await resolverCliente(supabase, empresaId, fd),
   }
   if (!campos.titulo || !/^\d{4}-\d{2}-\d{2}$/.test(campos.vencimento)) {

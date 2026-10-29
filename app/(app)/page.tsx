@@ -60,6 +60,17 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
     return `/?${p}`
   }
 
+  // Primeiros passos: aparece até a empresa ter 3 vencimentos cadastrados
+  const totalAtivos = cont.vencido + cont.atencao + cont.ok
+  const mostrarPassos = !historico && !sp.q && !sp.cliente && !sp.tipo && totalAtivos < 3
+  const passos = [
+    { feito: true, texto: 'Configurar sua empresa e os lembretes', href: '/bem-vindo?refazer=1' },
+    { feito: (clientes ?? []).length > 0, texto: 'Cadastrar seus clientes', href: '/clientes?novo=1' },
+    { feito: totalAtivos > 0, texto: 'Cadastrar o primeiro vencimento', href: '/itens/novo' },
+    { feito: totalAtivos >= 3, texto: 'Cadastrar pelo menos 3 vencimentos', href: '/itens/novo' },
+    { feito: false, texto: 'Enviar um e-mail de teste para conferir os lembretes', href: '/config' },
+  ]
+
   return (
     <>
       <div className="cabecalho">
@@ -72,7 +83,22 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
         <Link href="/itens/novo" className="btn so-desktop">Novo vencimento</Link>
       </div>
 
-      {sp.ok && <div className="aviso ok">{sp.ok === 'renovado' ? 'Renovado! O próximo vencimento já foi criado.' : 'Salvo com sucesso.'}</div>}
+      {sp.ok && <div className="aviso ok">{sp.ok === 'renovado' ? 'Renovado! O próximo vencimento já foi criado.' : 'Salvo com sucesso. Os lembretes deste item já estão ativos.'}</div>}
+
+      {mostrarPassos && (
+        <div className="card" style={{ marginBottom: 24 }}>
+          <h2>Primeiros passos</h2>
+          <p className="muted">Siga esta lista para deixar o sistema trabalhando por você. Ela some quando você terminar.</p>
+          <ol className="passos-inicio">
+            {passos.map((p, i) => (
+              <li key={i} className={p.feito ? 'feito' : ''}>
+                <span className="marca-passo">{p.feito ? '✓' : i + 1}</span>
+                {p.feito ? <span className="texto">{p.texto}</span> : <Link href={p.href}>{p.texto}</Link>}
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
 
       {!historico && (() => {
         const total = cont.vencido + cont.atencao + cont.ok
