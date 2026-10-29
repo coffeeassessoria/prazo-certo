@@ -47,13 +47,11 @@ export default async function Admin() {
         )}
       </div>
 
-      <div className="status">
-        <div className="segmentos">
-          <div className="segmento"><span className="n">{empresas?.length ?? 0}</span><span className="r">Empresas</span></div>
-          <div className="segmento ok"><span className="n">{ativas.length}</span><span className="r">Ativas</span></div>
-          <div className="segmento"><span className="n">{(perfis ?? []).filter((p) => p.empresa_id).length}</span><span className="r">Usuários</span></div>
-          <div className="segmento ok"><span className="n" style={{ fontSize: 20 }}>{brl(mrr)}</span><span className="r">Receita mensal</span></div>
-        </div>
+      <div className="metricas">
+        <div className="metrica"><span className="r">Empresas</span><span className="n">{empresas?.length ?? 0}</span><span className="d">cadastradas</span></div>
+        <div className="metrica ok"><span className="r">Ativas</span><span className="n">{ativas.length}</span><span className="d">com acesso liberado</span></div>
+        <div className="metrica"><span className="r">Usuários</span><span className="n">{(perfis ?? []).filter((p) => p.empresa_id).length}</span><span className="d">em todas as empresas</span></div>
+        <div className="metrica ok"><span className="r">Receita mensal</span><span className="n" style={{ fontSize: 22 }}>{brl(mrr)}</span><span className="d">empresas ativas</span></div>
       </div>
 
       <div className="card">

@@ -1,44 +1,43 @@
 # Guia de design — Prazo Certo
 
-## Conceito
-**Etiqueta de manutenção.** Todo técnico de climatização conhece a etiqueta presa no equipamento
-com a data da próxima manutenção. Cada vencimento no sistema é uma etiqueta: a data "carimbada"
-em destaque à esquerda, com o furo da etiqueta. A cor da etiqueta é o status. Esse é o único
-elemento "chamativo" do sistema; todo o resto é calmo e funcional.
+Base oficial: [`docs/design/design-system.md`](docs/design/design-system.md) (tokens Emergent) e a
+referência visual [`docs/design/referencia-dashboard.png`](docs/design/referencia-dashboard.png).
+Todos os tokens estão implementados como variáveis CSS em `app/globals.css`.
 
-## Cores
-| Token | Hex | Uso |
+## Tokens aplicados
+| Token | Valor | Uso no Prazo Certo |
 |---|---|---|
-| Aço | `#2c4a5e` | marca, topo, botões principais |
-| Tinta | `#16222c` | texto principal |
-| Tinta 2 | `#55697a` | texto secundário |
-| Gelo | `#edf2f5` | fundo do app |
-| Papel | `#ffffff` | cartões e formulários |
-| Vermelho | `#c8372b` | **só** vencido |
-| Âmbar | `#e9a514` | **só** vence em breve |
-| Verde | `#2a8053` | **só** em dia / renovar |
+| `color.text.primary` | `#16181d` | texto principal |
+| `color.text.secondary` | `#6a7181` | texto de apoio, rótulos |
+| `color.surface.raised` | `#155179` | marca, botão principal, item ativo |
+| `color.surface.muted` | `#ffffff` | cartões, sidebar, campos |
+| `color.surface.strong` | `#f3f5f6` | fundo do app, hover |
+| `color.border.default` | `#dddfe4` | bordas |
+| `font.family.primary` | Work Sans | toda a interface (hospedada no app) |
+| `radius.xs / sm / md` | 6px / 12px / pill | botões e campos / cartões / selos |
+| `shadow.1 / shadow.2` | sutis | cartões / login |
+| `motion` | 150ms / 200ms | só hover e foco |
 
-Regra: vermelho, âmbar e verde nunca aparecem como decoração. Se está colorido, é status.
+Cores de status (vermelho vencido, âmbar vence logo, verde em dia) são uma extensão do sistema
+e só podem aparecer para indicar status.
 
-## Tipografia
-- **Barlow** (texto e interface): família inspirada em placas e sinalização técnica.
-- **Barlow Semi Condensed** (títulos, datas e números): números altos e legíveis, cabem na etiqueta.
-- Fontes hospedadas no próprio app (pacote @fontsource), sem depender do Google Fonts.
-- Campos de formulário sempre com 16px (evita o zoom automático do iPhone).
-- Texto em frases normais: sem CAIXA ALTA em rótulos, sem emojis em títulos.
+## Estrutura
+- **Computador:** sidebar fixa à esquerda (marca, menu com ícones, usuário e sair no rodapé),
+  igual à referência. Conteúdo com cartões de métrica no topo.
+- **Celular (até 860px):** topo branco com a marca e barra de abas fixa embaixo
+  (Painel, Clientes, **Novo** em destaque, Histórico, Ajustes). Cara de aplicativo.
 
-## Cara de aplicativo no celular
-- Barra de abas fixa embaixo (Painel, Clientes, **Novo** em destaque, Histórico, Ajustes).
-- Alvos de toque de no mínimo 44px.
-- Respeita o "notch" e a barra do iPhone (`safe-area-inset`).
-- Instalável na tela inicial (manifest + ícones + modo standalone, sem barra do navegador).
-- Cor do topo igual à barra de status do sistema (`theme-color`).
-- Sem destaque azul ao tocar, sem "puxar" a página além do limite.
+## Elemento-assinatura
+A **etiqueta de vencimento**: a data "carimbada" numa etiqueta com furo, como a etiqueta de
+manutenção presa no equipamento. A cor da etiqueta é o status.
 
-## Escrita
-- Botões dizem exatamente o que acontece: "Renovar e criar próximo vencimento", não "Enviar".
-- Vazio vira convite para agir: "Nenhum vencimento aqui. Cadastre o primeiro…"
-- Erros dizem o que houve e como resolver, sem pedir desculpas.
+## Regras
+- Estados obrigatórios em componentes interativos: padrão, hover, foco visível, ativo, desabilitado, carregando, erro.
+- Foco sempre visível (contorno 2px na cor da marca).
+- Alvo de toque mínimo de 44px no celular; campos com 16px no celular para não dar zoom no iPhone.
+- Respeitar `prefers-reduced-motion` e as áreas seguras do iPhone (notch).
+- Botões dizem o que acontece ("Renovar e criar próximo vencimento"), nunca "Enviar".
+- Sem CAIXA ALTA em rótulos e sem emojis em títulos.
 
-## Ícone
-Etiqueta branca com furo e visto verde, sobre fundo aço. Arquivos em `public/`.
+## PWA
+Manifest, ícones (`public/`), modo standalone e cor do tema configurados: no celular, "Adicionar à tela inicial" abre sem barra do navegador.

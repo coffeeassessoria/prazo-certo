@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Vencimentos de documentos, contratos e manutenções',
     start_url: '/',
     display: 'standalone',
-    background_color: '#edf2f5',
-    theme_color: '#2c4a5e',
+    background_color: '#f3f5f6',
+    theme_color: '#155179',
     lang: 'pt-BR',
     icons: [
       { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },

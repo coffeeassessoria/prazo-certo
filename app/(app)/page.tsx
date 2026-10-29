@@ -76,25 +76,19 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
 
       {!historico && (() => {
         const total = cont.vencido + cont.atencao + cont.ok
-        const pct = (n: number) => (total ? `${(n / total) * 100}%` : '0%')
-        const seg = (f: string, n: number, rot: string) => (
-          <Link href={link(f)} className={`segmento ${f} ${filtro === f ? 'ativo' : ''}`}>
-            <span className="n">{n}</span><span className="r">{rot}</span>
+        const met = (f: string, n: number, rot: string, desc: string) => (
+          <Link href={link(f)} className={`metrica ${f} ${filtro === f ? 'ativo' : ''}`}>
+            <span className="r">{rot}</span>
+            <span className="n">{n}</span>
+            <span className="d">{desc}</span>
           </Link>
         )
         return (
-          <div className="status">
-            <div className="proporcao" aria-hidden>
-              <span style={{ width: pct(cont.vencido), background: 'var(--vermelho)' }} />
-              <span style={{ width: pct(cont.atencao), background: 'var(--ambar-vivo)' }} />
-              <span style={{ width: pct(cont.ok), background: 'var(--verde)' }} />
-            </div>
-            <div className="segmentos">
-              {seg('vencido', cont.vencido, 'Vencidos')}
-              {seg('atencao', cont.atencao, 'Vencem logo')}
-              {seg('ok', cont.ok, 'Em dia')}
-              {seg('todos', total, 'Todos')}
-            </div>
+          <div className="metricas">
+            {met('vencido', cont.vencido, 'Vencidos', 'precisam de ação agora')}
+            {met('atencao', cont.atencao, 'Vencem logo', 'dentro do prazo de aviso')}
+            {met('ok', cont.ok, 'Em dia', 'sem ação no momento')}
+            {met('todos', total, 'Ativos', 'vencimentos acompanhados')}
           </div>
         )
       })()}

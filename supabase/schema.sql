@@ -83,18 +83,19 @@ create table if not exists public.google_conexoes (
 );
 
 -- ---------- Funções auxiliares ----------
-create or replace function public.minha_empresa()
+-- Fica num schema privado (fora da API pública); usada pelas policies.
+create schema if not exists privado;
+grant usage on schema privado to authenticated;
+
+create or replace function privado.minha_empresa()
 returns uuid language sql stable security definer set search_path = public as $$
   select empresa_id from public.perfis where user_id = auth.uid()
 $$;
-
-create or replace function public.sou_admin_empresa()
-returns boolean language sql stable security definer set search_path = public as $$
-  select coalesce((select papel = 'admin' from public.perfis where user_id = auth.uid()), false)
-$$;
+revoke all on function privado.minha_empresa() from public, anon;
+grant execute on function privado.minha_empresa() to authenticated;
 
 create or replace function public.set_updated_at()
-returns trigger language plpgsql as $$
+returns trigger language plpgsql set search_path = public as $$
 begin new.updated_at = now(); return new; end $$;
 
 drop trigger if exists itens_updated_at on public.itens;
@@ -110,31 +111,31 @@ alter table public.google_conexoes enable row level security;
 
 drop policy if exists empresas_select on public.empresas;
 create policy empresas_select on public.empresas
-  for select using (id = public.minha_empresa());
+  for select using (id = (select privado.minha_empresa()));
 
 drop policy if exists perfis_select on public.perfis;
 create policy perfis_select on public.perfis
-  for select using (user_id = auth.uid() or empresa_id = public.minha_empresa());
+  for select using (user_id = auth.uid() or empresa_id = (select privado.minha_empresa()));
 
 drop policy if exists clientes_all on public.clientes;
 create policy clientes_all on public.clientes
-  for all using (empresa_id = public.minha_empresa())
-  with check (empresa_id = public.minha_empresa());
+  for all using (empresa_id = (select privado.minha_empresa()))
+  with check (empresa_id = (select privado.minha_empresa()));
 
 drop policy if exists itens_all on public.itens;
 create policy itens_all on public.itens
-  for all using (empresa_id = public.minha_empresa())
-  with check (empresa_id = public.minha_empresa());
+  for all using (empresa_id = (select privado.minha_empresa()))
+  with check (empresa_id = (select privado.minha_empresa()));
 
 -- (google_conexoes: sem policies de propósito)
 
 -- ---------- Storage: anexos (PDFs de laudos, PMOC, ART, contratos) ----------
-insert into storage.buckets (id, name, public)
-values ('anexos', 'anexos', false)
+insert into storage.buckets (id, name, public, file_size_limit)
+values ('anexos', 'anexos', false, 10485760)
 on conflict (id) do nothing;
 
 drop policy if exists anexos_rw on storage.objects;
 create policy anexos_rw on storage.objects
   for all to authenticated
-  using (bucket_id = 'anexos' and (storage.foldername(name))[1] = public.minha_empresa()::text)
-  with check (bucket_id = 'anexos' and (storage.foldername(name))[1] = public.minha_empresa()::text);
+  using (bucket_id = 'anexos' and (storage.foldername(name))[1] = (select privado.minha_empresa())::text)
+  with check (bucket_id = 'anexos' and (storage.foldername(name))[1] = (select privado.minha_empresa())::text);

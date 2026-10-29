@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from 'next'
-import '@fontsource/barlow/400.css'
-import '@fontsource/barlow/500.css'
-import '@fontsource/barlow/600.css'
-import '@fontsource/barlow-semi-condensed/500.css'
-import '@fontsource/barlow-semi-condensed/600.css'
+import '@fontsource/work-sans/400.css'
+import '@fontsource/work-sans/500.css'
+import '@fontsource/work-sans/600.css'
 import './globals.css'
 
 const nome = process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo'
@@ -11,13 +9,13 @@ const nome = process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo'
 export const metadata: Metadata = {
   title: nome,
   description: 'Vencimentos de documentos, contratos e manutenções',
-  appleWebApp: { capable: true, title: nome, statusBarStyle: 'black-translucent' },
+  appleWebApp: { capable: true, title: nome, statusBarStyle: 'default' },
   icons: { icon: '/icon-192.png', apple: '/apple-touch-icon.png' },
   formatDetection: { telephone: false },
 }
 
 export const viewport: Viewport = {
-  themeColor: '#2c4a5e',
+  themeColor: '#ffffff',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
