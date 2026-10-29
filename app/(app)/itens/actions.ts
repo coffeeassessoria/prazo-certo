@@ -5,6 +5,8 @@ import { revalidatePath } from 'next/cache'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
 import { finalizarEvento, removerEvento, semFalhar, sincronizarEvento } from '@/lib/google'
+import { qsToast } from '@/lib/toast'
+import { fmtData } from '@/lib/datas'
 
 type Supa = Awaited<ReturnType<typeof createClient>>
 
@@ -92,7 +94,9 @@ export async function salvarItem(fd: FormData) {
 
   await sincronizar(supabase, empresaId, itemId)
   revalidatePath('/')
-  redirect(id ? `/itens/${itemId}?ok=1` : '/?ok=1&f=todos')
+  redirect(id
+    ? `/itens/${itemId}?${qsToast('Alterações salvas', 'Os lembretes foram ajustados para a nova data.')}`
+    : `/?f=todos&${qsToast(`${campos.titulo} cadastrado`, `Vence em ${fmtData(campos.vencimento)}. Os lembretes por e-mail já estão ativos.`)}`)
 }
 
 export async function renovarItem(fd: FormData) {
@@ -136,7 +140,7 @@ export async function renovarItem(fd: FormData) {
   }
   await sincronizar(supabase, empresaId, novo.id)
   revalidatePath('/')
-  redirect('/?ok=renovado&f=todos')
+  redirect(`/?f=todos&${qsToast(`${atual.titulo} renovado`, `Próximo vencimento em ${fmtData(novoVenc)}.`)}`)
 }
 
 export async function concluirItem(fd: FormData) {
@@ -153,7 +157,7 @@ export async function concluirItem(fd: FormData) {
     await semFalhar(() => finalizarEvento(ctx.empresa.id, atual.google_event_id, 'Concluído', atual.titulo))
   }
   revalidatePath('/')
-  redirect('/?ok=1')
+  redirect(`/?${qsToast(`${atual?.titulo ?? 'Item'} concluído`, 'Ele saiu da lista e não terá mais lembretes.')}`)
 }
 
 export async function reabrirItem(fd: FormData) {
@@ -166,7 +170,7 @@ export async function reabrirItem(fd: FormData) {
     .eq('id', id).eq('empresa_id', ctx.empresa.id)
   await sincronizar(supabase, ctx.empresa.id, id)
   revalidatePath('/')
-  redirect(`/itens/${id}?ok=1`)
+  redirect(`/itens/${id}?${qsToast('Vencimento reaberto', 'Os lembretes voltaram a ficar ativos.')}`)
 }
 
 export async function excluirItem(fd: FormData) {
@@ -174,10 +178,10 @@ export async function excluirItem(fd: FormData) {
   const supabase = await createClient()
   const id = txt(fd, 'id')
   const { data: atual } = await supabase
-    .from('itens').select('google_event_id, anexo_path').eq('id', id).eq('empresa_id', ctx.empresa.id).single()
+    .from('itens').select('titulo, google_event_id, anexo_path').eq('id', id).eq('empresa_id', ctx.empresa.id).single()
   if (atual?.google_event_id) await semFalhar(() => removerEvento(ctx.empresa.id, atual.google_event_id))
   if (atual?.anexo_path) await supabase.storage.from('anexos').remove([atual.anexo_path])
   await supabase.from('itens').delete().eq('id', id).eq('empresa_id', ctx.empresa.id)
   revalidatePath('/')
-  redirect('/?ok=1')
+  redirect(`/?${qsToast(`${atual?.titulo ?? 'Vencimento'} excluído`, undefined, 'info')}`)
 }

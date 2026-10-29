@@ -1,12 +1,16 @@
 import Link from 'next/link'
+import { Calendar, CalendarClock, Plus, Search } from 'lucide-react'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
-import { hojeISO, situacao, TIPOS } from '@/lib/datas'
+import { fmtDataExtenso, hojeISO, situacao, TIPOS } from '@/lib/datas'
 import { ItemLinha, type ItemLista } from '@/components/ItemLinha'
+import { Cabecalho } from '@/components/ui/Cabecalho'
+import { Metrica } from '@/components/ui/Metrica'
+import { Vazio } from '@/components/ui/Vazio'
 
 export const dynamic = 'force-dynamic'
 
-type Busca = { f?: string; q?: string; cliente?: string; tipo?: string; ok?: string }
+type Busca = { f?: string; q?: string; cliente?: string; tipo?: string }
 
 export default async function Painel({ searchParams }: { searchParams: Promise<Busca> }) {
   const sp = await searchParams
@@ -42,6 +46,7 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
 
   const cont = { vencido: 0, atencao: 0, ok: 0 }
   if (!historico) for (const i of itens) cont[situacao(i, hoje) as 'vencido' | 'atencao' | 'ok']++
+  const totalAtivos = cont.vencido + cont.atencao + cont.ok
 
   const visiveis = historico
     ? itens
@@ -60,8 +65,9 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
     return `/?${p}`
   }
 
+  const clientesVencidos = new Set(itens.filter((i) => situacao(i, hoje) === 'vencido').map((i) => i.cliente_nome).filter(Boolean)).size
+
   // Primeiros passos: aparece até a empresa ter 3 vencimentos cadastrados
-  const totalAtivos = cont.vencido + cont.atencao + cont.ok
   const mostrarPassos = !historico && !sp.q && !sp.cliente && !sp.tipo && totalAtivos < 3
   const passos = [
     { feito: true, texto: 'Configurar sua empresa e os lembretes', href: '/bem-vindo?refazer=1' },
@@ -73,83 +79,74 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
 
   return (
     <>
-      <div className="cabecalho">
-        <div>
-          <h1>{historico ? 'Histórico' : 'Vencimentos'}</h1>
-          <div className="muted">
-            {historico ? 'Itens renovados ou concluídos' : `Hoje, ${hoje.split('-').reverse().join('/')}`}
-          </div>
-        </div>
-        <Link href="/itens/novo" className="btn so-desktop">Novo vencimento</Link>
-      </div>
-
-      {sp.ok && <div className="aviso ok">{sp.ok === 'renovado' ? 'Renovado! O próximo vencimento já foi criado.' : 'Salvo com sucesso. Os lembretes deste item já estão ativos.'}</div>}
+      <Cabecalho
+        titulo={historico ? 'Histórico' : 'Vencimentos'}
+        subIcone={<Calendar size={14} aria-hidden />}
+        sub={historico ? 'Itens renovados ou concluídos' : `Hoje, ${fmtDataExtenso(hoje)} • ${totalAtivos} ${totalAtivos === 1 ? 'item ativo' : 'itens ativos'}`}
+        acao={totalAtivos > 0 || historico ? <Link href="/itens/novo" className="btn so-desktop"><Plus size={16} />Novo vencimento</Link> : undefined}
+      />
 
       {mostrarPassos && (
         <div className="card" style={{ marginBottom: 24 }}>
           <h2>Primeiros passos</h2>
           <p className="muted">Siga esta lista para deixar o sistema trabalhando por você. Ela some quando você terminar.</p>
-          <ol className="passos-inicio">
+          <ol className="checklist duas" style={{ marginTop: 12 }}>
             {passos.map((p, i) => (
-              <li key={i} className={p.feito ? 'feito' : ''}>
-                <span className="marca-passo">{p.feito ? '✓' : i + 1}</span>
-                {p.feito ? <span className="texto">{p.texto}</span> : <Link href={p.href}>{p.texto}</Link>}
+              <li key={i}>
+                {p.feito ? (
+                  <span className="checklist-item is-checked"><span className="checklist-caixa">✓</span>{p.texto}</span>
+                ) : (
+                  <Link href={p.href} className="checklist-item"><span className="checklist-caixa">{i + 1}</span>{p.texto}</Link>
+                )}
               </li>
             ))}
           </ol>
         </div>
       )}
 
-      {!historico && (() => {
-        const total = cont.vencido + cont.atencao + cont.ok
-        const met = (f: string, n: number, rot: string, desc: string) => (
-          <Link href={link(f)} className={`metrica ${f} ${filtro === f ? 'ativo' : ''}`}>
-            <span className="r">{rot}</span>
-            <span className="n">{n}</span>
-            <span className="d">{desc}</span>
-          </Link>
-        )
-        return (
-          <div className="metricas">
-            {met('vencido', cont.vencido, 'Vencidos', 'precisam de ação agora')}
-            {met('atencao', cont.atencao, 'Vencem logo', 'dentro do prazo de aviso')}
-            {met('ok', cont.ok, 'Em dia', 'sem ação no momento')}
-            {met('todos', total, 'Ativos', 'vencimentos acompanhados')}
-          </div>
-        )
-      })()}
+      {!historico && (
+        <div className="metricas">
+          <Metrica href={link('vencido')} ativo={filtro === 'vencido'} tom="vencido" valor={cont.vencido} rotulo="Vencidos"
+            apoio={clientesVencidos ? `${clientesVencidos} ${clientesVencidos === 1 ? 'cliente' : 'clientes'}` : 'nenhum atrasado'} />
+          <Metrica href={link('atencao')} ativo={filtro === 'atencao'} tom="atencao" valor={cont.atencao} rotulo="Vencem logo" apoio="dentro do prazo de aviso" />
+          <Metrica href={link('ok')} ativo={filtro === 'ok'} tom="ok" valor={cont.ok} rotulo="Em dia" apoio="tudo certo" />
+          <Metrica href={link('todos')} ativo={filtro === 'todos'} valor={totalAtivos} rotulo="Ativos" apoio="total acompanhado" />
+        </div>
+      )}
 
-      <form className="filtros" method="get">
+      <form className="filtros" method="get" role="search">
         <input type="hidden" name="f" value={filtro} />
-        <input name="q" placeholder="Buscar por título ou cliente…" defaultValue={sp.q ?? ''} />
-        <select name="cliente" defaultValue={sp.cliente ?? ''}>
+        <div className="busca">
+          <Search size={18} aria-hidden />
+          <input name="q" aria-label="Buscar" placeholder="Buscar por título ou cliente" defaultValue={sp.q ?? ''} />
+        </div>
+        <select name="cliente" aria-label="Cliente" defaultValue={sp.cliente ?? ''}>
           <option value="">Todos os clientes</option>
           {(clientes ?? []).map((c) => <option key={c.id} value={c.id}>{c.nome}</option>)}
         </select>
-        <select name="tipo" defaultValue={sp.tipo ?? ''}>
+        <select name="tipo" aria-label="Tipo" defaultValue={sp.tipo ?? ''}>
           <option value="">Todos os tipos</option>
           {Object.entries(TIPOS).map(([v, r]) => <option key={v} value={v}>{r}</option>)}
         </select>
-        <button className="btn sec">Filtrar</button>
+        <button className="btn sec"><Search size={16} />Buscar vencimentos</button>
       </form>
 
-      {!historico && filtro === 'pendentes' && (
-        <p className="muted">Mostrando o que está vencido ou vence em breve. <Link href={link('todos')}>Ver todos</Link> ou <Link href="/?f=historico">histórico</Link>.</p>
+      {!historico && filtro === 'pendentes' && visiveis.length > 0 && (
+        <p className="muted">Mostrando o que está vencido ou vence logo. <Link href={link('todos')}>Ver todos</Link> ou <Link href="/?f=historico">ver histórico</Link>.</p>
       )}
 
       {visiveis.length ? (
         <div className="lista">
           {visiveis.map((i) => <ItemLinha key={i.id} item={i} hoje={hoje} />)}
         </div>
+      ) : filtro === 'pendentes' && itens.length ? (
+        <Vazio icone={CalendarClock} titulo="Nada vencido nem vencendo logo" texto="Que bom. Os próximos vencimentos aparecem aqui quando entrarem no prazo de aviso.">
+          <Link href={link('todos')} className="btn sec">Ver todos os vencimentos</Link>
+        </Vazio>
       ) : (
-        <div className="card vazio">
-          {filtro === 'pendentes' && itens.length ? (
-            <><h2>Tudo em dia</h2><p>Nada vencido nem vencendo nos próximos dias.</p></>
-          ) : (
-            <><h2>Nenhum vencimento aqui</h2><p>Cadastre o primeiro documento, contrato ou manutenção que precisa renovar.</p></>
-          )}
-          <Link href="/itens/novo" className="btn">Cadastrar vencimento</Link>
-        </div>
+        <Vazio titulo="Nenhum vencimento por aqui" texto="Que bom — ou cadastre o primeiro para começar a controlar.">
+          <Link href="/itens/novo" className="btn">Cadastrar primeiro vencimento</Link>
+        </Vazio>
       )}
     </>
   )

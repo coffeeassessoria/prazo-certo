@@ -1,42 +1,60 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { Abas, Menu } from './Navegacao'
+import { LogOut } from 'lucide-react'
+import { Abas, Menu, MenuGaveta } from './Navegacao'
+import { Logo } from './ui/Logo'
+import { TemaToggle } from './ui/TemaToggle'
+import { ToastDaUrl } from './ui/Toast'
 
-/** Estrutura visual do app: sidebar no computador, topo + abas no celular. */
+function iniciais(nome: string) {
+  return nome.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join('') || '?'
+}
+
+/**
+ * Estrutura do app (DS 2.0 · Layout):
+ * header 64px fixo · sidebar 280px (>1024) · gaveta (≤1024) · abas 72px (<768)
+ */
 export function Casca({
-  children, empresa, email, temEmpresa, superadmin,
+  children, empresa, email, nome, temEmpresa, superadmin,
 }: {
   children: React.ReactNode
   empresa?: string | null
   email?: string
+  nome?: string
   temEmpresa: boolean
   superadmin: boolean
 }) {
-  const nome = process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo'
-  const marca = (
-    <Link href="/" className="marca">
-      <img src="/icon-192.png" alt="" />
-      <span>
-        <span className="nome">{nome}</span>
-        {empresa && <span className="empresa">{empresa}</span>}
-      </span>
-    </Link>
-  )
+  const quem = nome || email || ''
   return (
-    <div className="app">
-      <aside className="sidebar">
-        {marca}
-        <Suspense><Menu temEmpresa={temEmpresa} superadmin={superadmin} /></Suspense>
-        <div className="rodape">
-          {email && <div className="quem">{email}</div>}
-          <form action="/sair" method="post"><button className="btn sec peq cheio">Sair</button></form>
+    <>
+      <header className="pc-header">
+        <div className="pc-header-in">
+          <div className="pc-header-esq">
+            <Suspense><MenuGaveta temEmpresa={temEmpresa} superadmin={superadmin} /></Suspense>
+            <Link href="/" className="marca" aria-label="Ir para o painel"><Logo sub={empresa} /></Link>
+          </div>
+          <div className="pc-header-acoes">
+            <TemaToggle />
+          </div>
         </div>
-      </aside>
-      <header className="topo-mobile">{marca}</header>
-      <div className="principal">
-        <main className="conteudo">{children}</main>
+      </header>
+      <div className="pc-corpo">
+        <aside className="pc-sidebar">
+          <Suspense><Menu temEmpresa={temEmpresa} superadmin={superadmin} /></Suspense>
+          <div className="sidebar-rodape">
+            <span className="avatar" aria-hidden>{iniciais(quem)}</span>
+            <span className="sidebar-quem"><b>{quem}</b>{email && nome && <span>{email}</span>}</span>
+            <form action="/sair" method="post">
+              <button className="btn ghost icone peq" aria-label="Sair do sistema" title="Sair"><LogOut size={16} /></button>
+            </form>
+          </div>
+        </aside>
+        <main className="pc-main">
+          <div className="conteudo">{children}</div>
+        </main>
       </div>
       {temEmpresa && <Suspense><Abas superadmin={superadmin} /></Suspense>}
-    </div>
+      <Suspense><ToastDaUrl /></Suspense>
+    </>
   )
 }

@@ -12,6 +12,8 @@ vencimentos de PMOC, laudos, ART, contratos e manutenções preventivas dos clie
 - **Admin da plataforma**: criar empresas, usuários, suspender acesso, mensalidade
 - Funciona no PC e no celular; pode ser instalado na tela inicial (PWA)
 
+Interface: **Design System 2.0** — guia em `docs/design-system/README.md`, catálogo vivo em `/design-system`, regras para devs em `CLAUDE.md`.
+
 Stack: Next.js 15 + Supabase (Postgres, Auth, Storage). Hospedagem: Vercel **ou** sua VPS (Docker).
 
 ---

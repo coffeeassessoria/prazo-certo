@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { semFalhar, sincronizarEvento, trocarCodigo } from '@/lib/google'
+import { qsToast } from '@/lib/toast'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 60
@@ -48,7 +49,7 @@ export async function GET(req: NextRequest) {
         await admin.from('itens').update({ google_event_id: eventId }).eq('id', i.id).eq('empresa_id', ctx.empresa.id)
       }
     }
-    return NextResponse.redirect(`${base}/config?ok=google`)
+    return NextResponse.redirect(`${base}/config?${qsToast('Google Agenda conectada', 'Os vencimentos ativos já foram enviados para a agenda.')}`)
   } catch (e) {
     console.error('[google callback]', e)
     return NextResponse.redirect(`${base}/config?erro=google-falhou`)

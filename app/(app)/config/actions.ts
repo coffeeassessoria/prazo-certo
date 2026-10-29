@@ -6,6 +6,7 @@ import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { normalizarTelefone } from '@/lib/telefone'
+import { qsToast } from '@/lib/toast'
 import { criarUsuario, type Resultado } from '@/lib/usuarios'
 
 async function exigirAdminEmpresa() {
@@ -23,14 +24,14 @@ export async function salvarWhatsapp(fd: FormData) {
   // empresas não tem policy de update para o usuário: grava via service role, sempre na empresa do próprio usuário
   await createAdminClient().from('empresas').update({ whatsapp_numeros: [...new Set(numeros)] }).eq('id', ctx.empresa.id)
   revalidatePath('/config')
-  redirect('/config?ok=whatsapp')
+  redirect(`/config?${qsToast('Números do WhatsApp salvos')}`)
 }
 
 export async function desconectarGoogle() {
   const ctx = await exigirAdminEmpresa()
   await createAdminClient().from('google_conexoes').delete().eq('empresa_id', ctx.empresa.id)
   revalidatePath('/config')
-  redirect('/config?ok=google-desconectado')
+  redirect(`/config?${qsToast('Google Agenda desconectada', undefined, 'info')}`)
 }
 
 export async function adicionarUsuario(_prev: Resultado, fd: FormData): Promise<Resultado> {
@@ -65,7 +66,7 @@ export async function salvarLembretes(fd: FormData) {
     .update({ emails_lembrete: emails, antecedencia_padrao: antecedencia, lembrete_email_ativo: fd.get('ativo') === 'on' })
     .eq('id', ctx.empresa.id)
   revalidatePath('/config')
-  redirect('/config?ok=lembretes')
+  redirect(`/config?${qsToast('Lembretes salvos', emails.length ? `Os avisos vão para ${emails.join(', ')}.` : 'Nenhum e-mail cadastrado: ninguém vai receber avisos.')}`)
 }
 
 /** Envia agora um e-mail com tudo que está vencido ou vencendo, sem registrar como enviado. */

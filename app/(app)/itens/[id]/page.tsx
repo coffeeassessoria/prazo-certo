@@ -2,9 +2,16 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
-import { fmtData, hojeISO, rotuloRecorrencia, situacao, somarMeses, textoPrazo, TIPOS } from '@/lib/datas'
+import { Bell, Building2, CalendarCheck, FileText, Pencil, Repeat, RotateCcw, Trash2 } from 'lucide-react'
+import { fmtData, hojeISO, rotuloRecorrencia, situacao, somarMeses, TIPOS } from '@/lib/datas'
 import { ItemForm } from '@/components/ItemForm'
-import { BotaoConfirmar } from '@/components/BotaoConfirmar'
+import { textoStatus } from '@/components/ItemLinha'
+import { Cabecalho } from '@/components/ui/Cabecalho'
+import { Etiqueta } from '@/components/ui/Etiqueta'
+import { Selo } from '@/components/ui/Selo'
+import { Confirmar } from '@/components/ui/Confirmar'
+import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
+import { Upload } from '@/components/ui/Upload'
 import { concluirItem, excluirItem, reabrirItem, renovarItem, salvarItem } from '../actions'
 
 export const dynamic = 'force-dynamic'
@@ -13,7 +20,7 @@ export default async function DetalheItem({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ editar?: string; ok?: string }>
+  searchParams: Promise<{ editar?: string }>
 }) {
   const { id } = await params
   const sp = await searchParams
@@ -32,13 +39,10 @@ export default async function DetalheItem({
     const { data: clientes } = await supabase
       .from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome')
     return (
-      <>
-        <div className="cabecalho">
-          <h1>Editar</h1>
-          <Link href={`/itens/${id}`} className="btn sec">Cancelar</Link>
-        </div>
+      <div style={{ maxWidth: 880 }}>
+        <Cabecalho voltar={{ href: `/itens/${id}`, rotulo: 'Cancelar edição' }} titulo="Editar vencimento" sub={item.titulo} />
         <ItemForm acao={salvarItem} clientes={clientes ?? []} item={item} modelos={ctx.empresa.modelos} antecedenciaPadrao={ctx.empresa.antecedencia_padrao} />
-      </>
+      </div>
     )
   }
 
@@ -57,102 +61,105 @@ export default async function DetalheItem({
   const ativo = item.status === 'ativo'
   const sugestao = item.recorrencia_meses ? somarMeses(item.vencimento, item.recorrencia_meses) : ''
 
+  const tom = s === 'renovado' || s === 'concluido' ? 'neutro' : s
+
   return (
-    <>
-      <div className="cabecalho">
-        <div>
-          <h1>{item.titulo}</h1>
-          <div className="muted">
-            {cliente ? <Link href={`/?f=todos&cliente=${cliente.id}`}>{cliente.nome}</Link> : 'Sem cliente'}, {TIPOS[item.tipo].toLowerCase()}
-          </div>
-        </div>
-        <Link href="/" className="btn sec so-desktop">Voltar</Link>
-      </div>
+    <div style={{ maxWidth: 960 }}>
+      <Cabecalho
+        voltar={{ href: '/', rotulo: 'Vencimentos' }}
+        titulo={item.titulo}
+        subIcone={<Building2 size={14} aria-hidden />}
+        sub={<>{cliente ? <Link href={`/?f=todos&cliente=${cliente.id}`}>{cliente.nome}</Link> : 'Sem cliente'} • {TIPOS[item.tipo]}</>}
+        acao={<Link href={`/itens/${id}?editar=1`} className="btn sec"><Pencil size={16} />Editar</Link>}
+      />
 
-      {sp.ok && <div className="aviso ok">Salvo com sucesso.</div>}
-
-      <div className="grade">
+      <div className="grade-2">
         <div className="card">
-          <div className="acoes" style={{ justifyContent: 'space-between' }}>
-            <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <Etiqueta data={item.vencimento} status={s} grande />
+            <div style={{ flex: 1, minWidth: 0 }}>
               <div className="muted">Vencimento</div>
               <div className="data-grande">{fmtData(item.vencimento)}</div>
+              <div style={{ marginTop: 8 }}><Selo tom={tom}>{textoStatus(s, item.vencimento, hoje)}</Selo></div>
             </div>
-            <span className={`selo ${s}`} style={{ fontSize: 14 }}>
-              {ativo ? textoPrazo(item.vencimento, hoje) : s === 'renovado' ? 'Renovado' : 'Concluído'}
-            </span>
           </div>
           <dl className="detalhes">
-            <dt>Repetição</dt><dd>{rotuloRecorrencia(item.recorrencia_meses)}</dd>
-            <dt>Aviso</dt><dd>{item.antecedencia_dias} dias antes</dd>
-            <dt>Google Agenda</dt><dd>{item.google_event_id ? 'Na agenda, com alerta' : 'Não sincronizada. Conecte em Configurações.'}</dd>
+            <dt>Repetição</dt><dd style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Repeat size={14} aria-hidden />{rotuloRecorrencia(item.recorrencia_meses)}</dd>
+            <dt>Primeiro aviso</dt><dd style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Bell size={14} aria-hidden />{item.antecedencia_dias} dias antes, por e-mail</dd>
+            <dt>Google Agenda</dt><dd>{item.google_event_id ? 'Na agenda, com alerta' : 'Não conectada. Conecte em Ajustes.'}</dd>
             {item.descricao && (<><dt>Observações</dt><dd style={{ whiteSpace: 'pre-wrap' }}>{item.descricao}</dd></>)}
             {cliente?.contato || cliente?.telefone ? (
               <><dt>Contato no cliente</dt><dd>{[cliente.contato, cliente.telefone].filter(Boolean).join(', ')}</dd></>
             ) : null}
-            <dt>Anexo</dt>
-            <dd>{anexoUrl ? <a href={anexoUrl} target="_blank" rel="noreferrer">{item.anexo_nome}</a> : '—'}</dd>
+            <dt>Documento</dt>
+            <dd>{anexoUrl ? <a href={anexoUrl} target="_blank" rel="noreferrer" style={{ display: 'inline-flex', gap: 6, alignItems: 'center' }}><FileText size={14} aria-hidden />{item.anexo_nome}</a> : 'Nenhum anexo'}</dd>
           </dl>
-          <div className="acoes empilha" style={{ marginTop: 18 }}>
-            <Link href={`/itens/${id}?editar=1`} className="btn sec">Editar</Link>
+          <hr className="separador" />
+          <div className="acoes empilha">
             {ativo ? (
               <form action={concluirItem}>
                 <input type="hidden" name="id" value={id} />
-                <BotaoConfirmar className="btn sec" mensagem="Marcar como concluído (não vai mais repetir)?">Concluir sem renovar</BotaoConfirmar>
+                <Confirmar className="btn sec" tom="info" titulo="Concluir sem renovar?"
+                  texto="O item sai da lista de vencimentos e para de gerar lembretes. Você pode reabrir depois pelo histórico."
+                  destaque={`${item.titulo} • vence em ${fmtData(item.vencimento)}`} confirmar="Concluir sem renovar">
+                  <CalendarCheck size={16} />Concluir sem renovar
+                </Confirmar>
               </form>
             ) : (
               <form action={reabrirItem}>
                 <input type="hidden" name="id" value={id} />
-                <BotaoConfirmar className="btn sec">Reabrir</BotaoConfirmar>
+                <BotaoEnviar className="btn sec" carregando="Reabrindo…"><RotateCcw size={16} />Reabrir vencimento</BotaoEnviar>
               </form>
             )}
             <form action={excluirItem}>
               <input type="hidden" name="id" value={id} />
-              <BotaoConfirmar className="btn perigo" mensagem="Excluir este item definitivamente?">Excluir</BotaoConfirmar>
+              <Confirmar className="btn ghost" titulo="Excluir vencimento?"
+                texto="Essa ação não pode ser desfeita. O documento anexado e o evento da agenda também serão removidos."
+                destaque={`${item.titulo} • vence em ${fmtData(item.vencimento)}`} confirmar="Excluir vencimento">
+                <Trash2 size={16} />Excluir
+              </Confirmar>
             </form>
           </div>
         </div>
 
-        {ativo && (
+        {ativo ? (
           <form action={renovarItem} className="card">
-            <h2>Marcar como renovado</h2>
-            <p className="muted">Fecha este vencimento e cria o próximo, já com aviso na agenda.</p>
+            <h2>Renovar este vencimento</h2>
+            <p className="muted">Fecha o vencimento atual e cria o próximo, com os lembretes já programados.</p>
             <input type="hidden" name="id" value={id} />
-            <div className="linha">
-              <div className="campo">
-                <label htmlFor="novo_vencimento">Próximo vencimento *</label>
-                <input id="novo_vencimento" name="novo_vencimento" type="date" required defaultValue={sugestao} />
-                {sugestao && <span className="dica">Sugerido pela repetição ({rotuloRecorrencia(item.recorrencia_meses).toLowerCase()})</span>}
-              </div>
-              <div className="campo">
-                <label htmlFor="anexo_r">Novo documento (opcional)</label>
-                <input id="anexo_r" name="anexo" type="file" accept=".pdf,image/*,.doc,.docx,.xls,.xlsx" />
-              </div>
+            <div className="campo" style={{ marginTop: 16 }}>
+              <label htmlFor="novo_vencimento">Próximo vencimento</label>
+              <input id="novo_vencimento" name="novo_vencimento" type="date" required defaultValue={sugestao} />
+              <span className="dica">{sugestao ? `Sugerido pela repetição (${rotuloRecorrencia(item.recorrencia_meses).toLowerCase()}). Confira no documento novo.` : 'Informe a nova data que está no documento renovado.'}</span>
             </div>
-            <BotaoConfirmar className="btn sucesso cheio">Renovar e criar próximo vencimento</BotaoConfirmar>
+            <div className="campo">
+              <label>Documento renovado <span className="opcional">(opcional)</span></label>
+              <Upload name="anexo" />
+            </div>
+            <BotaoEnviar className="btn grande cheio" carregando="Renovando…">Renovar e criar próximo vencimento</BotaoEnviar>
           </form>
-        )}
-
-        {historico && historico.length > 0 && (
-          <div className="card">
-            <h2>Histórico deste item</h2>
-            <div className="tabela-wrap">
-              <table>
-                <thead><tr><th>Vencimento</th><th>Situação</th><th>Finalizado em</th></tr></thead>
-                <tbody>
-                  {historico.map((h) => (
-                    <tr key={h.id}>
-                      <td><Link href={`/itens/${h.id}`}>{fmtData(h.vencimento)}</Link></td>
-                      <td>{h.status === 'ativo' ? 'Ativo' : h.status === 'renovado' ? 'Renovado' : 'Concluído'}</td>
-                      <td>{h.finalizado_em ? fmtData(h.finalizado_em) : '—'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
+        ) : <div />}
       </div>
-    </>
+
+      {historico && historico.length > 0 && (
+        <div className="card" style={{ marginTop: 24 }}>
+          <h2>Histórico deste item</h2>
+          <div className="tabela-wrap">
+            <table>
+              <thead><tr><th>Vencimento</th><th>Situação</th><th>Finalizado em</th></tr></thead>
+              <tbody>
+                {historico.map((h) => (
+                  <tr key={h.id}>
+                    <td><Link href={`/itens/${h.id}`}>{fmtData(h.vencimento)}</Link></td>
+                    <td><Selo peq tom={h.status === 'ativo' ? 'info' : 'neutro'}>{h.status === 'ativo' ? 'Ativo' : h.status === 'renovado' ? 'Renovado' : 'Concluído'}</Selo></td>
+                    <td className="sec">{h.finalizado_em ? fmtData(h.finalizado_em) : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }

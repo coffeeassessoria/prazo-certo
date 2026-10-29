@@ -1,0 +1,380 @@
+/* FIX DARK CONTRAST AAA - WCAG 2.2 AA 4.5:1 minimum */
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand */
+  --pc-brand-50: #f0f7fc;
+  --pc-brand-100: #d8eaf5;
+  --pc-brand-300: #7bb0d0;
+  --pc-brand-500: #1e6a94;
+  --pc-brand-700: #155179;
+  --pc-brand-800: #123f5e;
+  --pc-brand-900: #0f324b;
+
+  /* Neutrals */
+  --pc-neutral-0: #ffffff;
+  --pc-neutral-50: #f6f8f9;
+  --pc-neutral-100: #f3f5f6;
+  --pc-neutral-200: #e6e9ee;
+  --pc-neutral-300: #dddfe4;
+  --pc-neutral-400: #b8bec9;
+  --pc-neutral-500: #6a7181;
+  --pc-neutral-700: #2e343f;
+  --pc-neutral-900: #16181d;
+
+  /* Status Vencido */
+  --pc-danger-bg: #fef3f2;
+  --pc-danger-border: #fecdca;
+  --pc-danger-text: #b42318;
+  --pc-danger-strong: #7a271a;
+  --pc-danger-icon: #d92d20;
+
+  /* Status Warning */
+  --pc-warning-bg: #fef3c7;
+  --pc-warning-border: #fde68a;
+  --pc-warning-text: #92400e;
+  --pc-warning-strong: #78350f;
+  --pc-warning-icon: #d97706;
+
+  /* Status Success */
+  --pc-success-bg: #dcfce7;
+  --pc-success-border: #bbf7d0;
+  --pc-success-text: #166534;
+  --pc-success-strong: #14532d;
+  --pc-success-icon: #15803d;
+
+  /* Aliases for status - light */
+  --pc-status-danger-bg: var(--pc-danger-bg);
+  --pc-status-danger-border: var(--pc-danger-border);
+  --pc-status-danger-text: var(--pc-danger-text);
+  --pc-status-danger-icon: var(--pc-danger-icon);
+  --pc-status-danger-text-strong: var(--pc-danger-strong);
+
+  --pc-status-warning-bg: var(--pc-warning-bg);
+  --pc-status-warning-border: var(--pc-warning-border);
+  --pc-status-warning-text: var(--pc-warning-text);
+  --pc-status-warning-icon: var(--pc-warning-icon);
+  --pc-status-warning-text-strong: var(--pc-warning-strong);
+
+  --pc-status-success-bg: var(--pc-success-bg);
+  --pc-status-success-border: var(--pc-success-border);
+  --pc-status-success-text: var(--pc-success-text);
+  --pc-status-success-icon: var(--pc-success-icon);
+  --pc-status-success-text-strong: var(--pc-success-strong);
+
+  /* Info */
+  --pc-info-bg: #f0f7fc;
+  --pc-info-border: #d8eaf5;
+  --pc-info-text: #123f5e;
+
+  /* Semantic */
+  --pc-bg: var(--pc-neutral-100);
+  --pc-surface: var(--pc-neutral-0);
+  --pc-surface-2: var(--pc-neutral-50);
+  --pc-border: var(--pc-neutral-300);
+  --pc-text: var(--pc-neutral-900);
+  --pc-text-secondary: var(--pc-neutral-500);
+  --pc-text-inverse: #ffffff;
+
+  /* Radius */
+  --pc-radius-xs: 6px;
+  --pc-radius-sm: 8px;
+  --pc-radius-md: 12px;
+  --pc-radius-lg: 16px;
+  --pc-radius-xl: 24px;
+  --pc-radius-pill: 999px;
+
+  /* Shadows */
+  --pc-shadow-sm: 0 1px 2px rgba(16,24,40,.06);
+  --pc-shadow-md: 0 4px 8px rgba(16,24,40,.08);
+  --pc-shadow-lg: 0 12px 24px rgba(16,24,40,.12);
+  --pc-shadow-focus: 0 0 0 3px rgba(21,81,121,.25);
+
+  /* Motion */
+  --pc-duration-fast: 150ms;
+  --pc-duration-base: 250ms;
+  --pc-duration-slow: 350ms;
+  --pc-ease-out: cubic-bezier(.16,1,.3,1);
+
+  --pc-content-max: 1280px;
+}
+
+[data-theme="dark"] {
+  /* Neutrals - dark spec */
+  --pc-neutral-0: #1a212b;
+  --pc-neutral-50: #1e2936;
+  --pc-neutral-100: #121821;
+  --pc-neutral-200: #2a3441;
+  --pc-neutral-300: #3a4554;
+  --pc-neutral-400: #7a8699;
+  --pc-neutral-500: #9aa5b5;
+  --pc-neutral-700: #d0d7e2;
+  --pc-neutral-900: #f0f3f6;
+
+  /* Brand dark - spec */
+  --pc-brand-50: #0f2a3a;
+  --pc-brand-100: #123a4f;
+  --pc-brand-300: #4a9ac4;
+  --pc-brand-500: #7bb0d0;
+  --pc-brand-700: #a8d0e6;
+  --pc-brand-800: #c3e0ee;
+  --pc-brand-900: #d8eaf5;
+
+  /* Semantic dark - charcoal #121821 */
+  --pc-bg: #121821;
+  --pc-surface: #1a212b;
+  --pc-surface-2: #1e2936;
+  --pc-border: #3a4554;
+  --pc-text: #f0f3f6;
+  --pc-text-secondary: #9aa5b5;
+  --pc-text-inverse: #0f141a;
+
+  /* Status DANGER dark - CRITICAL never light bg */
+  --pc-danger-bg: #2a1515;
+  --pc-danger-border: #5c2222;
+  --pc-danger-text: #fca5a5;
+  --pc-danger-strong: #fecaca;
+  --pc-danger-icon: #f87171;
+
+  --pc-status-danger-bg: #2a1515;
+  --pc-status-danger-border: #5c2222;
+  --pc-status-danger-text: #fca5a5;
+  --pc-status-danger-icon: #f87171;
+  --pc-status-danger-text-strong: #fecaca;
+
+  /* Status WARNING dark */
+  --pc-warning-bg: #2a2010;
+  --pc-warning-border: #5c4a1e;
+  --pc-warning-text: #fde68a;
+  --pc-warning-strong: #fef3c7;
+  --pc-warning-icon: #fbbf24;
+
+  --pc-status-warning-bg: #2a2010;
+  --pc-status-warning-border: #5c4a1e;
+  --pc-status-warning-text: #fde68a;
+  --pc-status-warning-icon: #fbbf24;
+  --pc-status-warning-text-strong: #fef3c7;
+
+  /* Status SUCCESS dark */
+  --pc-success-bg: #12261a;
+  --pc-success-border: #1e4a2e;
+  --pc-success-text: #86efac;
+  --pc-success-strong: #bbf7d0;
+  --pc-success-icon: #4ade80;
+
+  --pc-status-success-bg: #12261a;
+  --pc-status-success-border: #1e4a2e;
+  --pc-status-success-text: #86efac;
+  --pc-status-success-icon: #4ade80;
+  --pc-status-success-text-strong: #bbf7d0;
+
+  /* Info dark */
+  --pc-info-bg: #0f2a3a;
+  --pc-info-border: #123a4f;
+  --pc-info-text: #a8d0e6;
+
+  /* Shadows dark */
+  --pc-shadow-sm: 0 1px 2px rgba(0,0,0,.25);
+  --pc-shadow-md: 0 4px 12px rgba(0,0,0,.35);
+  --pc-shadow-lg: 0 12px 32px rgba(0,0,0,.5);
+  --pc-shadow-focus: 0 0 0 3px rgba(74,154,196,.4);
+}
+
+/* Global */
+* { font-family: "Work Sans", system-ui, -apple-system, sans-serif; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  background: var(--pc-bg);
+  color: var(--pc-text);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+.pc-focus:focus-visible {
+  outline: 2px solid var(--pc-brand-700);
+  outline-offset: 2px;
+  box-shadow: var(--pc-shadow-focus);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: var(--pc-neutral-300); border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* === FIX DARK CONTRAST - BUTTONS === */
+.btn-primary {
+  background: var(--pc-brand-700);
+  color: var(--pc-text-inverse);
+  border: 1px solid transparent;
+}
+[data-theme="dark"] .btn-primary {
+  background: var(--pc-brand-300);
+  color: #0f141a;
+  border-color: var(--pc-brand-300);
+}
+[data-theme="dark"] .btn-primary:hover {
+  background: var(--pc-brand-500);
+}
+
+.btn-secondary {
+  background: var(--pc-surface);
+  border: 1px solid var(--pc-border);
+  color: var(--pc-text);
+}
+[data-theme="dark"] .btn-secondary {
+  background: transparent;
+  border: 1px solid var(--pc-neutral-300);
+  color: var(--pc-neutral-900);
+}
+[data-theme="dark"] .btn-secondary:hover {
+  background: var(--pc-neutral-200);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--pc-text);
+}
+[data-theme="dark"] .btn-ghost {
+  color: var(--pc-neutral-900);
+}
+[data-theme="dark"] .btn-ghost:hover {
+  background: var(--pc-neutral-200);
+}
+
+.btn-danger {
+  background: #b42318;
+  color: #ffffff;
+}
+[data-theme="dark"] .btn-danger {
+  background: #ef4444;
+  color: #0f141a;
+  background: #7f1d1d;
+  color: #fecaca;
+  border: 1px solid #5c2222;
+}
+[data-theme="dark"] .btn-danger:hover {
+  background: #991b1b;
+}
+
+/* === FIX DARK CONTRAST - CHECKLIST === */
+.checklist-item {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-border);
+  color: var(--pc-text);
+}
+.checklist-item.is-checked {
+  background: var(--pc-success-bg);
+  border-color: var(--pc-success-border);
+  color: var(--pc-success-text);
+}
+[data-theme="dark"] .checklist-item {
+  background: var(--pc-neutral-50);
+  border-color: var(--pc-neutral-300);
+  color: var(--pc-neutral-900);
+}
+[data-theme="dark"] .checklist-item.is-checked {
+  background: var(--pc-status-success-bg);
+  border-color: var(--pc-status-success-border);
+  color: var(--pc-status-success-text);
+}
+[data-theme="dark"] .checklist-item.is-checked .checklist-label {
+  color: var(--pc-status-success-text) !important;
+}
+
+.checklist-checkbox {
+  background: var(--pc-surface);
+  border: 1px solid var(--pc-border);
+}
+.checklist-checkbox.is-checked {
+  background: #15803d;
+  border-color: #15803d;
+  color: #ffffff;
+}
+[data-theme="dark"] .checklist-checkbox.is-checked {
+  background: #15803d;
+  border-color: #15803d;
+  color: #ffffff;
+}
+
+/* === FIX DARK CONTRAST - CARDS & TOKENS === */
+.metric-card {
+  background: var(--pc-surface-2);
+  border: 1px solid var(--pc-border);
+}
+[data-theme="dark"] .metric-card {
+  background: #1a212b;
+  border-color: #2a3441;
+}
+[data-theme="dark"] .metric-card .metric-number {
+  color: #f0f3f6;
+}
+[data-theme="dark"] .metric-card .metric-label {
+  color: #9aa5b5;
+}
+
+.token-swatch-label {
+  background: var(--pc-surface);
+  color: var(--pc-text);
+}
+[data-theme="dark"] .token-swatch-label {
+  background: var(--pc-neutral-0);
+  color: var(--pc-neutral-900);
+  border-top: 1px solid var(--pc-neutral-300);
+}
+
+/* Ensure no white-on-light or light-on-light */
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-\[var\(--pc-surface\)\].text-white,
+[data-theme="dark"] .text-white.bg-\[var\(--pc-brand-700\)\] {
+  color: #0f141a;
+}
+
+/* Force primary buttons in dark to have dark text */
+[data-theme="dark"] button[class*="bg-[var(--pc-brand-700)]"][class*="text-white"],
+[data-theme="dark"] a[class*="bg-[var(--pc-brand-700)]"][class*="text-white"],
+[data-theme="dark"] .bg-\[var\(--pc-brand-700\)\].text-white {
+  color: #0f141a !important;
+  background: #4a9ac4 !important;
+  background: var(--pc-brand-300) !important;
+}
+
+/* Fix any remaining hardcoded white text on light bg in dark */
+[data-theme="dark"] .bg-\[var\(--pc-brand-50\)\].text-\[var\(--pc-brand-700\)\] {
+  background: #0f2a3a !important;
+  color: #a8d0e6 !important;
+  border-color: #123a4f !important;
+}
+
+/* Fix tag / status pills already using vars - ensure dark vars */
+[data-theme="dark"] [class*="bg-[var(--pc-danger-bg)]"] {
+  background: #2a1515 !important;
+  color: #fca5a5 !important;
+  border-color: #5c2222 !important;
+}
+[data-theme="dark"] [class*="bg-[var(--pc-warning-bg)]"] {
+  background: #2a2010 !important;
+  color: #fde68a !important;
+  border-color: #5c4a1e !important;
+}
+[data-theme="dark"] [class*="bg-[var(--pc-success-bg)]"] {
+  background: #12261a !important;
+  color: #86efac !important;
+  border-color: #1e4a2e !important;
+}
+
+/* Audit: Replace fixed dark text colors in dark */
+[data-theme="dark"] .text-\[var\(--pc-text\)\] {
+  color: #f0f3f6 !important;
+}
+[data-theme="dark"] .text-\[12px\].text-\[var\(--pc-text-secondary\)\] {
+  color: #9aa5b5 !important;
+}

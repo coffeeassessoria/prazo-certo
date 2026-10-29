@@ -2,7 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { AlertCircle, LogIn } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
+import { LogoMarca } from '@/components/ui/Logo'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -19,7 +21,7 @@ export default function LoginPage() {
     const { error } = await createClient().auth.signInWithPassword({ email: email.trim(), password: senha })
     setCarregando(false)
     if (error) {
-      setErro('E-mail ou senha incorretos.')
+      setErro('E-mail ou senha não conferem. Confira e tente de novo.')
       return
     }
     router.replace('/')
@@ -29,21 +31,25 @@ export default function LoginPage() {
   return (
     <div className="entrada">
       <div className="card">
-        <img src="/icon-192.png" alt="" />
-        <h1>{nome}</h1>
-        <p className="sub">Documentos, contratos e manutenções sempre no prazo</p>
-        {erro && <div className="aviso erro">{erro}</div>}
+        <div className="topo-entrada">
+          <LogoMarca grande />
+          <div>
+            <h1>{nome}</h1>
+            <p className="sub">Documentos, contratos e manutenções sempre no prazo</p>
+          </div>
+        </div>
+        {erro && <div className="aviso erro" role="alert"><AlertCircle size={18} aria-hidden /><div>{erro}</div></div>}
         <form onSubmit={entrar}>
           <div className="campo">
             <label htmlFor="email">E-mail</label>
-            <input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!erro} />
           </div>
           <div className="campo">
             <label htmlFor="senha">Senha</label>
-            <input id="senha" type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} />
+            <input id="senha" type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} aria-invalid={!!erro} />
           </div>
-          <button className="btn cheio" disabled={carregando}>
-            {carregando ? 'Entrando…' : 'Entrar'}
+          <button className="btn grande cheio" disabled={carregando} aria-busy={carregando}>
+            {carregando ? <><span className="spinner" aria-hidden />Entrando…</> : <><LogIn size={16} />Entrar</>}
           </button>
         </form>
       </div>

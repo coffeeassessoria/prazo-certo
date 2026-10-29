@@ -4,6 +4,8 @@ import { useState, useTransition } from 'react'
 import { CATALOGO, SEGMENTOS, modelosPadrao, type Modelo } from '@/lib/modelos'
 import { TIPOS, rotuloRecorrencia } from '@/lib/datas'
 import { concluirOnboarding, type DadosOnboarding } from './actions'
+import { Logo } from '@/components/ui/Logo'
+import { AlertCircle, ArrowLeft, ArrowRight, Check, Plus } from 'lucide-react'
 
 const ANTECEDENCIAS = [
   { dias: 7, rotulo: '7 dias antes', dica: 'Para itens simples, resolvidos rápido' },
@@ -65,8 +67,7 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
   return (
     <div className="quiz">
       <div className="quiz-topo">
-        <img src="/icon-192.png" alt="" />
-        <span className="quiz-marca">{process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo'}</span>
+        <Logo sub="Configuração inicial" />
         {passo > 0 && <span className="quiz-contador">Passo {passo} de {total}</span>}
       </div>
       {passo > 0 && (
@@ -89,10 +90,10 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
               São 7 perguntas rápidas, cerca de 2 minutos. Com elas o sistema já fica pronto para avisar você
               antes de cada documento, contrato ou manutenção vencer.
             </p>
-            <ul className="quiz-lista">
-              <li>Dados da sua empresa</li>
-              <li>O que você precisa controlar</li>
-              <li>Quando e para quem mandar os lembretes</li>
+            <ul className="checklist quiz-lista">
+              {['Dados da sua empresa', 'O que você precisa controlar', 'Quando e para quem mandar os lembretes'].map((t, i) => (
+                <li key={t} className="checklist-item"><span className="checklist-caixa">{i + 1}</span>{t}</li>
+              ))}
             </ul>
           </>
         )}
@@ -121,7 +122,7 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
             <div className="opcoes" role="radiogroup">
               {SEGMENTOS.map((s) => (
                 <button type="button" role="radio" aria-checked={d.segmento === s.valor} key={s.valor}
-                  className={`opcao ${d.segmento === s.valor ? 'marcada' : ''}`} onClick={() => escolherSegmento(s.valor)}>
+                  className="opcao" onClick={() => escolherSegmento(s.valor)}>
                   <strong>{s.rotulo}</strong><span>{s.descricao}</span>
                 </button>
               ))}
@@ -140,8 +141,8 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
               {sugestoes.map((m) => {
                 const marcado = d.modelos.some((y) => y.titulo === m.titulo)
                 return (
-                  <button type="button" key={m.titulo} aria-pressed={marcado} className={`chip ${marcado ? 'marcado' : ''}`} onClick={() => alternarModelo(m)}>
-                    <span className="chip-titulo">{m.titulo}</span>
+                  <button type="button" key={m.titulo} aria-pressed={marcado} className="chip" onClick={() => alternarModelo(m)}>
+                    <span className="chip-titulo">{marcado && <Check size={14} aria-hidden />}{m.titulo}</span>
                     <span className="chip-meta">{TIPOS[m.tipo]}, {rotuloRecorrencia(m.recorrencia_meses).toLowerCase()}</span>
                   </button>
                 )
@@ -151,7 +152,7 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
               <input aria-label="Outro item" value={novoItem} onChange={(e) => setNovoItem(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); adicionarModelo() } }}
                 placeholder="Falta algum? Escreva aqui" style={{ flex: 1, minWidth: 200 }} />
-              <button type="button" className="btn sec" onClick={adicionarModelo}>Adicionar</button>
+              <button type="button" className="btn sec" onClick={adicionarModelo}><Plus size={16} />Adicionar</button>
             </div>
           </>
         )}
@@ -166,7 +167,7 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
             <div className="opcoes" role="radiogroup">
               {ANTECEDENCIAS.map((a) => (
                 <button type="button" role="radio" aria-checked={d.antecedencia === a.dias} key={a.dias}
-                  className={`opcao ${d.antecedencia === a.dias ? 'marcada' : ''}`} onClick={() => set('antecedencia', a.dias)}>
+                  className="opcao" onClick={() => set('antecedencia', a.dias)}>
                   <strong>{a.rotulo}</strong><span>{a.dica}</span>
                 </button>
               ))}
@@ -219,23 +220,23 @@ export function Quiz({ inicial, primeiroNome, podeConcluir }: { inicial: DadosOn
               <dt>Clientes</dt><dd>{d.clientes.filter((c) => c.trim()).length || 'Nenhum'} {d.clientes.filter((c) => c.trim()).length === 1 ? 'cliente' : 'clientes'}</dd>
             </dl>
             <p className="quiz-sub">Ao concluir, você vai direto para o cadastro do seu primeiro vencimento.</p>
-            {!podeConcluir && <div className="aviso erro">Só o administrador da empresa pode concluir esta configuração.</div>}
+            {!podeConcluir && <div className="aviso atencao"><AlertCircle size={18} aria-hidden /><div>Só o administrador da empresa pode concluir esta configuração.</div></div>}
           </>
         )}
 
-        {erro && <div className="aviso erro" role="alert" style={{ marginTop: 16 }}>{erro}</div>}
+        {erro && <div className="aviso erro" role="alert" style={{ marginTop: 16 }}><AlertCircle size={18} aria-hidden /><div>{erro}</div></div>}
 
         <div className="quiz-rodape">
           {passo > 0 ? (
-            <button type="button" className="btn sec" onClick={() => { setErro(''); setPasso((p) => p - 1) }} disabled={salvando}>Voltar</button>
+            <button type="button" className="btn sec grande" onClick={() => { setErro(''); setPasso((p) => p - 1) }} disabled={salvando}><ArrowLeft size={16} />Voltar</button>
           ) : <span />}
-          {passo === 0 && <button className="btn" autoFocus>Começar</button>}
+          {passo === 0 && <button className="btn grande" autoFocus>Começar<ArrowRight size={16} /></button>}
           {passo > 0 && passo < total && (
-            <button className="btn">{(passo === 6 && !d.clientes.some((c) => c.trim())) ? 'Pular por enquanto' : 'Continuar'}</button>
+            <button className="btn grande">{(passo === 6 && !d.clientes.some((c) => c.trim())) ? 'Pular por enquanto' : 'Continuar'}<ArrowRight size={16} /></button>
           )}
           {passo === total && (
-            <button className="btn sucesso" disabled={salvando || !podeConcluir} aria-busy={salvando}>
-              {salvando ? 'Salvando…' : 'Concluir e cadastrar primeiro vencimento'}
+            <button className="btn grande" disabled={salvando || !podeConcluir} aria-busy={salvando}>
+              {salvando ? <><span className="spinner" aria-hidden />Salvando…</> : 'Concluir e cadastrar primeiro vencimento'}
             </button>
           )}
         </div>

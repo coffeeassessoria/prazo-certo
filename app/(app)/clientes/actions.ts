@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
+import { qsToast } from '@/lib/toast'
 
 const txt = (fd: FormData, k: string) => String(fd.get(k) ?? '').trim() || null
 
@@ -24,7 +25,7 @@ export async function salvarCliente(fd: FormData) {
   if (id) await supabase.from('clientes').update(campos).eq('id', id).eq('empresa_id', ctx.empresa.id)
   else await supabase.from('clientes').insert({ ...campos, empresa_id: ctx.empresa.id })
   revalidatePath('/clientes')
-  redirect('/clientes?ok=1')
+  redirect(`/clientes?${qsToast(id ? 'Cliente atualizado' : `${campos.nome} cadastrado`, id ? undefined : 'Agora você pode cadastrar os vencimentos dele.')}`)
 }
 
 export async function excluirCliente(fd: FormData) {
@@ -32,5 +33,5 @@ export async function excluirCliente(fd: FormData) {
   const supabase = await createClient()
   await supabase.from('clientes').delete().eq('id', String(fd.get('id'))).eq('empresa_id', ctx.empresa.id)
   revalidatePath('/clientes')
-  redirect('/clientes?ok=1')
+  redirect(`/clientes?${qsToast('Cliente excluído', 'Os vencimentos dele continuam, agora sem cliente.', 'info')}`)
 }

@@ -1,0 +1,205 @@
+/* =====================================================================
+   PRAZO CERTO — Design System 2.0 · TOKENS (fonte única de verdade)
+   Copiado do DS validado: docs/design-system/fonte-validada/index.css
+   NÃO edite valores aqui sem atualizar docs/design-system/README.md.
+   Tema escuro: [data-theme="dark"] no <html> (ver components/ui/TemaToggle).
+   ===================================================================== */
+:root {
+  /* Brand */
+  --pc-brand-50: #f0f7fc;
+  --pc-brand-100: #d8eaf5;
+  --pc-brand-300: #7bb0d0;
+  --pc-brand-500: #1e6a94;
+  --pc-brand-700: #155179;
+  --pc-brand-800: #123f5e;
+  --pc-brand-900: #0f324b;
+
+  /* Neutrals */
+  --pc-neutral-0: #ffffff;
+  --pc-neutral-50: #f6f8f9;
+  --pc-neutral-100: #f3f5f6;
+  --pc-neutral-200: #e6e9ee;
+  --pc-neutral-300: #dddfe4;
+  --pc-neutral-400: #b8bec9;
+  --pc-neutral-500: #6a7181;
+  --pc-neutral-700: #2e343f;
+  --pc-neutral-900: #16181d;
+
+  /* Status Vencido */
+  --pc-danger-bg: #fef3f2;
+  --pc-danger-border: #fecdca;
+  --pc-danger-text: #b42318;
+  --pc-danger-strong: #7a271a;
+  --pc-danger-icon: #d92d20;
+
+  /* Status Warning */
+  --pc-warning-bg: #fef3c7;
+  --pc-warning-border: #fde68a;
+  --pc-warning-text: #92400e;
+  --pc-warning-strong: #78350f;
+  --pc-warning-icon: #d97706;
+
+  /* Status Success */
+  --pc-success-bg: #dcfce7;
+  --pc-success-border: #bbf7d0;
+  --pc-success-text: #166534;
+  --pc-success-strong: #14532d;
+  --pc-success-icon: #15803d;
+
+  /* Aliases for status - light */
+  --pc-status-danger-bg: var(--pc-danger-bg);
+  --pc-status-danger-border: var(--pc-danger-border);
+  --pc-status-danger-text: var(--pc-danger-text);
+  --pc-status-danger-icon: var(--pc-danger-icon);
+  --pc-status-danger-text-strong: var(--pc-danger-strong);
+
+  --pc-status-warning-bg: var(--pc-warning-bg);
+  --pc-status-warning-border: var(--pc-warning-border);
+  --pc-status-warning-text: var(--pc-warning-text);
+  --pc-status-warning-icon: var(--pc-warning-icon);
+  --pc-status-warning-text-strong: var(--pc-warning-strong);
+
+  --pc-status-success-bg: var(--pc-success-bg);
+  --pc-status-success-border: var(--pc-success-border);
+  --pc-status-success-text: var(--pc-success-text);
+  --pc-status-success-icon: var(--pc-success-icon);
+  --pc-status-success-text-strong: var(--pc-success-strong);
+
+  /* Info */
+  --pc-info-bg: #f0f7fc;
+  --pc-info-border: #d8eaf5;
+  --pc-info-text: #123f5e;
+
+  /* Semantic */
+  --pc-bg: var(--pc-neutral-100);
+  --pc-surface: var(--pc-neutral-0);
+  --pc-surface-2: var(--pc-neutral-50);
+  --pc-border: var(--pc-neutral-300);
+  --pc-text: var(--pc-neutral-900);
+  --pc-text-secondary: var(--pc-neutral-500);
+  --pc-text-inverse: #ffffff;
+
+  /* Radius */
+  --pc-radius-xs: 6px;
+  --pc-radius-sm: 8px;
+  --pc-radius-md: 12px;
+  --pc-radius-lg: 16px;
+  --pc-radius-xl: 24px;
+  --pc-radius-pill: 999px;
+
+  /* Shadows */
+  --pc-shadow-sm: 0 1px 2px rgba(16,24,40,.06);
+  --pc-shadow-md: 0 4px 8px rgba(16,24,40,.08);
+  --pc-shadow-lg: 0 12px 24px rgba(16,24,40,.12);
+  --pc-shadow-focus: 0 0 0 3px rgba(21,81,121,.25);
+
+  /* Motion */
+  --pc-duration-fast: 150ms;
+  --pc-duration-base: 250ms;
+  --pc-duration-slow: 350ms;
+  --pc-ease-out: cubic-bezier(.16,1,.3,1);
+
+  --pc-content-max: 1280px;
+
+  /* Tipografia (Work Sans) — escala xs..3xl */
+  --pc-font: "Work Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --pc-text-xs: 12px;  --pc-lh-xs: 16px;
+  --pc-text-sm: 14px;  --pc-lh-sm: 20px;
+  --pc-text-base: 16px; --pc-lh-base: 24px;
+  --pc-text-md: 18px;  --pc-lh-md: 28px;
+  --pc-text-lg: 20px;  --pc-lh-lg: 28px;
+  --pc-text-xl: 24px;  --pc-lh-xl: 32px;
+  --pc-text-2xl: 30px; --pc-lh-2xl: 36px;
+  --pc-text-3xl: 36px; --pc-lh-3xl: 40px;
+
+  /* Espaçamento — base 4 */
+  --pc-space-1: 4px;  --pc-space-2: 8px;  --pc-space-3: 12px; --pc-space-4: 16px; --pc-space-5: 20px;
+  --pc-space-6: 24px; --pc-space-8: 32px; --pc-space-10: 40px; --pc-space-12: 48px; --pc-space-16: 64px;
+
+  /* Layout */
+  --pc-header-h: 64px;
+  --pc-sidebar-w: 280px;
+  --pc-tabs-h: 72px;
+  --pc-touch: 44px;
+}
+
+[data-theme="dark"] {
+  /* Neutrals - dark spec */
+  --pc-neutral-0: #1a212b;
+  --pc-neutral-50: #1e2936;
+  --pc-neutral-100: #121821;
+  --pc-neutral-200: #2a3441;
+  --pc-neutral-300: #3a4554;
+  --pc-neutral-400: #7a8699;
+  --pc-neutral-500: #9aa5b5;
+  --pc-neutral-700: #d0d7e2;
+  --pc-neutral-900: #f0f3f6;
+
+  /* Brand dark - spec */
+  --pc-brand-50: #0f2a3a;
+  --pc-brand-100: #123a4f;
+  --pc-brand-300: #4a9ac4;
+  --pc-brand-500: #7bb0d0;
+  --pc-brand-700: #a8d0e6;
+  --pc-brand-800: #c3e0ee;
+  --pc-brand-900: #d8eaf5;
+
+  /* Semantic dark - charcoal #121821 */
+  --pc-bg: #121821;
+  --pc-surface: #1a212b;
+  --pc-surface-2: #1e2936;
+  --pc-border: #3a4554;
+  --pc-text: #f0f3f6;
+  --pc-text-secondary: #9aa5b5;
+  --pc-text-inverse: #0f141a;
+
+  /* Status DANGER dark - CRITICAL never light bg */
+  --pc-danger-bg: #2a1515;
+  --pc-danger-border: #5c2222;
+  --pc-danger-text: #fca5a5;
+  --pc-danger-strong: #fecaca;
+  --pc-danger-icon: #f87171;
+
+  --pc-status-danger-bg: #2a1515;
+  --pc-status-danger-border: #5c2222;
+  --pc-status-danger-text: #fca5a5;
+  --pc-status-danger-icon: #f87171;
+  --pc-status-danger-text-strong: #fecaca;
+
+  /* Status WARNING dark */
+  --pc-warning-bg: #2a2010;
+  --pc-warning-border: #5c4a1e;
+  --pc-warning-text: #fde68a;
+  --pc-warning-strong: #fef3c7;
+  --pc-warning-icon: #fbbf24;
+
+  --pc-status-warning-bg: #2a2010;
+  --pc-status-warning-border: #5c4a1e;
+  --pc-status-warning-text: #fde68a;
+  --pc-status-warning-icon: #fbbf24;
+  --pc-status-warning-text-strong: #fef3c7;
+
+  /* Status SUCCESS dark */
+  --pc-success-bg: #12261a;
+  --pc-success-border: #1e4a2e;
+  --pc-success-text: #86efac;
+  --pc-success-strong: #bbf7d0;
+  --pc-success-icon: #4ade80;
+
+  --pc-status-success-bg: #12261a;
+  --pc-status-success-border: #1e4a2e;
+  --pc-status-success-text: #86efac;
+  --pc-status-success-icon: #4ade80;
+  --pc-status-success-text-strong: #bbf7d0;
+
+  /* Info dark */
+  --pc-info-bg: #0f2a3a;
+  --pc-info-border: #123a4f;
+  --pc-info-text: #a8d0e6;
+
+  /* Shadows dark */
+  --pc-shadow-sm: 0 1px 2px rgba(0,0,0,.25);
+  --pc-shadow-md: 0 4px 12px rgba(0,0,0,.35);
+  --pc-shadow-lg: 0 12px 32px rgba(0,0,0,.5);
+  --pc-shadow-focus: 0 0 0 3px rgba(74,154,196,.4);
+}

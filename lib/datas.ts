@@ -85,3 +85,12 @@ export function rotuloRecorrencia(meses: number | null): string {
   if (!meses) return 'Não repete'
   return RECORRENCIAS.find((r) => r.valor === String(meses))?.rotulo ?? `A cada ${meses} meses`
 }
+
+const MESES_LONGOS = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro']
+export const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez']
+
+/** "29 de outubro de 2026" */
+export function fmtDataExtenso(iso: string): string {
+  const [a, m, d] = iso.slice(0, 10).split('-').map(Number)
+  return `${d} de ${MESES_LONGOS[m - 1]} de ${a}`
+}
