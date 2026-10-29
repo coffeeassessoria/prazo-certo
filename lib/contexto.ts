@@ -29,6 +29,7 @@ export type Contexto = {
   nome: string
   papel: 'admin' | 'membro'
   superadmin: boolean
+  trocarSenha: boolean
   empresa: Empresa | null
 }
 
@@ -41,7 +42,7 @@ export async function getContexto(): Promise<Contexto> {
 
   const { data: perfil } = await supabase
     .from('perfis')
-    .select('nome, papel, is_superadmin, empresa_id')
+    .select('nome, papel, is_superadmin, empresa_id, trocar_senha')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -61,6 +62,7 @@ export async function getContexto(): Promise<Contexto> {
     nome: perfil?.nome || user.email || '',
     papel: (perfil?.papel as 'admin' | 'membro') ?? 'membro',
     superadmin: !!perfil?.is_superadmin,
+    trocarSenha: !!perfil?.trocar_senha,
     empresa,
   }
 }
@@ -71,6 +73,7 @@ export async function getContexto(): Promise<Contexto> {
  */
 export async function exigirEmpresa(opts: { noOnboarding?: boolean } = {}): Promise<Contexto & { empresa: Empresa }> {
   const ctx = await getContexto()
+  if (ctx.trocarSenha) redirect('/trocar-senha')
   if (!ctx.empresa) redirect(ctx.superadmin ? '/admin' : '/sem-acesso')
   if (!ctx.empresa.ativo) redirect('/sem-acesso?motivo=bloqueado')
   if (!opts.noOnboarding && !ctx.empresa.onboarding_concluido) redirect('/bem-vindo')

@@ -9,9 +9,11 @@ export function gerarSenha(): string {
   return Array.from({ length: 10 }, () => chars[randomInt(chars.length)]).join('')
 }
 
-export async function criarUsuario(p: { email: string; nome: string; empresaId: string; papel: 'admin' | 'membro' }) {
+/** Cria o login com senha provisória. No primeiro acesso a pessoa é obrigada a trocar (perfis.trocar_senha). */
+export async function criarUsuario(p: { email: string; nome: string; empresaId: string; papel: 'admin' | 'membro'; senha?: string }) {
   const admin = createAdminClient()
-  const senha = gerarSenha()
+  const senha = p.senha?.trim() || gerarSenha()
+  if (senha.length < 8) throw new Error('A senha provisória precisa ter pelo menos 8 caracteres.')
   const { data, error } = await admin.auth.admin.createUser({
     email: p.email.toLowerCase(),
     password: senha,
@@ -28,6 +30,7 @@ export async function criarUsuario(p: { email: string; nome: string; empresaId: 
     nome: p.nome,
     email: p.email.toLowerCase(),
     papel: p.papel,
+    trocar_senha: true,
   })
   if (e2) {
     await admin.auth.admin.deleteUser(data.user.id)
@@ -38,7 +41,9 @@ export async function criarUsuario(p: { email: string; nome: string; empresaId: 
 
 export async function redefinirSenha(userId: string) {
   const senha = gerarSenha()
-  const { error } = await createAdminClient().auth.admin.updateUserById(userId, { password: senha })
+  const admin = createAdminClient()
+  const { error } = await admin.auth.admin.updateUserById(userId, { password: senha })
   if (error) throw new Error(error.message)
+  await admin.from('perfis').update({ trocar_senha: true }).eq('user_id', userId)
   return senha
 }

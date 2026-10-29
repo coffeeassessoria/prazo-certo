@@ -168,3 +168,6 @@ alter table public.lembretes_enviados enable row level security;
 drop policy if exists lembretes_select on public.lembretes_enviados;
 create policy lembretes_select on public.lembretes_enviados
   for select to authenticated using (empresa_id = (select privado.minha_empresa()));
+
+-- Migração 3: obriga troca da senha provisória no primeiro acesso
+alter table public.perfis add column if not exists trocar_senha boolean not null default false;

@@ -1,6 +1,8 @@
 import { exigirEmpresa } from '@/lib/contexto'
 import { redirect } from 'next/navigation'
 import { Quiz } from './Quiz'
+import { Suspense } from 'react'
+import { ToastDaUrl } from '@/components/ui/Toast'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +12,8 @@ export default async function BemVindo({ searchParams }: { searchParams: Promise
   if (ctx.empresa.onboarding_concluido && !refazer) redirect('/')
   const e = ctx.empresa
   return (
+    <>
+    <Suspense><ToastDaUrl /></Suspense>
     <Quiz
       inicial={{
         nome: e.nome,
@@ -26,5 +30,6 @@ export default async function BemVindo({ searchParams }: { searchParams: Promise
       primeiroNome={(ctx.nome || '').split(/[\s@]/)[0]}
       podeConcluir={ctx.papel === 'admin' || ctx.superadmin}
     />
+    </>
   )
 }

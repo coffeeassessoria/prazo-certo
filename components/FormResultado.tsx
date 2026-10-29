@@ -20,7 +20,7 @@ export function FormResultado({
   const [copiado, setCopiado] = useState(false)
   const app = process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo'
   const textoAcesso = res?.senha
-    ? `Acesso ao ${app}\nEndereço: ${typeof window !== 'undefined' ? window.location.origin : ''}\nE-mail: ${res.email}\nSenha: ${res.senha}`
+    ? `Seu acesso ao ${app}\n\nEndereço: ${typeof window !== 'undefined' ? window.location.origin : ''}\nE-mail: ${res.email}\nSenha provisória: ${res.senha}\n\nNo primeiro acesso você cria a sua senha e cadastra sua empresa em 2 minutos.`
     : ''
   return (
     <form action={formAction} className={className} aria-busy={pending}>

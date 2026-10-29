@@ -13,10 +13,13 @@ export async function criarEmpresa(_prev: Resultado, fd: FormData): Promise<Resu
   try {
     await exigirSuperadmin()
     const admin = createAdminClient()
-    const nome = txt(fd, 'empresa')
     const responsavel = txt(fd, 'responsavel')
     const email = txt(fd, 'email')
-    if (!nome || !responsavel || !email) return { ok: false, msg: 'Preencha empresa, responsável e e-mail.' }
+    const senhaProvisoria = txt(fd, 'senha')
+    // O nome da empresa é opcional aqui: o cliente confirma no quiz do primeiro acesso
+    const nome = txt(fd, 'empresa') || `Empresa de ${responsavel.split(' ')[0]}`
+    if (!responsavel || !email) return { ok: false, msg: 'Informe o nome e o e-mail do cliente.' }
+    if (senhaProvisoria && senhaProvisoria.length < 8) return { ok: false, msg: 'A senha provisória precisa ter pelo menos 8 caracteres.' }
     const whats = normalizarTelefone(txt(fd, 'whatsapp'))
     const valor = txt(fd, 'valor').replace(',', '.')
 
@@ -32,9 +35,9 @@ export async function criarEmpresa(_prev: Resultado, fd: FormData): Promise<Resu
     if (error) return { ok: false, msg: error.message }
 
     try {
-      const senha = await criarUsuario({ email, nome: responsavel, empresaId: emp.id, papel: 'admin' })
+      const senha = await criarUsuario({ email, nome: responsavel, empresaId: emp.id, papel: 'admin', senha: senhaProvisoria })
       revalidatePath('/admin')
-      return { ok: true, msg: `Empresa "${nome}" criada com o acesso de ${responsavel}.`, senha, email }
+      return { ok: true, msg: `Acesso de ${responsavel} criado. No primeiro login ele troca a senha e configura a empresa.`, senha, email }
     } catch (e: any) {
       await admin.from('empresas').delete().eq('id', emp.id)
       return { ok: false, msg: e.message }

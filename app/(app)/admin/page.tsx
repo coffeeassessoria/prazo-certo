@@ -8,6 +8,7 @@ import { Metrica } from '@/components/ui/Metrica'
 import { Selo } from '@/components/ui/Selo'
 import { Confirmar } from '@/components/ui/Confirmar'
 import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
+import { gerarSenha } from '@/lib/usuarios'
 import { acessarEmpresa, adicionarUsuarioEmpresa, alternarAtivo, criarEmpresa, resetarSenha } from './actions'
 
 export const dynamic = 'force-dynamic'
@@ -59,15 +60,46 @@ export default async function Admin() {
         <Metrica valor={brl(mrr)} rotulo="Receita mensal" apoio="soma das empresas ativas" />
       </div>
 
+      <FormResultado acao={criarEmpresa}>
+        <div className="card-topo">
+          <h2><UserPlus size={18} aria-hidden />Novo cliente do sistema</h2>
+          <span className="dica">sem pagamento: você cria o acesso e envia</span>
+        </div>
+        <ol className="checklist duas" style={{ marginBottom: 20 }}>
+          {['Você cria o acesso com e-mail e senha provisória', 'Envia o acesso pelo WhatsApp (botão aparece ao criar)', 'No 1º login ele troca a senha', 'Em seguida cai no cadastro da empresa (quiz)'].map((t, i) => (
+            <li key={t} className="checklist-item"><span className="checklist-caixa">{i + 1}</span>{t}</li>
+          ))}
+        </ol>
+        <div className="linha">
+          <div className="campo"><label htmlFor="a-resp">Nome do cliente</label><input id="a-resp" name="responsavel" required placeholder="Ex.: João da Silva" /></div>
+          <div className="campo"><label htmlFor="a-email">E-mail de acesso</label><input id="a-email" name="email" type="email" required placeholder="joao@empresa.com.br" /></div>
+        </div>
+        <div className="linha">
+          <div className="campo">
+            <label htmlFor="a-senha">Senha provisória</label>
+            <input id="a-senha" name="senha" defaultValue={gerarSenha()} minLength={8} required autoComplete="off" spellCheck={false} />
+            <span className="dica">Já sugerimos uma. Pode trocar. Ele vai criar a própria no primeiro acesso.</span>
+          </div>
+          <div className="campo"><label htmlFor="a-emp">Nome da empresa <span className="opcional">(opcional)</span></label><input id="a-emp" name="empresa" placeholder="Ele confirma no cadastro" /></div>
+        </div>
+        <details style={{ marginBottom: 12 }}>
+          <summary>Mais dados (opcional)</summary>
+          <div className="linha" style={{ marginTop: 8 }}>
+            <div className="campo"><label htmlFor="a-valor">Mensalidade em R$</label><input id="a-valor" name="valor" inputMode="decimal" placeholder="97,00" /></div>
+            <div className="campo"><label htmlFor="a-whats">WhatsApp do cliente</label><input id="a-whats" name="whatsapp" inputMode="tel" placeholder="(66) 99999-9999" /></div>
+          </div>
+          <div className="campo"><label htmlFor="a-cnpj">CNPJ</label><input id="a-cnpj" name="documento" inputMode="numeric" /></div>
+        </details>
+        <button className="btn grande"><UserPlus size={16} />Criar acesso do cliente</button>
+      </FormResultado>
+
       <div className="card">
         <div className="card-topo"><h2><Building2 size={18} aria-hidden />Empresas</h2></div>
         {semEmpresas ? (
           <ol className="checklist">
             {[
-              'Preencha "Nova empresa" abaixo com o nome e o e-mail do responsável.',
-              'Envie o acesso gerado pelo WhatsApp (o botão aparece depois de criar).',
-              'No primeiro login, o responsável responde o quiz de configuração.',
-              'Para configurar por ele, clique em "Visualizar" na empresa criada.',
+              'Nenhuma empresa ainda. Crie o primeiro acesso no formulário acima.',
+              'Para configurar por um cliente, clique em "Visualizar" na empresa dele.',
             ].map((t, i) => <li key={i} className="checklist-item"><span className="checklist-caixa">{i + 1}</span>{t}</li>)}
           </ol>
         ) : (
@@ -129,25 +161,10 @@ export default async function Admin() {
         )}
       </div>
 
-      <div className="grade-2" style={{ marginTop: 24 }}>
-        <FormResultado acao={criarEmpresa}>
-          <div className="card-topo"><h2><Building2 size={18} aria-hidden />Nova empresa</h2></div>
-          <p className="muted" style={{ marginBottom: 16 }}>Crie o acesso do responsável. No primeiro login ele responde um quiz rápido que configura empresa, lembretes e clientes.</p>
-          <div className="campo"><label htmlFor="a-emp">Nome da empresa</label><input id="a-emp" name="empresa" required placeholder="Ex.: ClimaTech Sul" /></div>
-          <div className="linha">
-            <div className="campo"><label htmlFor="a-resp">Responsável</label><input id="a-resp" name="responsavel" required /></div>
-            <div className="campo"><label htmlFor="a-email">E-mail de acesso</label><input id="a-email" name="email" type="email" required /></div>
-          </div>
-          <div className="linha">
-            <div className="campo"><label htmlFor="a-cnpj">CNPJ <span className="opcional">(opcional)</span></label><input id="a-cnpj" name="documento" inputMode="numeric" /></div>
-            <div className="campo"><label htmlFor="a-valor">Mensalidade em R$ <span className="opcional">(opcional)</span></label><input id="a-valor" name="valor" inputMode="decimal" placeholder="97,00" /></div>
-          </div>
-          <div className="campo"><label htmlFor="a-whats">WhatsApp autorizado <span className="opcional">(opcional)</span></label><input id="a-whats" name="whatsapp" inputMode="tel" placeholder="(66) 99999-9999" /></div>
-          <button className="btn">Criar empresa e acesso</button>
-        </FormResultado>
+      <div style={{ marginTop: 24, maxWidth: 640 }}>
 
         <FormResultado acao={adicionarUsuarioEmpresa}>
-          <div className="card-topo"><h2><UserPlus size={18} aria-hidden />Usuário em empresa existente</h2></div>
+          <div className="card-topo"><h2><UserPlus size={18} aria-hidden />Mais um usuário numa empresa existente</h2></div>
           <div className="campo">
             <label htmlFor="a-e">Empresa</label>
             <select id="a-e" name="empresa_id" required disabled={semEmpresas}>
