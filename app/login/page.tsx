@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertCircle, LogIn } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -13,6 +14,12 @@ export default function LoginPage() {
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
   const nome = process.env.NEXT_PUBLIC_APP_NOME || 'Prazo Certo'
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('link') === 'expirado') {
+      setErro('Esse link de redefinição expirou ou já foi usado. Peça um novo em "Esqueci minha senha".')
+    }
+  }, [])
 
   async function entrar(e: React.FormEvent) {
     e.preventDefault()
@@ -45,7 +52,10 @@ export default function LoginPage() {
             <input id="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={!!erro} />
           </div>
           <div className="campo">
-            <label htmlFor="senha">Senha</label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 }}>
+              <label htmlFor="senha">Senha</label>
+              <Link href="/esqueci-senha" style={{ fontSize: 13, fontWeight: 500 }}>Esqueci minha senha</Link>
+            </div>
             <input id="senha" type="password" autoComplete="current-password" required value={senha} onChange={(e) => setSenha(e.target.value)} aria-invalid={!!erro} />
           </div>
           <button className="btn grande cheio" disabled={carregando} aria-busy={carregando}>

@@ -23,5 +23,6 @@ export async function definirSenha(_prev: { erro?: string } | null, fd: FormData
   await createAdminClient().from('perfis').update({ trocar_senha: false }).eq('user_id', ctx.userId)
   revalidatePath('/', 'layout')
   // Próximo passo: o quiz de cadastro da empresa (se já foi feito, /bem-vindo manda para o painel)
-  redirect(ctx.empresa ? `/bem-vindo?${qsToast('Senha definida', 'Agora vamos configurar sua empresa.')}` : '/')
+  if (ctx.empresa && !ctx.empresa.onboarding_concluido) redirect(`/bem-vindo?${qsToast('Senha definida', 'Agora vamos configurar sua empresa.')}`)
+  redirect(`/?${qsToast('Senha alterada', 'Use a nova senha nos próximos acessos.')}`)
 }
