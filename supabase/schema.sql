@@ -70,6 +70,8 @@ create table if not exists public.itens (
 );
 create index if not exists itens_empresa_venc_idx on public.itens(empresa_id, status, vencimento);
 create index if not exists itens_cliente_idx on public.itens(cliente_id);
+create index if not exists itens_anterior_idx on public.itens(item_anterior_id);
+create index if not exists itens_created_by_idx on public.itens(created_by);
 
 -- ---------- Conexão Google Calendar (1 agenda por empresa) ----------
 -- Guarda o refresh token: NUNCA exposta ao navegador (sem policies = só service role).
@@ -81,6 +83,7 @@ create table if not exists public.google_conexoes (
   conectado_por uuid references auth.users(id) on delete set null,
   updated_at    timestamptz not null default now()
 );
+create index if not exists google_conexoes_por_idx on public.google_conexoes(conectado_por);
 
 -- ---------- Funções auxiliares ----------
 -- Fica num schema privado (fora da API pública); usada pelas policies.
@@ -111,20 +114,20 @@ alter table public.google_conexoes enable row level security;
 
 drop policy if exists empresas_select on public.empresas;
 create policy empresas_select on public.empresas
-  for select using (id = (select privado.minha_empresa()));
+  for select to authenticated using (id = (select privado.minha_empresa()));
 
 drop policy if exists perfis_select on public.perfis;
 create policy perfis_select on public.perfis
-  for select using (user_id = auth.uid() or empresa_id = (select privado.minha_empresa()));
+  for select to authenticated using (user_id = (select auth.uid()) or empresa_id = (select privado.minha_empresa()));
 
 drop policy if exists clientes_all on public.clientes;
 create policy clientes_all on public.clientes
-  for all using (empresa_id = (select privado.minha_empresa()))
+  for all to authenticated using (empresa_id = (select privado.minha_empresa()))
   with check (empresa_id = (select privado.minha_empresa()));
 
 drop policy if exists itens_all on public.itens;
 create policy itens_all on public.itens
-  for all using (empresa_id = (select privado.minha_empresa()))
+  for all to authenticated using (empresa_id = (select privado.minha_empresa()))
   with check (empresa_id = (select privado.minha_empresa()));
 
 -- (google_conexoes: sem policies de propósito)
