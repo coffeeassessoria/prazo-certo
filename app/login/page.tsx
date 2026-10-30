@@ -62,7 +62,7 @@ export default function LoginPage() {
             {carregando ? <><span className="spinner" aria-hidden />Entrando…</> : <><LogIn size={16} />Entrar</>}
           </button>
         </form>
-        <p className="dica" style={{ textAlign: 'center', marginTop: 16 }}><Link href="/privacidade">Política de privacidade</Link></p>
+        <p className="dica" style={{ textAlign: 'center', marginTop: 16 }}><Link href="/privacidade">Política de privacidade</Link> · <Link href="/termos">Termos de uso</Link></p>
       </div>
     </div>
   )
