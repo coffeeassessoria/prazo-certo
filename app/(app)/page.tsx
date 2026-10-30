@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { Calendar, CalendarClock, Plus, Search } from 'lucide-react'
+import { BellRing, Calendar, CalendarClock, Plus, Search } from 'lucide-react'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
-import { fmtDataExtenso, hojeISO, situacao, TIPOS } from '@/lib/datas'
+import { ACOMPANHAMENTO, fmtDataExtenso, hojeISO, situacao, TIPOS } from '@/lib/datas'
 import { ItemLinha, type ItemLista } from '@/components/ItemLinha'
 import { Cabecalho } from '@/components/ui/Cabecalho'
 import { Metrica } from '@/components/ui/Metrica'
@@ -29,10 +29,13 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
     .limit(historico ? 200 : 1000)
   if (sp.cliente) q = q.eq('cliente_id', sp.cliente)
   if (sp.tipo) q = q.eq('tipo', sp.tipo)
+  else if (!historico) q = q.neq('tipo', ACOMPANHAMENTO)
 
-  const [{ data }, { data: clientes }] = await Promise.all([
+  const [{ data }, { data: clientes }, { count: retornos }] = await Promise.all([
     q,
     supabase.from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome'),
+    supabase.from('itens').select('id', { count: 'exact', head: true })
+      .eq('empresa_id', ctx.empresa.id).eq('tipo', ACOMPANHAMENTO).eq('status', 'ativo').lte('vencimento', hoje),
   ])
 
   let itens: ItemLista[] = (data ?? []).map((i: any) => ({
@@ -104,6 +107,13 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
         </div>
       )}
 
+      {!historico && !!retornos && (
+        <Link href="/acompanhamentos" className="aviso aviso-link" style={{ marginBottom: 24 }}>
+          <BellRing size={18} aria-hidden />
+          <div><b>{retornos === 1 ? '1 retorno para fazer hoje' : `${retornos} retornos para fazer hoje`}</b>Abra os acompanhamentos para resolver ou adiar.</div>
+        </Link>
+      )}
+
       {!historico && (
         <div className="metricas">
           <Metrica href={link('vencido')} ativo={filtro === 'vencido'} tom="vencido" valor={cont.vencido} rotulo="Vencidos"
@@ -127,6 +137,7 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
         <select name="tipo" aria-label="Tipo" defaultValue={sp.tipo ?? ''}>
           <option value="">Todos os tipos</option>
           {Object.entries(TIPOS).map(([v, r]) => <option key={v} value={v}>{r}</option>)}
+          {historico && <option value={ACOMPANHAMENTO}>Acompanhamento</option>}
         </select>
         <button className="btn sec"><Search size={16} />Buscar vencimentos</button>
       </form>

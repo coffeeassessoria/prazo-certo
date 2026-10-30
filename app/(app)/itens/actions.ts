@@ -6,7 +6,7 @@ import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
 import { finalizarEvento, removerEvento, semFalhar, sincronizarEvento } from '@/lib/google'
 import { qsToast } from '@/lib/toast'
-import { fmtData } from '@/lib/datas'
+import { ACOMPANHAMENTO, fmtData, fmtDiaSemana, hojeISO, somarDias } from '@/lib/datas'
 
 type Supa = Awaited<ReturnType<typeof createClient>>
 
@@ -164,13 +164,15 @@ export async function reabrirItem(fd: FormData) {
   const ctx = await exigirEmpresa()
   const supabase = await createClient()
   const id = txt(fd, 'id')
+  const { data: atual } = await supabase.from('itens').select('tipo').eq('id', id).eq('empresa_id', ctx.empresa.id).single()
   await supabase
     .from('itens')
     .update({ status: 'ativo', finalizado_em: null })
     .eq('id', id).eq('empresa_id', ctx.empresa.id)
   await sincronizar(supabase, ctx.empresa.id, id)
   revalidatePath('/')
-  redirect(`/itens/${id}?${qsToast('Vencimento reaberto', 'Os lembretes voltaram a ficar ativos.')}`)
+  const acomp = atual?.tipo === ACOMPANHAMENTO
+  redirect(`/itens/${id}?${qsToast(acomp ? 'Acompanhamento reaberto' : 'Vencimento reaberto', 'Os lembretes voltaram a ficar ativos.')}`)
 }
 
 export async function excluirItem(fd: FormData) {
@@ -178,10 +180,93 @@ export async function excluirItem(fd: FormData) {
   const supabase = await createClient()
   const id = txt(fd, 'id')
   const { data: atual } = await supabase
-    .from('itens').select('titulo, google_event_id, anexo_path').eq('id', id).eq('empresa_id', ctx.empresa.id).single()
+    .from('itens').select('titulo, tipo, google_event_id, anexo_path').eq('id', id).eq('empresa_id', ctx.empresa.id).single()
   if (atual?.google_event_id) await semFalhar(() => removerEvento(ctx.empresa.id, atual.google_event_id))
   if (atual?.anexo_path) await supabase.storage.from('anexos').remove([atual.anexo_path])
   await supabase.from('itens').delete().eq('id', id).eq('empresa_id', ctx.empresa.id)
   revalidatePath('/')
-  redirect(`/?${qsToast(`${atual?.titulo ?? 'Vencimento'} excluído`, undefined, 'info')}`)
+  const destino = atual?.tipo === ACOMPANHAMENTO ? '/acompanhamentos' : '/'
+  redirect(`${destino}?${qsToast(`${atual?.titulo ?? 'Item'} excluído`, undefined, 'info')}`)
+}
+
+/* ---------- Acompanhamentos (retornos e cobranças) ---------- */
+
+const dataValida = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v)
+
+export async function salvarAcompanhamento(fd: FormData) {
+  const ctx = await exigirEmpresa()
+  const supabase = await createClient()
+  const empresaId = ctx.empresa.id
+  const id = txt(fd, 'id')
+  const titulo = txt(fd, 'titulo')
+  const quando = txt(fd, 'vencimento')
+  if (!titulo || !dataValida(quando)) throw new Error('Informe o que fazer e quando lembrar.')
+
+  const campos = {
+    titulo,
+    tipo: ACOMPANHAMENTO,
+    descricao: txt(fd, 'descricao') || null,
+    vencimento: quando,
+    recorrencia_meses: null,
+    antecedencia_dias: 0,
+    cliente_id: await resolverCliente(supabase, empresaId, fd),
+  }
+
+  let itemId = id
+  if (id) {
+    const { error } = await supabase.from('itens').update(campos).eq('id', id).eq('empresa_id', empresaId)
+    if (error) throw new Error(error.message)
+  } else {
+    const { data, error } = await supabase
+      .from('itens').insert({ ...campos, empresa_id: empresaId, created_by: ctx.userId }).select('id').single()
+    if (error) throw new Error(error.message)
+    itemId = data.id
+  }
+  await sincronizar(supabase, empresaId, itemId)
+  revalidatePath('/')
+  revalidatePath('/acompanhamentos')
+  redirect(id
+    ? `/itens/${itemId}?${qsToast('Alterações salvas', `Lembrete em ${fmtDiaSemana(quando)}.`)}`
+    : `/acompanhamentos?${qsToast('Acompanhamento salvo', `Você recebe o lembrete ${quando === hojeISO() ? 'hoje' : `em ${fmtDiaSemana(quando)}`}, no e-mail das 7h.`)}`)
+}
+
+export async function adiarAcompanhamento(fd: FormData) {
+  const ctx = await exigirEmpresa()
+  const supabase = await createClient()
+  const empresaId = ctx.empresa.id
+  const id = txt(fd, 'id')
+  const dias = Number(txt(fd, 'dias'))
+  const data = txt(fd, 'data')
+  const nova = dataValida(data) ? data : dias > 0 ? somarDias(hojeISO(), dias) : ''
+  if (!nova) throw new Error('Escolha para quando adiar.')
+
+  const { data: atual } = await supabase
+    .from('itens').select('titulo, adiamentos').eq('id', id).eq('empresa_id', empresaId).single()
+  if (!atual) throw new Error('Acompanhamento não encontrado')
+  await supabase
+    .from('itens')
+    .update({ vencimento: nova, status: 'ativo', finalizado_em: null, adiamentos: (atual.adiamentos ?? 0) + 1 })
+    .eq('id', id).eq('empresa_id', empresaId)
+  await sincronizar(supabase, empresaId, id)
+  revalidatePath('/')
+  revalidatePath('/acompanhamentos')
+  redirect(`/acompanhamentos?${qsToast(`${atual.titulo} adiado`, `Novo lembrete em ${fmtDiaSemana(nova)}.`)}`)
+}
+
+export async function resolverAcompanhamento(fd: FormData) {
+  const ctx = await exigirEmpresa()
+  const supabase = await createClient()
+  const id = txt(fd, 'id')
+  const { data: atual } = await supabase
+    .from('itens').select('titulo, google_event_id').eq('id', id).eq('empresa_id', ctx.empresa.id).single()
+  await supabase
+    .from('itens')
+    .update({ status: 'concluido', finalizado_em: new Date().toISOString() })
+    .eq('id', id).eq('empresa_id', ctx.empresa.id)
+  if (atual?.google_event_id) {
+    await semFalhar(() => finalizarEvento(ctx.empresa.id, atual.google_event_id, 'Resolvido', atual.titulo))
+  }
+  revalidatePath('/')
+  revalidatePath('/acompanhamentos')
+  redirect(`/acompanhamentos?${qsToast(`${atual?.titulo ?? 'Acompanhamento'} resolvido`, 'Ele saiu da lista e não terá mais lembretes.')}`)
 }

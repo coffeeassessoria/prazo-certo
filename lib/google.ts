@@ -90,11 +90,12 @@ export type ItemAgenda = {
   id: string
 }
 
-const EMOJI: Record<string, string> = { documento: '📄', manutencao: '🔧', contrato: '📝', outro: '📌' }
+const EMOJI: Record<string, string> = { documento: '📄', manutencao: '🔧', contrato: '📝', outro: '📌', acompanhamento: '🔔' }
 const MAX_MIN = 40320 // limite do Google: 4 semanas
 
 function montarEvento(item: ItemAgenda) {
-  const titulo = `${EMOJI[item.tipo] ?? '📌'} Vence: ${item.titulo}${item.cliente_nome ? ' — ' + item.cliente_nome : ''}`
+  const prefixo = item.tipo === 'acompanhamento' ? 'Retorno' : 'Vence'
+  const titulo = `${EMOJI[item.tipo] ?? '📌'} ${prefixo}: ${item.titulo}${item.cliente_nome ? ' — ' + item.cliente_nome : ''}`
   const minutosAviso = Math.min(Math.max(item.antecedencia_dias, 0) * 1440, MAX_MIN)
   const overrides = [{ method: 'popup', minutes: 0 }, { method: 'popup', minutes: 1440 }]
   if (minutosAviso > 1440) {

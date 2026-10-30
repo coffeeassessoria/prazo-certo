@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       .map((i: any) => ({
         id: i.id, titulo: i.titulo, tipo: i.tipo, vencimento: i.vencimento, antecedencia_dias: i.antecedencia_dias,
         cliente_nome: (Array.isArray(i.clientes) ? i.clientes[0]?.nome : i.clientes?.nome) ?? null,
-        marco: marcoDoDia(diasAte(i.vencimento, hoje), i.antecedencia_dias),
+        marco: marcoDoDia(diasAte(i.vencimento, hoje), i.antecedencia_dias, i.tipo, i.vencimento),
       }))
       .filter((i) => i.marco) as (ItemLembrete & { marco: string })[]
     if (!candidatos.length) continue

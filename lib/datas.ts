@@ -43,13 +43,14 @@ export function fmtData(iso: string | null | undefined): string {
 export type Situacao = 'vencido' | 'atencao' | 'ok' | 'renovado' | 'concluido'
 
 export function situacao(
-  item: { status: string; vencimento: string; antecedencia_dias: number },
+  item: { status: string; vencimento: string; antecedencia_dias: number; tipo?: string },
   hoje = hojeISO()
 ): Situacao {
   if (item.status === 'renovado') return 'renovado'
   if (item.status === 'concluido') return 'concluido'
   const dias = diasAte(item.vencimento, hoje)
   if (dias < 0) return 'vencido'
+  if (item.tipo === ACOMPANHAMENTO) return dias === 0 ? 'atencao' : 'ok'
   if (dias <= Math.max(item.antecedencia_dias, 7)) return 'atencao'
   return 'ok'
 }
@@ -68,6 +69,37 @@ export const TIPOS: Record<string, string> = {
   manutencao: 'Manutenção',
   contrato: 'Contrato',
   outro: 'Outro',
+}
+
+/** Lembretes curtos de retorno ("cobrar se comprou a peça", "ver se o ar foi arrumado"). */
+export const ACOMPANHAMENTO = 'acompanhamento'
+
+/** Rótulo de qualquer tipo, incluindo acompanhamento (TIPOS só tem as categorias de vencimento). */
+export const ROTULO_TIPO: Record<string, string> = { ...TIPOS, acompanhamento: 'Acompanhamento' }
+
+/** Atalhos de "Lembrar em" dos acompanhamentos (dias a partir de hoje). */
+export const LEMBRAR_EM = [
+  { dias: 1, rotulo: 'Amanhã' },
+  { dias: 3, rotulo: 'Em 3 dias' },
+  { dias: 7, rotulo: 'Em 7 dias' },
+  { dias: 15, rotulo: 'Em 15 dias' },
+]
+
+/** "retorno hoje", "amanhã", "em 3 dias", "atrasado há 2 dias" */
+export function textoRetorno(iso: string, hoje = hojeISO()): string {
+  const d = diasAte(iso, hoje)
+  if (d === 0) return 'retorno hoje'
+  if (d === 1) return 'amanhã'
+  if (d > 1) return `em ${d} dias`
+  if (d === -1) return 'atrasado desde ontem'
+  return `atrasado há ${-d} dias`
+}
+
+const DIAS_SEMANA = ['dom.', 'seg.', 'ter.', 'qua.', 'qui.', 'sex.', 'sáb.']
+/** "sex., 02/11" */
+export function fmtDiaSemana(iso: string): string {
+  const [a, m, d] = iso.slice(0, 10).split('-').map(Number)
+  return `${DIAS_SEMANA[new Date(Date.UTC(a, m - 1, d)).getUTCDay()]}, ${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}`
 }
 
 export const RECORRENCIAS: { valor: string; rotulo: string }[] = [

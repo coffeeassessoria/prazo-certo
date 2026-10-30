@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { Building2, Repeat } from 'lucide-react'
-import { diasAte, situacao, TIPOS, type Situacao } from '@/lib/datas'
+import { BellRing, Building2, Repeat } from 'lucide-react'
+import { ACOMPANHAMENTO, diasAte, ROTULO_TIPO, situacao, textoRetorno, type Situacao } from '@/lib/datas'
 import { Etiqueta } from '@/components/ui/Etiqueta'
 import { Selo } from '@/components/ui/Selo'
 
@@ -15,9 +15,10 @@ export type ItemLista = {
   cliente_nome: string | null
 }
 
-export function textoStatus(s: Situacao, venc: string, hoje: string): string {
+export function textoStatus(s: Situacao, venc: string, hoje: string, tipo?: string): string {
   if (s === 'renovado') return 'renovado'
-  if (s === 'concluido') return 'concluído'
+  if (s === 'concluido') return tipo === ACOMPANHAMENTO ? 'resolvido' : 'concluído'
+  if (tipo === ACOMPANHAMENTO) return textoRetorno(venc, hoje)
   const d = diasAte(venc, hoje)
   if (d === 0) return 'vence hoje'
   if (d === 1) return 'vence amanhã'
@@ -31,15 +32,15 @@ export function textoStatus(s: Situacao, venc: string, hoje: string): string {
 export function ItemLinha({ item, hoje }: { item: ItemLista; hoje: string }) {
   const s = situacao(item, hoje)
   const tom = s === 'renovado' || s === 'concluido' ? 'neutro' : s
-  const selo = <Selo tom={tom} peq>{textoStatus(s, item.vencimento, hoje)}</Selo>
+  const selo = <Selo tom={tom} peq>{textoStatus(s, item.vencimento, hoje, item.tipo)}</Selo>
   return (
     <Link href={`/itens/${item.id}`} className="item">
       <Etiqueta data={item.vencimento} status={s} />
       <span className="item-corpo">
         <span className="item-titulo">{item.titulo}</span>
         <span className="item-meta">
-          <Building2 size={14} aria-hidden />
-          <span>{item.cliente_nome ? `${item.cliente_nome} • ` : ''}{TIPOS[item.tipo] ?? item.tipo}</span>
+          {item.tipo === ACOMPANHAMENTO ? <BellRing size={14} aria-hidden /> : <Building2 size={14} aria-hidden />}
+          <span>{item.cliente_nome ? `${item.cliente_nome} • ` : ''}{ROTULO_TIPO[item.tipo] ?? item.tipo}</span>
           {item.recorrencia_meses ? <><Repeat size={13} aria-label="Repete" /></> : null}
         </span>
         <span className="item-selo-mobile">{selo}</span>

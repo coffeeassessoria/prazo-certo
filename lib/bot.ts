@@ -1,4 +1,4 @@
-import { diasAte, fmtData, hojeISO, TIPOS } from '@/lib/datas'
+import { diasAte, fmtData, hojeISO, ROTULO_TIPO } from '@/lib/datas'
 
 export type ItemBot = {
   titulo: string
@@ -50,7 +50,7 @@ function linha(i: ItemBot, hoje: string): string {
   const d = diasAte(i.vencimento, hoje)
   const quando = d < 0 ? `há ${-d}d` : d === 0 ? 'HOJE' : `em ${d}d`
   const cliente = i.cliente_nome ? ` · ${i.cliente_nome}` : ''
-  return `• ${fmtData(i.vencimento).slice(0, 5)} (${quando}) — ${i.titulo}${cliente} _[${TIPOS[i.tipo] ?? i.tipo}]_`
+  return `• ${fmtData(i.vencimento).slice(0, 5)} (${quando}) — ${i.titulo}${cliente} _[${ROTULO_TIPO[i.tipo] ?? i.tipo}]_`
 }
 
 function bloco(titulo: string, itens: ItemBot[], hoje: string, max = 15): string[] {

@@ -175,6 +175,8 @@ p { margin: 0 0 var(--pc-space-2); }
 @media (max-width: 767px) { .linha { grid-template-columns: 1fr; gap: 0; } }
 label { font-size: var(--pc-text-sm); font-weight: 500; color: var(--pc-text); }
 .opcional { font-weight: 400; color: var(--pc-text-secondary); }
+legend.rotulo-campo { padding: 0; margin-bottom: 6px; font-size: var(--pc-text-sm); font-weight: 500; color: var(--pc-text); }
+.titulo-icone { display: flex; align-items: center; gap: var(--pc-space-2); }
 input, select, textarea {
   width: 100%; height: var(--pc-touch); padding: 0 var(--pc-space-3);
   font: 400 var(--pc-text-base)/var(--pc-lh-base) var(--pc-font); color: var(--pc-text);
@@ -410,6 +412,8 @@ a.checklist-item:hover { border-color: var(--pc-brand-700); text-decoration: non
   transition: border-color var(--pc-duration-fast), background var(--pc-duration-fast);
 }
 .opcao:hover { background: var(--pc-surface-2); }
+a.opcao { color: var(--pc-text); }
+a.opcao:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .opcao strong { font-size: var(--pc-text-base); font-weight: 600; }
 .opcao span { font-size: var(--pc-text-sm); color: var(--pc-text-secondary); }
 .opcao[aria-checked="true"] { background: var(--pc-brand-50); border-color: var(--pc-brand-700); box-shadow: 0 0 0 1px var(--pc-brand-700); }
@@ -459,3 +463,7 @@ details > summary { cursor: pointer; font-weight: 600; color: var(--pc-brand-700
 details > summary::-webkit-details-marker { display: none; }
 .data-grande { font-size: var(--pc-text-2xl); line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; }
 .pre-codigo { margin: 0; padding: var(--pc-space-4); border-radius: var(--pc-radius-md); background: #121821; color: #d0d8e3; font: 12px/1.7 ui-monospace, SFMono-Regular, Menlo, monospace; overflow-x: auto; }
+
+/* Aviso clicável (ex.: retornos de hoje no painel) */
+a.aviso-link { color: inherit; }
+a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }

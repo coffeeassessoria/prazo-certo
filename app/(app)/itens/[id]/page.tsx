@@ -2,8 +2,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
-import { Bell, Building2, CalendarCheck, FileText, Pencil, Repeat, RotateCcw, Trash2 } from 'lucide-react'
-import { fmtData, hojeISO, rotuloRecorrencia, situacao, somarMeses, TIPOS } from '@/lib/datas'
+import { Bell, BellRing, Building2, CalendarCheck, CheckCircle2, Clock, FileText, Pencil, Repeat, RotateCcw, Trash2 } from 'lucide-react'
+import { ACOMPANHAMENTO, fmtData, fmtDiaSemana, hojeISO, LEMBRAR_EM, ROTULO_TIPO, rotuloRecorrencia, situacao, somarDias, somarMeses } from '@/lib/datas'
+import { AcompanhamentoForm } from '@/components/AcompanhamentoForm'
 import { ItemForm } from '@/components/ItemForm'
 import { textoStatus } from '@/components/ItemLinha'
 import { Cabecalho } from '@/components/ui/Cabecalho'
@@ -12,7 +13,7 @@ import { Selo } from '@/components/ui/Selo'
 import { Confirmar } from '@/components/ui/Confirmar'
 import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
 import { Upload } from '@/components/ui/Upload'
-import { concluirItem, excluirItem, reabrirItem, renovarItem, salvarItem } from '../actions'
+import { adiarAcompanhamento, concluirItem, excluirItem, reabrirItem, renovarItem, resolverAcompanhamento, salvarAcompanhamento, salvarItem } from '../actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,6 +35,107 @@ export default async function DetalheItem({
   if (!item) notFound()
 
   const cliente: any = Array.isArray(item.clientes) ? item.clientes[0] : item.clientes
+  const acomp = item.tipo === ACOMPANHAMENTO
+
+  if (sp.editar && acomp) {
+    const { data: clientes } = await supabase
+      .from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome')
+    return (
+      <div style={{ maxWidth: 720 }}>
+        <Cabecalho voltar={{ href: `/itens/${id}`, rotulo: 'Cancelar edição' }} titulo="Editar acompanhamento" sub={item.titulo} />
+        <AcompanhamentoForm acao={salvarAcompanhamento} clientes={clientes ?? []} item={item} />
+      </div>
+    )
+  }
+
+  if (acomp) {
+    const s = situacao(item, hoje)
+    const ativo = item.status === 'ativo'
+    const tom = s === 'renovado' || s === 'concluido' ? 'neutro' : s
+    return (
+      <div style={{ maxWidth: 960 }}>
+        <Cabecalho
+          voltar={{ href: '/acompanhamentos', rotulo: 'Acompanhamentos' }}
+          titulo={item.titulo}
+          subIcone={<BellRing size={14} aria-hidden />}
+          sub={<>{cliente ? <Link href={`/?f=todos&cliente=${cliente.id}`}>{cliente.nome}</Link> : 'Sem cliente'} • Acompanhamento</>}
+          acao={<Link href={`/itens/${id}?editar=1`} className="btn sec"><Pencil size={16} />Editar</Link>}
+        />
+        <div className="grade-2">
+          <div className="card">
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <Etiqueta data={item.vencimento} status={s} grande />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="muted">Lembrar em</div>
+                <div className="data-grande">{fmtData(item.vencimento)}</div>
+                <div style={{ marginTop: 8 }}><Selo tom={tom}>{textoStatus(s, item.vencimento, hoje, item.tipo)}</Selo></div>
+              </div>
+            </div>
+            <dl className="detalhes">
+              <dt>Aviso</dt><dd style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Bell size={14} aria-hidden />No dia, no e-mail das 7h. Se ficar pendente, de novo a cada 2 dias.</dd>
+              <dt>Google Agenda</dt><dd>{item.google_event_id ? 'Na agenda, com alerta' : 'Não conectada. Conecte em Ajustes.'}</dd>
+              {item.adiamentos > 0 && (<><dt>Adiado</dt><dd>{item.adiamentos} {item.adiamentos === 1 ? 'vez' : 'vezes'}</dd></>)}
+              {item.descricao && (<><dt>Observação</dt><dd style={{ whiteSpace: 'pre-wrap' }}>{item.descricao}</dd></>)}
+              {cliente?.contato || cliente?.telefone ? (
+                <><dt>Contato no cliente</dt><dd>{[cliente.contato, cliente.telefone].filter(Boolean).join(', ')}</dd></>
+              ) : null}
+              <dt>Criado em</dt><dd>{fmtData(item.created_at)}</dd>
+            </dl>
+            <hr className="separador" />
+            <div className="acoes empilha">
+              {!ativo && (
+                <form action={reabrirItem}>
+                  <input type="hidden" name="id" value={id} />
+                  <BotaoEnviar className="btn sec" carregando="Reabrindo…"><RotateCcw size={16} />Reabrir acompanhamento</BotaoEnviar>
+                </form>
+              )}
+              <form action={excluirItem}>
+                <input type="hidden" name="id" value={id} />
+                <Confirmar className="btn ghost" titulo="Excluir acompanhamento?"
+                  texto="Essa ação não pode ser desfeita. O evento da agenda também será removido."
+                  destaque={`${item.titulo} • ${fmtData(item.vencimento)}`} confirmar="Excluir acompanhamento">
+                  <Trash2 size={16} />Excluir
+                </Confirmar>
+              </form>
+            </div>
+          </div>
+
+          {ativo ? (
+            <div className="card">
+              <h2>Já fez o retorno?</h2>
+              <p className="muted">Marque como resolvido para parar os lembretes.</p>
+              <form action={resolverAcompanhamento} style={{ marginTop: 16 }}>
+                <input type="hidden" name="id" value={id} />
+                <BotaoEnviar className="btn grande cheio" carregando="Salvando…"><CheckCircle2 size={16} />Marcar como resolvido</BotaoEnviar>
+              </form>
+              <hr className="separador" />
+              <h2 className="titulo-icone"><Clock size={18} aria-hidden />Ainda não deu? Lembrar de novo</h2>
+              <div className="chips compactos">
+                {LEMBRAR_EM.map((o) => (
+                  <form key={o.dias} action={adiarAcompanhamento}>
+                    <input type="hidden" name="id" value={id} />
+                    <input type="hidden" name="dias" value={o.dias} />
+                    <BotaoEnviar className="chip" carregando="Adiando…">
+                      <span className="chip-titulo">{o.rotulo}</span>
+                      <span className="chip-meta">{fmtDiaSemana(somarDias(hoje, o.dias))}</span>
+                    </BotaoEnviar>
+                  </form>
+                ))}
+              </div>
+              <form action={adiarAcompanhamento} style={{ marginTop: 12 }}>
+                <input type="hidden" name="id" value={id} />
+                <div className="campo" style={{ marginBottom: 8 }}>
+                  <label htmlFor="adiar-data">Ou escolha a data</label>
+                  <input id="adiar-data" name="data" type="date" min={somarDias(hoje, 1)} required style={{ maxWidth: 240 }} />
+                </div>
+                <BotaoEnviar className="btn sec" carregando="Adiando…">Adiar para esta data</BotaoEnviar>
+              </form>
+            </div>
+          ) : <div />}
+        </div>
+      </div>
+    )
+  }
 
   if (sp.editar) {
     const { data: clientes } = await supabase
@@ -69,7 +171,7 @@ export default async function DetalheItem({
         voltar={{ href: '/', rotulo: 'Vencimentos' }}
         titulo={item.titulo}
         subIcone={<Building2 size={14} aria-hidden />}
-        sub={<>{cliente ? <Link href={`/?f=todos&cliente=${cliente.id}`}>{cliente.nome}</Link> : 'Sem cliente'} • {TIPOS[item.tipo]}</>}
+        sub={<>{cliente ? <Link href={`/?f=todos&cliente=${cliente.id}`}>{cliente.nome}</Link> : 'Sem cliente'} • {ROTULO_TIPO[item.tipo]}</>}
         acao={<Link href={`/itens/${id}?editar=1`} className="btn sec"><Pencil size={16} />Editar</Link>}
       />
 
@@ -80,7 +182,7 @@ export default async function DetalheItem({
             <div style={{ flex: 1, minWidth: 0 }}>
               <div className="muted">Vencimento</div>
               <div className="data-grande">{fmtData(item.vencimento)}</div>
-              <div style={{ marginTop: 8 }}><Selo tom={tom}>{textoStatus(s, item.vencimento, hoje)}</Selo></div>
+              <div style={{ marginTop: 8 }}><Selo tom={tom}>{textoStatus(s, item.vencimento, hoje, item.tipo)}</Selo></div>
             </div>
           </div>
           <dl className="detalhes">

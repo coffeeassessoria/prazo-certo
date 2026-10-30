@@ -51,7 +51,7 @@ create table if not exists public.itens (
   empresa_id        uuid not null references public.empresas(id) on delete cascade,
   cliente_id        uuid references public.clientes(id) on delete set null,
   tipo              text not null default 'documento'
-                    check (tipo in ('documento','manutencao','contrato','outro')),
+                    check (tipo in ('documento','manutencao','contrato','outro','acompanhamento')),
   titulo            text not null,
   descricao         text,
   vencimento        date not null,
@@ -64,6 +64,7 @@ create table if not exists public.itens (
   anexo_path        text,
   anexo_nome        text,
   google_event_id   text,
+  adiamentos        int not null default 0,  -- acompanhamentos: quantas vezes foi adiado
   created_by        uuid references auth.users(id) on delete set null,
   created_at        timestamptz not null default now(),
   updated_at        timestamptz not null default now()
@@ -174,3 +175,9 @@ create policy lembretes_select on public.lembretes_enviados
 
 -- Migração 3: obriga troca da senha provisória no primeiro acesso
 alter table public.perfis add column if not exists trocar_senha boolean not null default false;
+
+-- Migração 4 (30/10/2026): acompanhamentos (lembretes curtos de retorno/cobrança)
+-- alter table public.itens drop constraint if exists itens_tipo_check;
+-- alter table public.itens add constraint itens_tipo_check
+--   check (tipo in ('documento','manutencao','contrato','outro','acompanhamento'));
+-- alter table public.itens add column if not exists adiamentos int not null default 0;
