@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="/icon-192.png">
+<title>Guia do usuário · Prazo Certo</title>
+<meta name="description" content="Passo a passo ilustrado do Prazo Certo: primeiro acesso, vencimentos, acompanhamentos, lembretes e Google Agenda.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: manual de campo — índice de capítulos à esquerda (abas no celular), capítulo com passos numerados ao lado do print anotado */
+:root {
+  --bg: #f3f5f6; --surface: #ffffff; --surface-2: #f6f8f9; --border: #dddfe4;
+  --text: #16181d; --text-2: #5d6474;
+  --brand: #155179; --brand-soft: #f0f7fc; --brand-line: #d8eaf5; --on-brand: #ffffff;
+  --mark: #ea580c; --mark-soft: #fff1e8; --ok: #15803d; --ok-soft: #e7f6ec; --red: #b42318; --amber: #b45309;
+  --font: "Work Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --shadow: 0 1px 2px rgba(16,40,64,.06), 0 4px 16px rgba(16,40,64,.06);
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121821; --surface: #1a212c; --surface-2: #212a36; --border: #2e3846;
+  --text: #e8ebef; --text-2: #a3abb9;
+  --brand: #4a9ac4; --brand-soft: #16283a; --brand-line: #24425c; --on-brand: #0f141a;
+  --mark: #fb923c; --mark-soft: #3a2414; --ok: #4ade80; --ok-soft: #12261a; --red: #f87171; --amber: #fbbf24;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121821; --surface: #1a212c; --surface-2: #212a36; --border: #2e3846;
+  --text: #e8ebef; --text-2: #a3abb9;
+  --brand: #4a9ac4; --brand-soft: #16283a; --brand-line: #24425c; --on-brand: #0f141a;
+  --mark: #fb923c; --mark-soft: #3a2414; --ok: #4ade80; --ok-soft: #12261a; --red: #f87171; --amber: #fbbf24;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25); color-scheme: dark }
+
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--text); font: 400 16px/1.6 var(--font); }
+a { color: var(--brand) }
+.topo { background: var(--surface); border-bottom: 1px solid var(--border); }
+.topo-in { max-width: 1240px; margin: 0 auto; padding-block: 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+.marca { width: 44px; height: 44px; border-radius: 10px; background: #155179; position: relative; display: grid; place-items: center; flex: none; }
+.marca::before { content: ""; position: absolute; top: -4px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--surface); border: 2px solid #155179; }
+.marca span { width: 24px; height: 27px; border-radius: 5px; background: #fff; display: grid; place-items: center; }
+.topo h1 { font-size: 24px; line-height: 1.2; margin: 0; letter-spacing: -.01em; text-wrap: balance }
+.topo p { margin: 2px 0 0; color: var(--text-2); font-size: 14px }
+.voltar { margin-left: auto; font: 600 14px var(--font); text-decoration: none; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); min-height: 44px; display: inline-flex; align-items: center }
+.progresso { min-width: 200px; flex: 0 1 280px; font-size: 13px; color: var(--text-2) }
+.barra { height: 8px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--border); overflow: hidden; margin-top: 6px }
+.barra i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s }
+
+.corpo { max-width: 1240px; margin: 0 auto; padding-block: 24px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 32px; align-items: start; }
+nav.indice { position: sticky; top: calc(16px + env(safe-area-inset-top, 0px)); display: flex; flex-direction: column; gap: 4px }
+.indice-rotulo { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--text-2); margin: 0 0 6px 12px }
+.indice a { display: flex; gap: 10px; align-items: center; padding: 9px 12px; border-radius: 8px; text-decoration: none; color: var(--text-2); font-size: 14px; font-weight: 500; border-left: 3px solid transparent; }
+.indice a:hover { background: var(--surface); color: var(--text) }
+.indice a[aria-current="true"] { background: var(--surface); color: var(--brand); border-left-color: var(--brand); box-shadow: var(--shadow) }
+.indice .n { width: 24px; height: 24px; flex: none; border-radius: 6px; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums }
+.indice a.feito .n { background: var(--ok); border-color: var(--ok); color: var(--surface) }
+.indice .so { margin-left: auto; font-size: 11px; color: var(--text-2) }
+
+.capitulo { min-width: 0 }
+.cap-cab { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-end; margin-bottom: 8px }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--brand) }
+.capitulo h2 { font-size: 30px; line-height: 1.2; margin: 4px 0 0; letter-spacing: -.015em; text-wrap: balance }
+.lead { color: var(--text-2); max-width: 65ch; margin: 8px 0 24px }
+.aviso-adm { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; padding: 6px 12px; border-radius: 99px; background: var(--brand-soft); border: 1px solid var(--brand-line); color: var(--brand); font-weight: 500 }
+
+.passo { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 28px; align-items: start; }
+.passo.largo { grid-template-columns: minmax(0, 1fr) }
+.passo.celular { grid-template-columns: minmax(0, 1fr) 300px }
+.passo h3 { font-size: 19px; line-height: 1.3; margin: 0 0 4px; text-wrap: balance }
+.passo .onde { font-size: 13px; color: var(--text-2); margin: 0 0 16px }
+.onde code, .passo code { font-family: inherit; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 1px 6px; font-size: .92em }
+ol.marcas { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 14px }
+ol.marcas li { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 12px; align-items: start }
+.b { width: 28px; height: 28px; border-radius: 50%; background: var(--mark); color: #fff; font-weight: 700; font-size: 14px; display: grid; place-items: center; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 4px var(--mark-soft) }
+.b.ponto { background: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft) }
+ol.marcas b { font-weight: 600 }
+ol.marcas p { margin: 2px 0 0; color: var(--text-2); font-size: 15px }
+.dica { margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: var(--brand-soft); border: 1px solid var(--brand-line); font-size: 14px; }
+.dica.atencao { background: var(--mark-soft); border-color: color-mix(in srgb, var(--mark) 40%, transparent) }
+.dica b { display: block; margin-bottom: 2px }
+
+figure { margin: 0; min-width: 0 }
+.print { display: block; width: 100%; padding: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #fff; cursor: zoom-in; box-shadow: var(--shadow); transition: transform .15s }
+.print:hover { transform: translateY(-2px) }
+.print:focus-visible, .indice a:focus-visible, .nav-cap button:focus-visible, .check:focus-within { outline: 3px solid var(--brand); outline-offset: 3px }
+.print img { display: block; width: 100%; height: auto }
+.celular .print { max-width: 300px; margin-left: auto; border-radius: 28px; border-width: 6px; border-color: var(--text) }
+figcaption { font-size: 12px; color: var(--text-2); margin-top: 8px; text-align: center }
+
+.fim-cap { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-top: 8px; padding-top: 20px; border-top: 1px solid var(--border) }
+.check { display: inline-flex; gap: 10px; align-items: center; font-weight: 500; cursor: pointer; padding: 10px 14px; border-radius: 10px; background: var(--surface); border: 1px solid var(--border); min-height: 44px }
+.check input { width: 20px; height: 20px; accent-color: var(--ok) }
+.nav-cap { display: flex; gap: 8px }
+.nav-cap button { font: 600 14px var(--font); min-height: 44px; padding: 0 18px; border-radius: 8px; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text) }
+.nav-cap button.prox { background: var(--brand); border-color: var(--brand); color: var(--on-brand) }
+.nav-cap button[disabled] { opacity: .4; cursor: default }
+
+.zoom { position: fixed; inset: 0; z-index: 50; background: rgba(10,16,24,.86); display: grid; place-items: center; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); cursor: zoom-out; overflow: auto }
+.zoom img { max-width: min(1400px, 100%); max-height: calc(100vh - 80px); width: auto; height: auto; border-radius: 10px; background: #fff }
+.zoom p { color: #fff; font-size: 13px; margin: 10px 0 0; text-align: center }
+
+@media (max-width: 900px) {
+  .corpo { grid-template-columns: minmax(0, 1fr); gap: 16px }
+  nav.indice { position: static; flex-direction: row; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin }
+  .indice-rotulo { display: none }
+  .indice a { flex: none; border-left: 0; border-bottom: 3px solid transparent; border-radius: 8px 8px 0 0 }
+  .indice a[aria-current="true"] { border-bottom-color: var(--brand) }
+  .indice .so { display: none }
+  .passo, .passo.celular { grid-template-columns: minmax(0, 1fr); padding: 18px; gap: 18px }
+  .celular .print { margin: 0 auto }
+  .capitulo h2 { font-size: 24px }
+  .progresso { flex-basis: 100% }
+  .voltar { margin-left: 0 }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important } }
+
+html{color-scheme:light}body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+</style>
+<script>try{var t=localStorage.getItem("pc-tema");if(t==="dark"||t==="light")document.documentElement.dataset.theme=t}catch(e){}</script>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-in">
+    <div class="marca" aria-hidden="true"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span></div>
+    <div>
+      <h1>Guia do Prazo Certo</h1>
+      <p>Passo a passo com as telas do sistema. Os números laranja nas imagens mostram onde tocar.</p>
+    </div>
+    <a class="voltar" href="/">Abrir o sistema</a>
+    <div class="progresso" aria-live="polite">
+      <span id="prog-txt">0 de 7 capítulos concluídos</span>
+      <div class="barra"><i id="prog-barra"></i></div>
+    </div>
+  </div>
+</header>
+
+<div class="corpo">
+  <nav class="indice" aria-label="Capítulos do guia">
+    <p class="indice-rotulo">Capítulos</p>
+    <a href="#primeiro-acesso" data-cap="primeiro-acesso"><span class="n">1</span>Primeiro acesso</a>
+    <a href="#painel" data-cap="painel"><span class="n">2</span>O painel</a>
+    <a href="#vencimento" data-cap="vencimento"><span class="n">3</span>Cadastrar vencimento</a>
+    <a href="#renovar" data-cap="renovar"><span class="n">4</span>Renovar e histórico</a>
+    <a href="#acompanhamentos" data-cap="acompanhamentos"><span class="n">5</span>Acompanhamentos</a>
+    <a href="#lembretes" data-cap="lembretes"><span class="n">6</span>E-mail e Google Agenda</a>
+    <a href="#equipe" data-cap="equipe"><span class="n">7</span>Clientes e equipe</a>
+  </nav>
+
+  <main>
+    <!-- 1 -->
+    <section class="capitulo" id="cap-primeiro-acesso" data-cap="primeiro-acesso">
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 1 · 5 minutos</div><h2>Primeiro acesso</h2></div></div>
+      <p class="lead">Você recebe pelo WhatsApp o endereço do sistema, seu e-mail de acesso e uma senha provisória. No primeiro login você cria sua senha e responde 7 perguntas sobre a empresa.</p>
+
+      <article class="passo">
+        <div>
+          <h3>Entre com a senha provisória</h3>
+          <p class="onde">Endereço: <code>prazo-certo-xi.vercel.app</code></p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>E-mail</b><p>O mesmo e-mail que veio na mensagem de acesso.</p></div></li>
+            <li><span class="b">2</span><div><b>Senha</b><p>Digite a senha provisória exatamente como recebeu, com letras maiúsculas e minúsculas.</p></div></li>
+            <li><span class="b">3</span><div><b>Entrar</b><p>Toque para continuar.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Tela de login"><img src="/guia/img/01-login.png" alt="Tela de login com campos de e-mail e senha e o botão Entrar" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Crie a sua senha</h3>
+          <p class="onde">Aparece sozinha no primeiro acesso</p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Nova senha, duas vezes</b><p>Pelo menos 8 caracteres. Evite data de nascimento ou o nome da empresa. Toque em <b>Salvar senha e continuar</b>.</p></div></li>
+          </ol>
+          <div class="dica"><b>A senha provisória deixa de valer</b>Daqui em diante você entra sempre com a senha que acabou de criar.</div>
+        </div>
+        <figure><button class="print" data-legenda="Criar a sua senha"><img src="/guia/img/02-trocar-senha.png" alt="Tela Bem-vindo com os campos de nova senha" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Responda as perguntas de boas-vindas</h3>
+          <p class="onde">7 perguntas rápidas, cerca de 2 minutos</p>
+          <ol class="marcas">
+            <li><span class="b ponto">•</span><div><b>Dados da empresa</b><p>Nome, cidade e área de atuação.</p></div></li>
+            <li><span class="b ponto">•</span><div><b>O que você controla</b><p>Marque PMOC, laudos, contratos, manutenções. Viram atalhos no cadastro.</p></div></li>
+            <li><span class="b ponto">•</span><div><b>Quando e para quem avisar</b><p>Quantos dias antes e quais e-mails recebem os lembretes.</p></div></li>
+          </ol>
+          <div class="dica">No fim, o sistema abre direto o cadastro do primeiro vencimento. Dá para refazer depois em <b>Ajustes → Refazer configuração inicial</b>.</div>
+        </div>
+        <figure><button class="print" data-legenda="Perguntas de boas-vindas"><img src="/guia/img/03-boas-vindas.png" alt="Tela Vamos configurar sua conta com as etapas do questionário" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo celular">
+        <div>
+          <h3>Esqueceu a senha?</h3>
+          <p class="onde">Na tela de login</p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Esqueci minha senha</b><p>Informe seu e-mail. Chega um link para criar uma senha nova, válido por 1 hora. Não chegou em 2 minutos? Olhe o spam.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Login no celular"><img src="/guia/img/01b-login-celular.png" alt="Login no celular com o link Esqueci minha senha destacado" loading="lazy"></button></figure>
+      </article>
+    </section>
+
+    <!-- 2 -->
+    <section class="capitulo" id="cap-painel" data-cap="painel" hidden>
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 2 · 3 minutos</div><h2>O painel</h2></div></div>
+      <p class="lead">O painel abre mostrando só o que precisa de atenção: o que venceu e o que vence logo. A cor da etiqueta diz a situação: <b style="color:var(--red)">vermelho</b> vencido, <b style="color:var(--amber)">amarelo</b> vence logo, <b style="color:var(--ok)">verde</b> em dia.</p>
+
+      <article class="passo largo">
+        <div>
+          <h3>Como ler o painel</h3>
+          <ol class="marcas" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px 24px">
+            <li><span class="b">1</span><div><b>Retornos de hoje</b><p>Aparece quando há acompanhamentos para fazer. Toque para abrir.</p></div></li>
+            <li><span class="b">2</span><div><b>Quadros de situação</b><p>Vencidos, Vencem logo, Em dia e Ativos. Cada quadro é um filtro: toque para ver só aqueles.</p></div></li>
+            <li><span class="b">3</span><div><b>Busca e filtros</b><p>Ache por nome ou cliente, ou filtre por cliente e tipo.</p></div></li>
+            <li><span class="b">4</span><div><b>Cada vencimento</b><p>Etiqueta com a data, nome, cliente e prazo. Toque para abrir e renovar.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Painel no computador"><img src="/guia/img/04-painel.png" alt="Painel de vencimentos com faixa de retornos, quatro quadros de situação, busca e lista" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo celular">
+        <div>
+          <h3>No celular</h3>
+          <p class="onde">Mesmo painel, com a barra de abas embaixo</p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Botão + do centro</b><p>Cadastra um vencimento ou um acompanhamento.</p></div></li>
+            <li><span class="b">2</span><div><b>Menu</b><p>Abre todas as opções, incluindo o Histórico.</p></div></li>
+          </ol>
+          <div class="dica"><b>Instale como aplicativo</b>Android: menu ⋮ do Chrome → <i>Adicionar à tela inicial</i>. iPhone: botão Compartilhar do Safari → <i>Adicionar à Tela de Início</i>.</div>
+        </div>
+        <figure><button class="print" data-legenda="Painel no celular"><img src="/guia/img/05-painel-celular.png" alt="Painel no celular com o botão + e o menu destacados" loading="lazy"></button></figure>
+      </article>
+    </section>
+
+    <!-- 3 -->
+    <section class="capitulo" id="cap-vencimento" data-cap="vencimento" hidden>
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 3 · 2 minutos por item</div><h2>Cadastrar um vencimento</h2></div></div>
+      <p class="lead">Um vencimento é tudo que tem data para vencer e precisa ser renovado: PMOC, ART, laudo, contrato, manutenção preventiva. O cadastro faz 4 perguntas e já programa os lembretes.</p>
+
+      <article class="passo celular">
+        <div>
+          <h3>Abra o cadastro</h3>
+          <p class="onde">Computador: menu <b>Novo vencimento</b>. Celular: botão <b>+</b></p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Vencimento</b><p>Para documentos, contratos e manutenções.</p></div></li>
+            <li><span class="b">2</span><div><b>Acompanhamento</b><p>Para retornos curtos. Veja o capítulo 5.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Escolha do que cadastrar"><img src="/guia/img/06-novo-celular.png" alt="Tela O que você quer cadastrar com as opções Vencimento e Acompanhamento" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Responda as 4 perguntas</h3>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>O que vence?</b><p>Toque num atalho (PMOC, ART, Laudo…) ou escreva o nome.</p></div></li>
+            <li><span class="b">2</span><div><b>De qual cliente?</b><p>Escolha da lista ou toque em <i>É um cliente novo</i>.</p></div></li>
+            <li><span class="b">3</span><div><b>Quando vence?</b><p>A data do documento e de quanto em quanto tempo renova (mensal, anual…).</p></div></li>
+            <li><span class="b">4</span><div><b>Quando avisar?</b><p>O primeiro aviso, de 7 a 90 dias antes. Embaixo aparecem as datas exatas dos lembretes.</p></div></li>
+            <li><span class="b">5</span><div><b>Salvar e ativar lembretes</b><p>Pronto. Os avisos já estão programados.</p></div></li>
+          </ol>
+          <div class="dica">Quer guardar o PDF ou a foto do documento? Toque em <i>Anexar documento ou observações</i> antes de salvar.</div>
+        </div>
+        <figure><button class="print" data-legenda="Cadastro de vencimento"><img src="/guia/img/07-novo-vencimento.png" alt="Formulário de novo vencimento em 4 etapas, preenchido com PMOC do Hospital Santa Clara" loading="lazy"></button></figure>
+      </article>
+    </section>
+
+    <!-- 4 -->
+    <section class="capitulo" id="cap-renovar" data-cap="renovar" hidden>
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 4 · 1 minuto</div><h2>Renovar, concluir e histórico</h2></div></div>
+      <p class="lead">Renovou o documento com o cliente? Registre no sistema. Os avisos daquele item param e o próximo vencimento já fica programado.</p>
+
+      <article class="passo">
+        <div>
+          <h3>Abra o vencimento e escolha</h3>
+          <p class="onde">Toque no item no painel</p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Renovar este vencimento</b><p>Confira a data sugerida em <i>Próximo vencimento</i>, anexe o documento novo se quiser e toque em <b>Renovar e criar próximo vencimento</b>.</p></div></li>
+            <li><span class="b">2</span><div><b>Concluir sem renovar</b><p>Para o que não continua: contrato encerrado, cliente que saiu. Os lembretes param.</p></div></li>
+            <li><span class="b">3</span><div><b>Editar</b><p>Corrige nome, data, cliente, aviso ou anexo. Os lembretes se ajustam sozinhos.</p></div></li>
+          </ol>
+          <div class="dica atencao"><b>Excluir é só para cadastro errado</b>Apaga de vez o item, o anexo e o evento da agenda. Para encerrar, use <i>Concluir sem renovar</i>.</div>
+        </div>
+        <figure><button class="print" data-legenda="Detalhe do vencimento"><img src="/guia/img/08-detalhe-renovar.png" alt="Detalhe do PMOC do Frigorífico Boi Bom com o cartão de renovar" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Histórico</h3>
+          <p class="onde">Menu <b>Histórico</b></p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Tudo o que já foi renovado ou concluído</b><p>Abra um item para ver o documento antigo ou reabrir, se foi concluído por engano.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Histórico"><img src="/guia/img/09-historico.png" alt="Tela de histórico com um PMOC renovado" loading="lazy"></button></figure>
+      </article>
+    </section>
+
+    <!-- 5 -->
+    <section class="capitulo" id="cap-acompanhamentos" data-cap="acompanhamentos" hidden>
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 5 · 30 segundos por retorno</div><h2>Acompanhamentos</h2></div></div>
+      <p class="lead">Para tudo que precisa de um retorno em poucos dias: “cobrar se a ADM comprou a peça do orçamento”, “voltar para ver se o ar da sala 3 foi arrumado”. Ficam separados dos vencimentos.</p>
+
+      <article class="passo">
+        <div>
+          <h3>A lista de acompanhamentos</h3>
+          <p class="onde">Menu <b>Acompanhamentos</b> (no celular, aba <b>Retornos</b>)</p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Novo acompanhamento</b><p>Cria um retorno novo.</p></div></li>
+            <li><span class="b">2</span><div><b>Atrasados, Para hoje e Próximos</b><p>Os atrasados e os de hoje ficam no topo. Toque em um para resolver ou adiar.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Lista de acompanhamentos"><img src="/guia/img/10-acompanhamentos.png" alt="Lista de acompanhamentos separada em atrasados, para hoje e próximos" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Cadastre em uma tela</h3>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>O que você precisa lembrar?</b><p>Escreva como falaria: “cobrar se compraram a peça do orçamento”.</p></div></li>
+            <li><span class="b">2</span><div><b>Cliente</b><p>Opcional. Escolha da lista ou crie um novo.</p></div></li>
+            <li><span class="b">3</span><div><b>Lembrar em</b><p>Amanhã, 3, 7 ou 15 dias, ou escolha uma data. Embaixo aparece o dia exato do lembrete.</p></div></li>
+            <li><span class="b">4</span><div><b>Salvar acompanhamento</b><p>No dia marcado, chega no e-mail das 7h e na Google Agenda.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Novo acompanhamento"><img src="/guia/img/11-novo-acompanhamento.png" alt="Formulário de novo acompanhamento preenchido para a ADM do Brasil, lembrar em 3 dias" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>No dia: resolva ou adie</h3>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Marcar como resolvido</b><p>O retorno foi feito. Os avisos param.</p></div></li>
+            <li><span class="b">2</span><div><b>Lembrar de novo</b><p>O cliente não respondeu? Escolha 1, 3, 7 ou 15 dias, ou uma data. O sistema conta quantas vezes foi adiado.</p></div></li>
+          </ol>
+          <div class="dica">Se você não fizer nada, o aviso volta a cada 2 dias até resolver ou adiar.</div>
+        </div>
+        <figure><button class="print" data-legenda="Resolver ou adiar"><img src="/guia/img/12-acompanhamento-detalhe.png" alt="Detalhe do acompanhamento com os botões Marcar como resolvido e Lembrar de novo" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo celular">
+        <div>
+          <h3>No celular</h3>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Aba Retornos</b><p>Abre a lista direto. O botão <b>+</b> também cria acompanhamentos.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Retornos no celular"><img src="/guia/img/13-retornos-celular.png" alt="Lista de acompanhamentos no celular com a aba Retornos destacada" loading="lazy"></button></figure>
+      </article>
+    </section>
+
+    <!-- 6 -->
+    <section class="capitulo" id="cap-lembretes" data-cap="lembretes" hidden>
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 6 · 5 minutos, uma vez só</div><h2>E-mail e Google Agenda</h2></div></div>
+      <p class="lead">Todo dia às 7h (horário de Cuiabá) chega um único e-mail-resumo com o que precisa de atenção. Com a Google Agenda conectada, cada item também vira um evento com alerta no celular.</p>
+
+      <article class="passo">
+        <div>
+          <h3>Confira os e-mails e teste</h3>
+          <p class="onde">Menu <b>Ajustes</b> → <b>Lembretes por e-mail</b></p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Quem recebe</b><p>Um e-mail por linha. Pode ser o seu e o da equipe de manutenção.</p></div></li>
+            <li><span class="b">2</span><div><b>Salvar lembretes</b><p>Salve sempre que mudar algo.</p></div></li>
+            <li><span class="b">3</span><div><b>Enviar e-mail de teste</b><p>Confira se chegou. Se caiu no spam, marque como “não é spam”.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Lembretes por e-mail"><img src="/guia/img/14-ajustes-email.png" alt="Ajustes com a lista de e-mails, o botão Salvar lembretes e Enviar e-mail de teste" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Como o e-mail chega</h3>
+          <ol class="marcas">
+            <li><span class="b ponto">•</span><div><b>Vencidos e vencem hoje</b><p>No topo, em vermelho e amarelo.</p></div></li>
+            <li><span class="b ponto">•</span><div><b>Vencem em breve</b><p>Os que entraram no prazo de aviso.</p></div></li>
+            <li><span class="b ponto">•</span><div><b>Retornos e cobranças</b><p>Os acompanhamentos do dia.</p></div></li>
+          </ol>
+          <p class="onde" style="margin-top:16px">Cada item do e-mail é um link para abrir no sistema.</p>
+          <div style="overflow-x:auto">
+          <table style="border-collapse:collapse;font-size:14px;width:100%;min-width:300px">
+            <thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Tipo</th><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Quando avisa</th></tr></thead>
+            <tbody>
+              <tr><td style="padding:8px;border-bottom:1px solid var(--border)">Vencimento</td><td style="padding:8px;border-bottom:1px solid var(--border)">No prazo de aviso, 7 dias antes, 1 dia antes e no dia</td></tr>
+              <tr><td style="padding:8px;border-bottom:1px solid var(--border)">Vencido</td><td style="padding:8px;border-bottom:1px solid var(--border)">Uma vez por semana até renovar</td></tr>
+              <tr><td style="padding:8px">Acompanhamento</td><td style="padding:8px">No dia; se pendente, a cada 2 dias</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+        <figure><button class="print" data-legenda="Exemplo do e-mail diário"><img src="/guia/img/17-email.png" alt="Exemplo do e-mail de lembrete com vencidos, vencem em breve e retornos" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Conecte a Google Agenda</h3>
+          <p class="onde">Menu <b>Ajustes</b> → <b>Google Agenda</b></p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Conectar Google Agenda</b><p>Escolha a conta Google onde quer ver os eventos.</p></div></li>
+            <li><span class="b ponto">2</span><div><b>“O Google não verificou este app”</b><p>É normal. Toque em <b>Avançado</b> → <b>Acessar Prazo Certo</b> → <b>Continuar</b>.</p></div></li>
+            <li><span class="b ponto">3</span><div><b>Pronto</b><p>O cartão mostra <i>Conectada</i>. Tudo o que está ativo vai para a agenda na hora.</p></div></li>
+          </ol>
+          <div class="dica"><b>É seguro</b>O sistema só cria e altera os eventos dele. Não lê os outros compromissos da sua agenda.</div>
+        </div>
+        <figure>
+          <button class="print" data-legenda="Antes de conectar"><img src="/guia/img/15-ajustes-google.png" alt="Cartão Google Agenda não conectada com o botão Conectar" loading="lazy"></button>
+          <figcaption>Antes</figcaption>
+          <button class="print" data-legenda="Depois de conectar" style="margin-top:12px"><img src="/guia/img/16-google-conectada.png" alt="Cartão Google Agenda conectada" loading="lazy"></button>
+          <figcaption>Depois</figcaption>
+        </figure>
+      </article>
+    </section>
+
+    <!-- 7 -->
+    <section class="capitulo" id="cap-equipe" data-cap="equipe" hidden>
+      <div class="cap-cab"><div><div class="eyebrow">Capítulo 7 · 3 minutos</div><h2>Clientes e equipe</h2></div></div>
+      <p class="lead">Cadastre os clientes para filtrar os vencimentos de cada um. Se mais gente da empresa vai usar o sistema, crie um acesso para cada pessoa.</p>
+
+      <article class="passo">
+        <div>
+          <h3>Clientes</h3>
+          <p class="onde">Menu <b>Clientes</b></p>
+          <ol class="marcas">
+            <li><span class="b ponto">•</span><div><b>Novo cliente</b><p>Nome, contato e telefone. Também dá para criar o cliente direto no cadastro do vencimento.</p></div></li>
+            <li><span class="b ponto">•</span><div><b>Vencimentos do cliente</b><p>Cada cliente mostra quantos itens tem vencidos, vencendo e ativos. Toque para ver só os dele.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Clientes"><img src="/guia/img/18-clientes.png" alt="Lista de clientes com selos de vencidos e ativos" loading="lazy"></button></figure>
+      </article>
+
+      <article class="passo">
+        <div>
+          <h3>Mais pessoas da empresa</h3>
+          <p class="onde">Menu <b>Ajustes</b> → <b>Usuários da empresa</b> (só administradores)</p>
+          <ol class="marcas">
+            <li><span class="b">1</span><div><b>Adicionar funcionário</b><p>Nome e e-mail. A pessoa recebe uma senha provisória e troca no primeiro acesso, como no capítulo 1.</p></div></li>
+          </ol>
+        </div>
+        <figure><button class="print" data-legenda="Usuários da empresa"><img src="/guia/img/19-usuarios.png" alt="Cartão de usuários com o formulário Adicionar funcionário aberto" loading="lazy"></button></figure>
+      </article>
+    </section>
+
+    <div class="fim-cap">
+      <label class="check"><input type="checkbox" id="feito"> Já fiz este capítulo</label>
+      <div class="nav-cap">
+        <button type="button" id="ant">Anterior</button>
+        <button type="button" id="prox" class="prox">Próximo capítulo</button>
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text-2);margin-top:24px">As telas usam uma empresa de exemplo, a ClimaTech. Dúvidas: Coffee Assessoria, lembretes@coffeeassessoria.com.br · <a href="/privacidade">Privacidade</a> · <a href="/termos">Termos</a></p>
+  </main>
+</div>
+
+<div class="zoom" id="zoom" hidden role="dialog" aria-modal="true" aria-label="Imagem ampliada"><div><img id="zoom-img" alt=""><p id="zoom-leg"></p></div></div>
+
+<script>
+(function () {
+  var caps = Array.prototype.map.call(document.querySelectorAll('section.capitulo'), function (s) { return s.dataset.cap })
+  var links = document.querySelectorAll('nav.indice a')
+  var feitos = {}
+  try { feitos = JSON.parse(localStorage.getItem('pc-guia-feitos') || '{}') || {} } catch (e) { feitos = {} }
+  var atual = caps[0]
+  function salvar() { try { localStorage.setItem('pc-guia-feitos', JSON.stringify(feitos)) } catch (e) {} }
+  function progresso() {
+    var n = caps.filter(function (c) { return feitos[c] }).length
+    document.getElementById('prog-txt').textContent = n + ' de ' + caps.length + ' capítulos concluídos'
+    document.getElementById('prog-barra').style.width = (n / caps.length * 100) + '%'
+    links.forEach(function (a) { a.classList.toggle('feito', !!feitos[a.dataset.cap]) })
+  }
+  function mostrar(c, rolar) {
+    if (caps.indexOf(c) < 0) c = caps[0]
+    atual = c
+    document.querySelectorAll('section.capitulo').forEach(function (s) { s.hidden = s.dataset.cap !== c })
+    links.forEach(function (a) { a.setAttribute('aria-current', a.dataset.cap === c ? 'true' : 'false') })
+    var i = caps.indexOf(c)
+    document.getElementById('ant').disabled = i === 0
+    var p = document.getElementById('prox')
+    p.disabled = i === caps.length - 1
+    p.textContent = i === caps.length - 1 ? 'Fim do guia' : 'Próximo: ' + links[i + 1].textContent.replace(/^\d+/, '').replace('Coffee', '').trim()
+    document.getElementById('feito').checked = !!feitos[c]
+    var ativo = document.querySelector('nav.indice a[aria-current="true"]')
+    if (ativo && ativo.scrollIntoView && window.innerWidth <= 900) ativo.scrollIntoView({ block: 'nearest', inline: 'center' })
+    if (rolar) window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  function ir(c) { if (location.hash !== '#' + c) location.hash = c; else mostrar(c, true) }
+  window.addEventListener('hashchange', function () { mostrar(location.hash.slice(1), true) })
+  document.getElementById('ant').addEventListener('click', function () { ir(caps[caps.indexOf(atual) - 1]) })
+  document.getElementById('prox').addEventListener('click', function () {
+    feitos[atual] = true; salvar(); progresso()
+    ir(caps[caps.indexOf(atual) + 1])
+  })
+  document.getElementById('feito').addEventListener('change', function (e) { feitos[atual] = e.target.checked; salvar(); progresso() })
+
+  var zoom = document.getElementById('zoom'), zimg = document.getElementById('zoom-img'), zleg = document.getElementById('zoom-leg'), origem = null
+  document.querySelectorAll('.print').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var img = b.querySelector('img'); origem = b
+      zimg.src = img.src; zimg.alt = img.alt; zleg.textContent = (b.dataset.legenda || '') + ' · toque para fechar'
+      zoom.hidden = false; zoom.focus && zoom.setAttribute('tabindex', '-1'); zoom.focus()
+    })
+  })
+  function fechar() { zoom.hidden = true; if (origem) origem.focus() }
+  zoom.addEventListener('click', fechar)
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !zoom.hidden) fechar() })
+
+  progresso()
+  mostrar(location.hash.slice(1) || caps[0], false)
+})()
+</script>
+
+</body>
+</html>

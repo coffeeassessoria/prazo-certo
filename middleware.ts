@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLICAS = ['/login', '/privacidade', '/termos', '/esqueci-senha', '/auth/', '/api/whatsapp', '/api/cron', '/demo', '/design-system']
+const PUBLICAS = ['/login', '/inicio', '/guia', '/privacidade', '/termos', '/esqueci-senha', '/auth/', '/api/whatsapp', '/api/cron', '/demo', '/design-system']
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
@@ -32,6 +32,8 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   if (!user) {
+    // Visitante no endereço principal vê a página de vendas (sem mudar a URL)
+    if (path === '/') return NextResponse.rewrite(new URL('/inicio', request.url))
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     url.search = ''
