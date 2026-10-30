@@ -467,3 +467,9 @@ details > summary::-webkit-details-marker { display: none; }
 /* Aviso clicável (ex.: retornos de hoje no painel) */
 a.aviso-link { color: inherit; }
 a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
+
+/* Texto legal (política de privacidade) */
+.texto-legal p, .texto-legal li { font-size: var(--pc-text-sm); line-height: 22px; color: var(--pc-text-secondary); }
+.texto-legal h2 { font-size: var(--pc-text-base); margin: var(--pc-space-6) 0 var(--pc-space-2); }
+.texto-legal ul { padding-left: var(--pc-space-5); margin: 0 0 var(--pc-space-3); }
+.texto-legal b { color: var(--pc-text); font-weight: 600; }
