@@ -515,7 +515,7 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .lp-passo-n { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--pc-radius-sm); background: var(--pc-brand-50); color: var(--pc-brand-700); font-weight: 700; margin-bottom: var(--pc-space-4); }
 .lp-prints { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--pc-space-6); align-items: start; }
 .lp-prints figure { margin: 0; min-width: 0; }
-.lp-prints img { border-radius: var(--pc-radius-md); border: 1px solid var(--pc-border); box-shadow: var(--pc-shadow-md); background: #fff; max-height: 640px; object-fit: cover; object-position: top; }
+.lp-prints img { border-radius: var(--pc-radius-md); border: 1px solid var(--pc-border); box-shadow: var(--pc-shadow-md); background: #fff; }
 .lp-prints figcaption { margin-top: var(--pc-space-3); font-size: var(--pc-text-sm); color: var(--pc-text-secondary); }
 .lp-recursos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--pc-space-8) var(--pc-space-6); }
 .lp-recurso-ico { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--pc-radius-sm); background: var(--pc-brand-50); color: var(--pc-brand-700); margin-bottom: var(--pc-space-4); }

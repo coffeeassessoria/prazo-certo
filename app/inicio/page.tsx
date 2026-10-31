@@ -86,9 +86,9 @@ export default function Inicio() {
             <div className="lp-hero-telas" aria-hidden>
               <div className="lp-janela">
                 <div className="lp-janela-barra"><i /><i /><i /><span>prazo certo · painel</span></div>
-                <img src="/inicio/painel.jpg" alt="" width={1708} height={1000} />
+                <img src="/inicio/painel.png" alt="" width={1360} height={796} />
               </div>
-              <div className="lp-celular"><img src="/inicio/retornos-celular.jpg" alt="" width={780} height={1520} /></div>
+              <div className="lp-celular"><img src="/inicio/retornos-celular.png" alt="" width={384} height={748} /></div>
             </div>
           </div>
         </section>
@@ -133,11 +133,11 @@ export default function Inicio() {
             </ol>
             <div className="lp-prints">
               <figure>
-                <img src="/inicio/cadastro.jpg" alt="Cadastro de vencimento em 4 perguntas" width={1708} height={1758} loading="lazy" />
+                <img src="/inicio/cadastro.png" alt="Cadastro de vencimento em 4 perguntas" width={1360} height={1389} loading="lazy" />
                 <figcaption>O cadastro guiado mostra as datas exatas dos lembretes antes de salvar.</figcaption>
               </figure>
               <figure>
-                <img src="/inicio/email.png" alt="Exemplo do e-mail diário de lembretes" width={640} height={1100} loading="lazy" />
+                <img src="/inicio/email.png" alt="Exemplo do e-mail diário de lembretes" width={800} height={1205} loading="lazy" />
                 <figcaption>O e-mail das 7h: vencidos, vencendo e retornos do dia.</figcaption>
               </figure>
             </div>
