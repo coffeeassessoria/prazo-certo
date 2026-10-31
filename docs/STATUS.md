@@ -35,3 +35,16 @@
 - Cadastro de vencimento pelo WhatsApp; resumo semanal no WhatsApp
 - Aviso para o cliente final ("seu PMOC vence em 30 dias")
 - Importar planilha de vencimentos; cobrança recorrente (Asaas/Mercado Pago)
+
+## Primeira etapa de demandas de climatização (código preparado em 30/10)
+- Branch `codex/demandas-climatizacao`: responsável, situação, próxima ação, retorno, vínculo ao vencimento e histórico de contatos.
+- Exemplos de orçamento, agendamento, peças, documentos e pós-atendimento; demonstração interativa.
+- Migração incremental e guia de ativação em `docs/DEMANDAS.md`.
+- Ainda não aplicado no Supabase nem publicado na main. O banco deve ser migrado antes da publicação.
+
+## PMOC e timbrado A4 (código preparado em 30/10)
+- Ajustes de identidade/logo, cadastro de unidades, ambientes e aparelhos.
+- Plano PMOC editável, execuções e PDF A4 versionado com snapshot e armazenamento privado.
+- Rascunho e versão para assinatura; estrutura inicial baseada na Portaria GM/MS nº 3.523/1998 e Anexo I.
+- Guia de ativação e limites: `docs/PMOC.md`; exige a segunda migração incremental antes de publicar.
+- Supabase/storage de produção ainda não atualizados nem testados com conta real.

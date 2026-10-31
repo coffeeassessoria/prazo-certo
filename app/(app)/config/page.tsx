@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { CalendarDays, KeyRound, LogOut, Mail, MessageCircle, RotateCcw, Send, Settings, UserPlus, Users } from 'lucide-react'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
@@ -50,6 +51,8 @@ export default async function Config({ searchParams }: { searchParams: Promise<{
         acao={ehAdmin ? <a href="/bem-vindo?refazer=1" className="btn sec"><RotateCcw size={16} />Refazer configuração inicial</a> : undefined}
       />
       {sp.erro && ERROS[sp.erro] && <Aviso tipo="erro" titulo="Google Agenda não conectada">{ERROS[sp.erro]}</Aviso>}
+
+      <div className="card"><h2>Logo e timbrado dos documentos</h2><p className="muted">Cadastre a identidade da sua empresa para gerar PMOC e futuros documentos em A4.</p><Link className="btn sec" href="/config/documentos">Configurar logo e timbrado</Link></div>
 
       <div className="card">
         <div className="card-topo">

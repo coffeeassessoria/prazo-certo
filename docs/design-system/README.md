@@ -134,3 +134,18 @@ export default async function MinhaTela() {
 }
 ```
 Componente novo? Crie em `components/ui/`, estilize em `globals.css` só com tokens, adicione ao catálogo `/design-system` e a esta tabela.
+
+## Demandas de climatização
+
+`ItemLinha` também aceita `etapa_demanda`, `categoria_demanda`, `responsavel_nome` e `proxima_acao`.
+`AcompanhamentoForm` atende cadastro/edição e `modo="contato"`; usa os campos, botões e avisos do DS.
+Exemplos interativos em `/demo/acompanhamentos` e seção Demandas do catálogo.
+
+## Identidade e PMOC
+
+`components/ui/IdentidadeForm.tsx`: dados da prestadora, upload e prévia proporcional do logo.
+`components/ui/PmocForm.tsx`: unidade, dados técnicos, atividades editáveis e projeto em PDF.
+Estilos usam tokens em `app/globals.css`; exemplos no catálogo `#documentos` e em `/demo/pmoc`.
+O gerador usa `lib/documentos/timbrado.ts` para A4 com cabeçalho, logo e rodapé em todas as páginas.
+
+`components/ui/InventarioUnidade.tsx`: lista e formulários de ambientes/equipamentos, usados pela operação, catálogo e demonstração.

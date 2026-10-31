@@ -133,6 +133,20 @@ lib/google.ts               criação/atualização dos eventos
 supabase/schema.sql         tabelas + isolamento entre empresas (RLS)
 ```
 
+## Demandas e retornos para climatização
+
+A área de acompanhamentos agora permite atribuir responsável, situação, próxima ação e histórico de contatos. Pode ser vinculada a uma manutenção, PMOC ou contrato sem mudar o prazo original. O e-mail-resumo mostra o próximo passo e quem cuida.
+
+**Antes de publicar esta atualização:** aplicar `supabase/migrations/20261030_demandas_climatizacao.sql` no Supabase usado pela aplicação. A Vercel publica cada push na main; aplicar a migração antes de mesclar. Detalhes de ativação, migração dos acompanhamentos existentes e limites em [docs/DEMANDAS.md](docs/DEMANDAS.md).
+
+Demonstração: `/demo/acompanhamentos` (lista), `/demo/acompanhamentos/novo` (cadastro) e `/demo/acompanhamentos/retorno` (simulação de contato). Verificações: `npm test`, `npm run typecheck` e `npm run build`.
+
+## PMOC e PDFs timbrados
+
+Unidades, ambientes e equipamentos alimentam planos PMOC com atividades editáveis, registro de execução e PDFs A4 versionados. O administrador cadastra nome, contatos e logo da prestadora em **Ajustes → Logo e timbrado**.
+
+Aplicar também `supabase/migrations/20261030_pmoc_documentos.sql` **antes de publicar**. Detalhes de base técnica, ativação, privacidade e limites em [docs/PMOC.md](docs/PMOC.md). Demonstração: `/demo/pmoc`.
+
 ## Próximos passos sugeridos
 
 - Cadastro de vencimento pelo WhatsApp (ex.: "novo PMOC Frigorífico 15/03/2027 anual")

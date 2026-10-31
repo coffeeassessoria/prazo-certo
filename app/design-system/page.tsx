@@ -12,6 +12,11 @@ import { Aviso } from '@/components/ui/Aviso'
 import { Vazio } from '@/components/ui/Vazio'
 import { LogoMarca } from '@/components/ui/Logo'
 import { ItemLinha } from '@/components/ItemLinha'
+import { InventarioUnidade } from '@/components/ui/InventarioUnidade'
+import { IdentidadeForm } from '@/components/ui/IdentidadeForm'
+import { PmocForm } from '@/components/ui/PmocForm'
+import { exemploPmoc } from '@/lib/pmoc-demo'
+import { AcompanhamentoForm } from '@/components/AcompanhamentoForm'
 import { hojeISO, somarDias } from '@/lib/datas'
 import { DemoModalToast, DemoUpload } from './Interativo'
 
@@ -32,6 +37,10 @@ function Secao({ id, titulo, children, sub }: { id: string; titulo: string; sub?
   )
 }
 
+async function demonstrarDocumento(){'use server';return {ok:true,msg:'Exemplo do catálogo. Nenhum dado foi salvo.'}}
+
+async function demonstrarDemanda() { 'use server'; return { erro: 'Exemplo do catálogo. Nenhum dado foi salvo.' } }
+
 export default function DesignSystem() {
   const hoje = hojeISO()
   return (
@@ -39,10 +48,22 @@ export default function DesignSystem() {
       <Cabecalho titulo="Design System 2.0" sub="Catálogo vivo dos componentes do Prazo Certo. Toda tela nova usa estas peças. Guia completo em docs/design-system/README.md." />
 
       <nav className="chips compactos" style={{ marginBottom: 32 }} aria-label="Seções">
-        {[['conceito', 'Conceito'], ['tokens', 'Tokens'], ['componentes', 'Componentes'], ['layout', 'Layout'], ['icones', 'Ícones e logo'], ['voz', 'Tom de voz'], ['checklist', 'Checklist']].map(([id, r]) => (
+        {[['conceito', 'Conceito'], ['tokens', 'Tokens'], ['componentes', 'Componentes'], ['layout', 'Layout'], ['icones', 'Ícones e logo'], ['voz', 'Tom de voz'], ['documentos', 'Documentos'], ['demandas', 'Demandas'], ['checklist', 'Checklist']].map(([id, r]) => (
           <a key={id} href={`#${id}`} className="chip" style={{ textDecoration: 'none' }}><span className="chip-titulo">{r}</span></a>
         ))}
       </nav>
+
+      <Secao id="documentos" titulo="Timbrado e plano PMOC" sub="Logo proporcional, campos do plano e rotinas editáveis. O PDF usa uma base compartilhada em A4.">
+        <div className="documento-form-wrap"><IdentidadeForm acao={demonstrarDocumento} identidade={exemploPmoc().identidade} logoUrl="/demo/logo-climatech.png" />
+          <details className="card"><summary>Formulário do plano PMOC</summary><PmocForm acao={demonstrarDocumento} unidades={[{id:'demo',nome:'Unidade de exemplo'}]} unidadePadrao="demo" /></details>
+          <details className="card"><summary>Inventário da unidade</summary><InventarioUnidade id="demo" ambientes={exemploPmoc().ambientes} equipamentos={exemploPmoc().equipamentos} salvarAmbiente={demonstrarDocumento} salvarEquipamento={demonstrarDocumento} baseHref="/demo/pmoc/unidade" /></details>
+        </div>
+      </Secao>
+
+      <Secao id="demandas" titulo="Demandas de climatização" sub="Item com situação, responsável e próxima ação. O prazo do vencimento vinculado é independente do retorno.">
+        <div className="lista demanda-grupo"><ItemLinha hoje={hoje} item={{ id:'catalogo', href:'/demo/acompanhamentos/retorno', titulo:'Aprovar troca do compressor', tipo:'acompanhamento', vencimento:hoje, antecedencia_dias:0, status:'ativo', recorrencia_meses:null, cliente_nome:'Hospital Santa Clara', etapa_demanda:'aguardando_cliente', categoria_demanda:'orcamento', responsavel_nome:'Vanderlei', proxima_acao:'Ligar para confirmar a aprovação do orçamento' }} /></div>
+        <div className="demanda-form-wrap"><AcompanhamentoForm acao={demonstrarDemanda} clientes={[]} responsaveis={[{ user_id:'exemplo',nome:'Vanderlei' }]} responsavelPadrao="exemplo" /></div>
+      </Secao>
 
       <Secao id="conceito" titulo="Conceito">
         <div className="card">

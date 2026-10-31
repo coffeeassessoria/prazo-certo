@@ -558,3 +558,31 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
   .lp-secao, .lp-final { padding-block: var(--pc-space-12); }
   .lp-rodape nav { margin-left: 0; }
 }
+
+/* Demandas de climatização — DS 2.0 */
+.demanda-campos { border: 0; padding: 0; margin: 0; min-width: 0; }
+.demanda-form-wrap { max-width: 720px; }
+.demanda-filtros { flex-wrap: wrap; }
+.demanda-grupo { margin-bottom: var(--pc-space-6); }
+.demanda-proxima { display: block; margin-top: var(--pc-space-2); color: var(--pc-text); font-size: var(--pc-text-sm); line-height: 1.5; overflow-wrap: anywhere; }
+.demanda-resumo { display: flex; align-items: center; gap: var(--pc-space-4); }
+.demanda-texto { white-space: pre-wrap; overflow-wrap: anywhere; }
+.demanda-historico { margin-top: var(--pc-space-6); }
+.demanda-eventos { padding-left: var(--pc-space-5); margin-top: var(--pc-space-4); }
+.demanda-eventos > li { padding-block: var(--pc-space-3); border-bottom: 1px solid var(--pc-border); overflow-wrap: anywhere; }
+.demanda-eventos > li:last-child { border-bottom: 0; }
+.demanda-eventos ul { margin-top: var(--pc-space-2); padding-left: var(--pc-space-4); }
+.demanda-paginacao { margin-top: var(--pc-space-4); flex-wrap: wrap; }
+@media (max-width: 767px) {
+  .demanda-filtros > *, .demanda-filtros .busca { width: 100%; min-width: 0; }
+  .demanda-paginacao .btn { min-height: 44px; }
+}
+
+/* Identidade e PMOC: componentes do DS em A4 e na operação. */
+.documento-form-wrap { max-width: 880px; }
+.documento-secao { margin-block: var(--pc-space-6); }
+.documento-logo-preview { background: var(--pc-document-paper); border: 1px solid var(--pc-border); border-radius: var(--pc-radius-md); padding: var(--pc-space-4); margin-bottom: var(--pc-space-3); }
+.documento-logo-preview img { display: block; max-width: 100%; width: auto; height: auto; max-height: 120px; object-fit: contain; }
+.pmoc-rotina { min-width: 0; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-md); padding: var(--pc-space-4); margin-block: var(--pc-space-4); }
+.pmoc-rotina legend { font-weight: 600; padding-inline: var(--pc-space-2); color: var(--pc-text-secondary); }
+@media (max-width: 767px) { .documento-form-wrap .btn { min-height: 44px; } }

@@ -22,7 +22,7 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
 
   let q = supabase
     .from('itens')
-    .select('id, titulo, tipo, vencimento, antecedencia_dias, status, recorrencia_meses, cliente_id, clientes(nome)')
+    .select('id, titulo, tipo, vencimento, antecedencia_dias, status, recorrencia_meses, cliente_id, etapa_demanda, categoria_demanda, proxima_acao, clientes(nome)')
     .eq('empresa_id', ctx.empresa.id)
     .in('status', historico ? ['renovado', 'concluido'] : ['ativo'])
     .order('vencimento', { ascending: !historico })
@@ -110,7 +110,7 @@ export default async function Painel({ searchParams }: { searchParams: Promise<B
       {!historico && !!retornos && (
         <Link href="/acompanhamentos" className="aviso aviso-link" style={{ marginBottom: 24 }}>
           <BellRing size={18} aria-hidden />
-          <div><b>{retornos === 1 ? '1 retorno para fazer hoje' : `${retornos} retornos para fazer hoje`}</b>Abra os acompanhamentos para resolver ou adiar.</div>
+          <div><b>{retornos === 1 ? '1 retorno para fazer hoje' : `${retornos} retornos para fazer hoje`}</b>Abra as demandas para registrar o contato e combinar o próximo passo.</div>
         </Link>
       )}
 

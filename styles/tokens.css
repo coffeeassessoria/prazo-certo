@@ -78,6 +78,7 @@
   --pc-text: var(--pc-neutral-900);
   --pc-text-secondary: var(--pc-neutral-500);
   --pc-text-inverse: #ffffff;
+  --pc-document-paper: #ffffff; /* papel dos PDFs, inclusive no tema escuro */
 
   /* Radius */
   --pc-radius-xs: 6px;
