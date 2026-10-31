@@ -3,8 +3,7 @@
    Tokens em styles/tokens.css. Guia de uso: docs/design-system/README.md
    Catálogo vivo: /design-system
    Regra de ouro: só usar var(--pc-*). Nada de hex solto aqui, exceto os
-   pares de contraste definidos pelo DS (botão perigo, botão primário no
-   escuro e visto verde).
+   pares de contraste definidos pelo DS (botão perigo e visto verde).
    ===================================================================== */
 @import "../styles/tokens.css";
 
@@ -87,9 +86,10 @@ p { margin: 0 0 var(--pc-space-2); }
   }
   .abas a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--pc-space-1); min-height: var(--pc-touch); font-size: 10px; font-weight: 500; color: var(--pc-text-secondary); }
   .abas a:hover { text-decoration: none; }
-  .abas a[aria-current="page"] { color: var(--pc-brand-700); }
-  .abas .fab { width: 56px; height: 56px; border-radius: var(--pc-radius-pill); background: var(--pc-brand-700); color: var(--pc-text-inverse); display: grid; place-items: center; box-shadow: var(--pc-shadow-lg); transform: translateY(-12px); }
-  [data-theme="dark"] .abas .fab { background: var(--pc-brand-300); color: #0f141a; }
+  .abas a[aria-current="page"] { color: var(--pc-accent-text); }
+  .abas .fab { width: 56px; height: 56px; border-radius: var(--pc-radius-pill); background: var(--pc-accent); color: var(--pc-accent-ink); display: grid; place-items: center; box-shadow: var(--pc-shadow-lg); transform: translateY(-12px); }
+  .abas a:hover .fab { background: var(--pc-accent-hover); }
+  .abas a:active .fab { background: var(--pc-accent-active); }
 }
 @media (min-width: 768px) { .so-mobile { display: none !important; } }
 
@@ -117,7 +117,7 @@ p { margin: 0 0 var(--pc-space-2); }
 .menu a svg { opacity: .7; flex: none; }
 .menu a:hover { background: var(--pc-surface-2); color: var(--pc-text); text-decoration: none; }
 .menu a:hover svg { opacity: 1; }
-.menu a[aria-current="page"] { background: var(--pc-brand-50); color: var(--pc-brand-700); border-left-color: var(--pc-brand-700); }
+.menu a[aria-current="page"] { background: var(--pc-accent-soft); color: var(--pc-accent-text); border-left-color: var(--pc-accent-border); }
 .menu a[aria-current="page"] svg { opacity: 1; }
 .menu-rotulo { font-size: var(--pc-text-xs); font-weight: 600; color: var(--pc-text-secondary); padding: var(--pc-space-4) var(--pc-space-3) var(--pc-space-1); }
 .sidebar-rodape { margin-top: auto; position: sticky; bottom: 0; padding: var(--pc-space-4); border-top: 1px solid var(--pc-border); background: var(--pc-surface); display: flex; align-items: center; gap: var(--pc-space-3); }
@@ -135,13 +135,11 @@ p { margin: 0 0 var(--pc-space-2); }
   display: inline-flex; align-items: center; justify-content: center; gap: var(--pc-space-2);
   height: 40px; padding: 0 var(--pc-space-4); border-radius: var(--pc-radius-xs);
   font: 600 var(--pc-text-sm)/1 var(--pc-font); white-space: nowrap; cursor: pointer;
-  background: var(--pc-brand-700); color: var(--pc-text-inverse); border: 1px solid transparent;
+  background: var(--pc-accent); color: var(--pc-accent-ink); border: 1px solid transparent;
   transition: background var(--pc-duration-fast), border-color var(--pc-duration-fast), color var(--pc-duration-fast);
 }
-.btn:hover { background: var(--pc-brand-500); text-decoration: none; }
-.btn:active { background: var(--pc-brand-800); transform: translateY(1px); }
-[data-theme="dark"] .btn { background: var(--pc-brand-300); color: #0f141a; border-color: var(--pc-brand-300); }
-[data-theme="dark"] .btn:hover { background: var(--pc-brand-500); border-color: var(--pc-brand-500); }
+.btn:hover { background: var(--pc-accent-hover); text-decoration: none; }
+.btn:active { background: var(--pc-accent-active); transform: translateY(1px); }
 .btn.sec { background: var(--pc-surface); color: var(--pc-text); border-color: var(--pc-border); }
 .btn.sec:hover { background: var(--pc-surface-2); }
 [data-theme="dark"] .btn.sec { background: transparent; border-color: var(--pc-neutral-300); color: var(--pc-neutral-900); }
@@ -244,7 +242,7 @@ input[type="file"] { padding: 9px var(--pc-space-3); }
   transition: background var(--pc-duration-fast), border-color var(--pc-duration-fast);
 }
 a.metrica:hover { background: var(--pc-surface); text-decoration: none; }
-.metrica.ativo { background: var(--pc-brand-50); border-color: var(--pc-brand-700); box-shadow: 0 0 0 1px var(--pc-brand-700); }
+.metrica.ativo { background: var(--pc-accent-soft); border-color: var(--pc-accent-border); box-shadow: 0 0 0 1px var(--pc-accent-border); }
 .metrica-n { display: block; font-size: 28px; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--pc-text); }
 .metrica-r { display: flex; align-items: center; gap: 6px; margin-top: var(--pc-space-1); font-size: 13px; font-weight: 600; color: var(--pc-text); }
 .metrica-d { display: block; font-size: var(--pc-text-xs); color: var(--pc-text-secondary); }
@@ -253,7 +251,7 @@ a.metrica:hover { background: var(--pc-surface); text-decoration: none; }
 .ponto.atencao { background: var(--pc-warning-icon); }
 .ponto.ok { background: var(--pc-success-icon); }
 [data-theme="dark"] .metrica { background: #1a212b; border-color: #2a3441; }
-[data-theme="dark"] .metrica.ativo { background: var(--pc-brand-50); border-color: var(--pc-brand-500); box-shadow: 0 0 0 1px var(--pc-brand-500); }
+[data-theme="dark"] .metrica.ativo { background: var(--pc-accent-soft); border-color: var(--pc-accent-border); box-shadow: 0 0 0 1px var(--pc-accent-border); }
 
 /* =====================  ETIQUETA DE VENCIMENTO (assinatura)  =====================
    52×52 · raio 8 · furo 12px no topo · dia 20 bold + mês 10 bold
@@ -398,9 +396,9 @@ a.checklist-item:hover { border-color: var(--pc-brand-700); text-decoration: non
   transition: border-color var(--pc-duration-fast), background var(--pc-duration-fast);
 }
 .chip:hover { background: var(--pc-surface-2); }
-.chip[aria-pressed="true"] { background: var(--pc-brand-50); border-color: var(--pc-brand-700); box-shadow: 0 0 0 1px var(--pc-brand-700); }
+.chip[aria-pressed="true"] { background: var(--pc-accent-soft); border-color: var(--pc-accent-border); box-shadow: 0 0 0 1px var(--pc-accent-border); }
 .chip-titulo { display: flex; align-items: center; gap: 6px; font-size: var(--pc-text-sm); font-weight: 500; }
-.chip[aria-pressed="true"] .chip-titulo { color: var(--pc-brand-700); }
+.chip[aria-pressed="true"] .chip-titulo { color: var(--pc-accent-text); }
 .chip-meta { font-size: var(--pc-text-xs); color: var(--pc-text-secondary); }
 .chips.compactos .chip { min-height: 36px; }
 .opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--pc-space-3); }
@@ -416,7 +414,7 @@ a.opcao { color: var(--pc-text); }
 a.opcao:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .opcao strong { font-size: var(--pc-text-base); font-weight: 600; }
 .opcao span { font-size: var(--pc-text-sm); color: var(--pc-text-secondary); }
-.opcao[aria-checked="true"] { background: var(--pc-brand-50); border-color: var(--pc-brand-700); box-shadow: 0 0 0 1px var(--pc-brand-700); }
+.opcao[aria-checked="true"] { background: var(--pc-accent-soft); border-color: var(--pc-accent-border); box-shadow: 0 0 0 1px var(--pc-accent-border); }
 
 /* ---------- Formulário guiado (etapas) ---------- */
 .etapa { padding-bottom: var(--pc-space-6); margin-bottom: var(--pc-space-6); border-bottom: 1px solid var(--pc-border); }

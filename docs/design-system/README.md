@@ -1,6 +1,7 @@
 # Prazo Certo · Design System 2.0
 
 Padrão oficial de interface do Prazo Certo, validado em 29/10/2026.
+Atualização de 30/10/2026: destaque champanhe fosco aprovado para ações e seleção.
 Toda tela nova **precisa** seguir este guia. Na dúvida, copie um padrão que já existe.
 
 | Onde | O quê |
@@ -17,7 +18,7 @@ Toda tela nova **precisa** seguir este guia. Na dúvida, copie um padrão que j�
 
 Ferramenta de trabalho que tira peso da cabeça do gestor. Visual **calmo, sólido e técnico**: nada pisca, tudo informa.
 A **etiqueta com furo** é o coração: transforma a data em objeto físico, fácil de reconhecer em campo.
-Azul profundo é a âncora de confiança; neutros para leitura longa; **cor só para status**.
+Azul profundo é a âncora da marca e dos links; neutros para leitura longa; **champanhe fosco em ações principais e seleção**. Vermelho, amarelo e verde continuam exclusivos dos respectivos status.
 
 Três princípios: **Confiável** (sem ruído nem gradiente) · **Óbvio** (toque grande, rótulos que dizem o que fazem) · **Calmo** (muito espaço, pouca cor).
 
@@ -31,8 +32,23 @@ color: var(--pc-text-secondary);  /* apoio */
 background: var(--pc-surface);    /* cartões */
 background: var(--pc-bg);         /* fundo do app */
 border-color: var(--pc-border);
-background: var(--pc-brand-700);  /* ação principal */
+background: var(--pc-accent);     /* ação principal */
+color: var(--pc-accent-ink);      /* texto sobre a ação principal */
 ```
+
+**Destaque champanhe (uso contido, sem gradiente ou brilho):**
+
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--pc-accent` | `#b69a5b` | `#d6be86` | Botão primário e botão Novo mobile |
+| `--pc-accent-hover` | `#ab9054` | `#c9b17a` | Hover da ação |
+| `--pc-accent-active` | `#9f854c` | `#bda56d` | Ação pressionada |
+| `--pc-accent-ink` | `#0f141a` | `#0f141a` | Texto e ícone sobre champanhe |
+| `--pc-accent-text` | `#806328` | `#d6be86` | Texto do menu e filtros selecionados |
+| `--pc-accent-soft` | `#f4efe3` | `#302b20` | Fundo de seleção |
+| `--pc-accent-border` | `#b69a5b` | `#d6be86` | Borda da seleção |
+
+Botões primários usam texto escuro nos dois temas (contraste 6,84:1 no claro e 10,19:1 no escuro; mínimo de 5:1 nos estados hover/pressionado). O champanhe não substitui as cores de status, o azul dos links, o foco azul nem a identidade nos PDFs dos clientes.
 
 **Status (exclusivo para status, nunca decoração):**
 
@@ -50,7 +66,7 @@ background: var(--pc-brand-700);  /* ação principal */
 
 ### Tema escuro
 Ativado por `data-theme="dark"` no `<html>`. Segue o sistema por padrão; o usuário troca no botão do topo ou em Ajustes (salvo no navegador).
-Os tokens mudam sozinhos. Regras críticas do DS: primário no escuro = `#4a9ac4` com texto `#0f141a`; status no escuro usam **fundo escuro** (`#2a1515`, `#2a2010`, `#12261a`), nunca fundo claro.
+Os tokens mudam sozinhos. Primário no escuro = champanhe `#d6be86` com texto `#0f141a`; status no escuro usam **fundo escuro** (`#2a1515`, `#2a2010`, `#12261a`), nunca fundo claro.
 
 ## 3. Componentes
 
