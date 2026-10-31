@@ -1,6 +1,6 @@
 /* =====================================================================
    PRAZO CERTO — Design System 2.0 · TOKENS (fonte única de verdade)
-   Copiado do DS validado: docs/design-system/fonte-validada/index.css
+   Base: docs/design-system/fonte-validada/index.css; destaque champanhe aprovado em 30/10/2026.
    NÃO edite valores aqui sem atualizar docs/design-system/README.md.
    Tema escuro: [data-theme="dark"] no <html> (ver components/ui/TemaToggle).
    ===================================================================== */
@@ -13,6 +13,15 @@
   --pc-brand-700: #155179;
   --pc-brand-800: #123f5e;
   --pc-brand-900: #0f324b;
+
+  /* Destaque champanhe: ações principais e seleção, independente da marca/status. */
+  --pc-accent: #b69a5b;
+  --pc-accent-hover: #ab9054;
+  --pc-accent-active: #9f854c;
+  --pc-accent-ink: #0f141a;
+  --pc-accent-text: #806328;
+  --pc-accent-soft: #f4efe3;
+  --pc-accent-border: #b69a5b;
 
   /* Neutrals */
   --pc-neutral-0: #ffffff;
@@ -144,6 +153,13 @@
   --pc-brand-700: #a8d0e6;
   --pc-brand-800: #c3e0ee;
   --pc-brand-900: #d8eaf5;
+
+  --pc-accent: #d6be86;
+  --pc-accent-hover: #c9b17a;
+  --pc-accent-active: #bda56d;
+  --pc-accent-text: #d6be86;
+  --pc-accent-soft: #302b20;
+  --pc-accent-border: #d6be86;
 
   /* Semantic dark - charcoal #121821 */
   --pc-bg: #121821;

@@ -23,7 +23,8 @@ import { DemoModalToast, DemoUpload } from './Interativo'
 export const metadata = { title: 'Design System 2.0 · Prazo Certo' }
 
 const CORES: { grupo: string; uso: string; tokens: [string, string][] }[] = [
-  { grupo: 'Brand · azul confiança', uso: '700 é ação principal, 50 é fundo informativo', tokens: [['50', 'fundo info'], ['100', 'borda info'], ['300', 'ação no escuro'], ['500', 'hover'], ['700', 'primário'], ['800', 'pressionado'], ['900', 'texto escuro']].map(([n, u]) => [`--pc-brand-${n}`, u] as [string, string]) },
+  { grupo: 'Brand · azul profundo', uso: 'Marca, links e informação; preservado junto ao champanhe', tokens: [['50', 'fundo info'], ['100', 'borda info'], ['300', 'apoio'], ['500', 'apoio'], ['700', 'links e foco'], ['800', 'apoio'], ['900', 'texto escuro']].map(([n, u]) => [`--pc-brand-${n}`, u] as [string, string]) },
+  { grupo: 'Destaque · champanhe fosco', uso: 'Ações principais e seleção; texto escuro sobre o botão nos dois temas', tokens: [['--pc-accent', 'ação principal'], ['--pc-accent-hover', 'hover'], ['--pc-accent-active', 'pressionado'], ['--pc-accent-ink', 'texto do botão'], ['--pc-accent-text', 'texto selecionado'], ['--pc-accent-soft', 'fundo selecionado'], ['--pc-accent-border', 'borda selecionada']] },
   { grupo: 'Neutros · leitura longa', uso: 'Superfícies, bordas e texto', tokens: [['0', 'superfície'], ['50', 'hover'], ['100', 'fundo do app'], ['200', 'separador'], ['300', 'borda'], ['400', 'ícone desabilitado'], ['500', 'texto secundário'], ['700', 'título suave'], ['900', 'texto']].map(([n, u]) => [`--pc-neutral-${n}`, u] as [string, string]) },
 ]
 
@@ -70,7 +71,8 @@ export default function DesignSystem() {
           <p style={{ fontSize: 18, lineHeight: '32px', maxWidth: '70ch', color: 'var(--pc-text)' }}>
             O Prazo Certo é a ferramenta que tira peso da cabeça do gestor. Visual calmo, sólido e técnico, como um painel de controle de hospital:
             nada pisca, tudo informa. A etiqueta com furo é o coração — transforma data abstrata em objeto físico, fácil de reconhecer em campo.
-            Azul profundo é a âncora de confiança, neutros para leitura longa e cor apenas para status, nunca para enfeitar.
+            Azul profundo é a âncora da marca, neutros para leitura longa e champanhe fosco para ações principais e seleção.
+            Vermelho, amarelo e verde continuam reservados aos status.
           </p>
           <div className="grade-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', marginTop: 24 }}>
             {[['Confiável', 'Azul profundo, sem ruído, sem gradiente. Bordas suaves, sombras sutis.'], ['Óbvio', 'Hierarquia forte, toque grande, rótulos que dizem o que fazem. Ícone sempre com texto.'], ['Calmo', 'Muito espaço, pouca cor. A cor fala só quando importa: vencido, vence logo, em dia.']].map(([t, d]) => (
