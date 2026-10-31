@@ -30,7 +30,7 @@ export function Menu({ temEmpresa, superadmin, aoNavegar }: Props) {
         <>
           <Link href="/" {...a('/')} {...l}><LayoutDashboard size={20} />Painel</Link>
           <Link href="/itens/novo" {...a('/itens/novo')} {...l}><Plus size={20} />Novo vencimento</Link>
-          <Link href="/acompanhamentos" {...a('/acompanhamentos')} {...l}><BellRing size={20} />Acompanhamentos</Link>
+          <Link href="/acompanhamentos" {...a('/acompanhamentos')} {...l}><BellRing size={20} />Demandas e retornos</Link>
           <Link href="/clientes" {...a('/clientes')} {...l}><Users size={20} />Clientes</Link>
           <Link href="/?f=historico" {...a('/?f=historico')} {...l}><History size={20} />Histórico</Link>
           <Link href="/config" {...a('/config')} {...l}><Settings size={20} />Ajustes</Link>
@@ -85,7 +85,7 @@ export function Abas({ superadmin }: { superadmin: boolean }) {
     <nav className="abas" aria-label="Navegação rápida">
       <Link href="/" {...a('/')}><LayoutDashboard size={24} />Painel</Link>
       <Link href="/clientes" {...a('/clientes')}><Users size={24} />Clientes</Link>
-      <Link href="/novo" aria-label="Cadastrar vencimento ou acompanhamento"><span className="fab"><Plus size={24} /></span></Link>
+      <Link href="/novo" aria-label="Cadastrar vencimento ou demanda"><span className="fab"><Plus size={24} /></span></Link>
       <Link href="/acompanhamentos" {...a('/acompanhamentos')}><BellRing size={24} />Retornos</Link>
       <Link href="/config" {...a('/config')}><Settings size={24} />Ajustes</Link>
     </nav>

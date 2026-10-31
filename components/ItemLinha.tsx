@@ -3,9 +3,11 @@ import { BellRing, Building2, Repeat } from 'lucide-react'
 import { ACOMPANHAMENTO, diasAte, ROTULO_TIPO, situacao, textoRetorno, type Situacao } from '@/lib/datas'
 import { Etiqueta } from '@/components/ui/Etiqueta'
 import { Selo } from '@/components/ui/Selo'
+import { CATEGORIAS, ETAPAS, type Categoria, type Etapa } from '@/lib/demandas'
 
 export type ItemLista = {
   id: string
+  href?: string
   titulo: string
   tipo: string
   vencimento: string
@@ -13,6 +15,10 @@ export type ItemLista = {
   status: string
   recorrencia_meses: number | null
   cliente_nome: string | null
+  proxima_acao?: string | null
+  responsavel_nome?: string | null
+  categoria_demanda?: Categoria
+  etapa_demanda?: Etapa
 }
 
 export function textoStatus(s: Situacao, venc: string, hoje: string, tipo?: string): string {
@@ -32,10 +38,10 @@ export function textoStatus(s: Situacao, venc: string, hoje: string, tipo?: stri
 export function ItemLinha({ item, hoje }: { item: ItemLista; hoje: string }) {
   const s = situacao(item, hoje)
   const tom = s === 'renovado' || s === 'concluido' ? 'neutro' : s
-  const selo = <Selo tom={tom} peq>{textoStatus(s, item.vencimento, hoje, item.tipo)}</Selo>
+  const selo = <Selo tom={tom} peq>{item.tipo === ACOMPANHAMENTO && item.status === 'concluido' && item.etapa_demanda ? ETAPAS[item.etapa_demanda] : textoStatus(s, item.vencimento, hoje, item.tipo)}</Selo>
   return (
-    <Link href={`/itens/${item.id}`} className="item">
-      <Etiqueta data={item.vencimento} status={s} />
+    <Link href={item.href ?? `/itens/${item.id}`} className="item">
+      <Etiqueta data={item.vencimento} status={s} rotulo={item.tipo === ACOMPANHAMENTO ? 'Retorno em' : 'Vence em'} />
       <span className="item-corpo">
         <span className="item-titulo">{item.titulo}</span>
         <span className="item-meta">
@@ -43,6 +49,8 @@ export function ItemLinha({ item, hoje }: { item: ItemLista; hoje: string }) {
           <span>{item.cliente_nome ? `${item.cliente_nome} • ` : ''}{ROTULO_TIPO[item.tipo] ?? item.tipo}</span>
           {item.recorrencia_meses ? <><Repeat size={13} aria-label="Repete" /></> : null}
         </span>
+        {item.tipo === ACOMPANHAMENTO && item.etapa_demanda && <span className="item-meta">{ETAPAS[item.etapa_demanda]} • {item.categoria_demanda ? CATEGORIAS[item.categoria_demanda] : 'Demanda'}{item.responsavel_nome ? ` • ${item.responsavel_nome}` : ''}</span>}
+        {item.tipo === ACOMPANHAMENTO && item.proxima_acao && <span className="demanda-proxima">{item.status === 'ativo' ? 'Próxima ação' : 'Última ação prevista'}: {item.proxima_acao}</span>}
         <span className="item-selo-mobile">{selo}</span>
       </span>
       {selo}

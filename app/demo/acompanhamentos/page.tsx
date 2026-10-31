@@ -1,33 +1,32 @@
-import { BellRing } from 'lucide-react'
+import Link from 'next/link'
+import { BellRing, Plus } from 'lucide-react'
 import { Casca } from '@/components/Casca'
-import { AcompanhamentoForm } from '@/components/AcompanhamentoForm'
 import { ItemLinha } from '@/components/ItemLinha'
 import { Cabecalho } from '@/components/ui/Cabecalho'
+import { Metrica } from '@/components/ui/Metrica'
+import { Aviso } from '@/components/ui/Aviso'
 import { hojeISO, somarDias } from '@/lib/datas'
 
-async function nada() { 'use server' }
+export const dynamic = 'force-dynamic'
 
-// Demonstração dos acompanhamentos (não salva nada)
-export default function DemoAcompanhamentos() {
+export default function DemoDemandas() {
   const hoje = hojeISO()
-  const base = { tipo: 'acompanhamento', antecedencia_dias: 0, status: 'ativo', recorrencia_meses: null }
+  const base = { tipo: 'acompanhamento', antecedencia_dias: 0, status: 'ativo', recorrencia_meses: null, href: '/demo/acompanhamentos/retorno' }
   const itens = [
-    { ...base, id: 'a', titulo: 'Cobrar se compraram a peça do orçamento', vencimento: somarDias(hoje, -2), cliente_nome: 'ADM do Brasil' },
-    { ...base, id: 'b', titulo: 'Voltar para ver se o ar da sala 3 foi arrumado', vencimento: hoje, cliente_nome: 'Hospital Santa Clara' },
-    { ...base, id: 'c', titulo: 'Ligar para confirmar a visita técnica', vencimento: somarDias(hoje, 3), cliente_nome: null },
+    { ...base, id: 'a', titulo: 'Aprovar troca do compressor da recepção', vencimento: somarDias(hoje, -2), cliente_nome: 'Hospital Santa Clara', etapa_demanda: 'aguardando_cliente' as const, categoria_demanda: 'orcamento' as const, responsavel_nome: 'Vanderlei', proxima_acao: 'Ligar para o João e confirmar aprovação do orçamento 123' },
+    { ...base, id: 'b', titulo: 'Confirmar chegada do motor do ventilador', vencimento: hoje, cliente_nome: 'Mercado Central', etapa_demanda: 'aguardando_fornecedor' as const, categoria_demanda: 'peca' as const, responsavel_nome: 'Ana', proxima_acao: 'Consultar a previsão de entrega com a distribuidora' },
+    { ...base, id: 'c', titulo: 'Agendar a próxima manutenção preventiva', vencimento: somarDias(hoje, 3), cliente_nome: 'Clínica Boa Vista', etapa_demanda: 'a_fazer' as const, categoria_demanda: 'agendamento' as const, responsavel_nome: 'Vanderlei', proxima_acao: 'Combinar a visita e confirmar a liberação de acesso' },
   ]
-  return (
-    <Casca empresa="ClimaTech (demonstração)" email="admin@climatech.com" nome="ClimaTech Admin" temEmpresa superadmin={false}>
-      <Cabecalho titulo="Acompanhamentos" subIcone={<BellRing size={14} aria-hidden />} sub="2 para fazer hoje • 3 em aberto" />
-      <div className="grade-2">
-        <div>
-          <h2>Para fazer <span className="opcional">(2)</span></h2>
-          <div className="lista" style={{ marginBottom: 24 }}>{itens.slice(0, 2).map((i) => <ItemLinha key={i.id} item={i} hoje={hoje} />)}</div>
-          <h2>Próximos <span className="opcional">(1)</span></h2>
-          <div className="lista">{itens.slice(2).map((i) => <ItemLinha key={i.id} item={i} hoje={hoje} />)}</div>
-        </div>
-        <AcompanhamentoForm acao={nada} compacto clientes={[{ id: '1', nome: 'ADM do Brasil' }, { id: '2', nome: 'Hospital Santa Clara' }]} />
-      </div>
-    </Casca>
-  )
+  return <Casca empresa="ClimaTech (demonstração)" email="admin@climatech.com" nome="Vanderlei" temEmpresa superadmin={false}>
+    <Aviso titulo="Demonstração de demandas de climatização">Dados fictícios. Abra uma demanda para simular um contato ou <Link href="/demo/acompanhamentos/novo">experimente o cadastro</Link>.</Aviso>
+    <Cabecalho titulo="Demandas e retornos" sub="Orçamentos, peças, visitas e retornos da sua empresa de climatização." subIcone={<BellRing size={14} aria-hidden />}
+      acao={<Link href="/demo/acompanhamentos/novo" className="btn"><Plus size={16} />Nova demanda</Link>} />
+    <div className="metricas">
+      <Metrica tom="vencido" valor={1} rotulo="Atrasadas" apoio="na empresa" />
+      <Metrica tom="atencao" valor={1} rotulo="Para hoje" apoio="retorno combinado" />
+      <Metrica valor={1} rotulo="Meus retornos" apoio="hoje e atrasados" />
+      <Metrica valor={3} rotulo="Em aberto" apoio="total na empresa" />
+    </div>
+    {itens.map((item,i) => <section key={item.id} className="demanda-grupo"><h2>{['Atrasadas','Para hoje','Próximas'][i]}</h2><div className="lista"><ItemLinha item={item} hoje={hoje} /></div></section>)}
+  </Casca>
 }

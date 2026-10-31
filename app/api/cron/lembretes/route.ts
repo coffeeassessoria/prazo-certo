@@ -31,17 +31,24 @@ export async function GET(req: NextRequest) {
     const para = (emp.emails_lembrete ?? []).filter(Boolean)
     if (!para.length) continue
 
-    const { data: itens } = await admin
+    const { data: itens, error: erroItens } = await admin
       .from('itens')
-      .select('id, titulo, tipo, vencimento, antecedencia_dias, clientes(nome)')
+      .select('id, titulo, tipo, vencimento, antecedencia_dias, proxima_acao, responsavel_id, clientes(nome)')
       .eq('empresa_id', emp.id)
       .eq('status', 'ativo')
       .lte('vencimento', somarDias(hoje, 366))
       .limit(1000)
 
+    if (erroItens) {
+      resultado[emp.id] = { erro: 'Não foi possível carregar os itens para lembretes.' }
+      continue
+    }
+    const { data: responsaveis } = await admin.from('perfis').select('user_id,nome,email').eq('empresa_id', emp.id)
     const candidatos = (itens ?? [])
       .map((i: any) => ({
         id: i.id, titulo: i.titulo, tipo: i.tipo, vencimento: i.vencimento, antecedencia_dias: i.antecedencia_dias,
+        proxima_acao: i.proxima_acao,
+        responsavel_nome: responsaveis?.find(p => p.user_id === i.responsavel_id)?.nome || responsaveis?.find(p => p.user_id === i.responsavel_id)?.email || null,
         cliente_nome: (Array.isArray(i.clientes) ? i.clientes[0]?.nome : i.clientes?.nome) ?? null,
         marco: marcoDoDia(diasAte(i.vencimento, hoje), i.antecedencia_dias, i.tipo, i.vencimento),
       }))
@@ -51,6 +58,7 @@ export async function GET(req: NextRequest) {
     const { data: jaEnviados } = await admin
       .from('lembretes_enviados')
       .select('item_id, marco')
+      .eq('empresa_id', emp.id)
       .eq('canal', 'email')
       .in('item_id', candidatos.map((c) => c.id))
     const enviados = new Set((jaEnviados ?? []).map((e) => `${e.item_id}:${e.marco}`))

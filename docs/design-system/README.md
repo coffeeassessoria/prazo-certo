@@ -134,3 +134,9 @@ export default async function MinhaTela() {
 }
 ```
 Componente novo? Crie em `components/ui/`, estilize em `globals.css` só com tokens, adicione ao catálogo `/design-system` e a esta tabela.
+
+## Demandas de climatização
+
+`ItemLinha` também aceita `etapa_demanda`, `categoria_demanda`, `responsavel_nome` e `proxima_acao`.
+`AcompanhamentoForm` atende cadastro/edição e `modo="contato"`; usa os campos, botões e avisos do DS.
+Exemplos interativos em `/demo/acompanhamentos` e seção Demandas do catálogo.

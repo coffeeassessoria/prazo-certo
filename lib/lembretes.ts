@@ -29,6 +29,8 @@ export type ItemLembrete = {
   vencimento: string
   antecedencia_dias: number
   cliente_nome: string | null
+  proxima_acao?: string | null
+  responsavel_nome?: string | null
 }
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!)
@@ -81,6 +83,8 @@ export function montarEmail(empresa: string, itens: ItemLembrete[], hoje: string
           </td><td style="padding-left:12px;vertical-align:middle">
           <div style="font-weight:600;font-size:15px">${esc(i.titulo)}</div>
           <div style="font-size:13px;color:#6a7181;margin-top:2px">${i.cliente_nome ? esc(i.cliente_nome) + ' · ' : ''}${ROTULO_TIPO[i.tipo] ?? i.tipo} · ${fmtData(i.vencimento)} · <strong style="color:${cor[k]}">${prazo}</strong></div>
+          ${i.tipo === ACOMPANHAMENTO && i.proxima_acao ? `<div style="font-size:14px;margin-top:8px">Próxima ação: ${esc(i.proxima_acao)}</div>` : ''}
+          ${i.tipo === ACOMPANHAMENTO && i.responsavel_nome ? `<div style="font-size:13px;margin-top:4px">Responsável: ${esc(i.responsavel_nome)}</div>` : ''}
           </td></tr></table>
         </a>`
       }).join('')}`
@@ -96,14 +100,14 @@ export function montarEmail(empresa: string, itens: ItemLembrete[], hoje: string
       ${bloco('Vencem em breve', proximos, 'p')}
       ${bloco('Retornos e cobranças para fazer', retornos, 'h')}
       <a href="${appUrl}" style="display:inline-block;margin-top:20px;background:#155179;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:12px 20px;border-radius:6px">Abrir o painel</a>
-      <p style="font-size:12px;color:#6a7181;margin:20px 0 0">Depois de renovar, marque como renovado no sistema para parar os avisos deste item. Nos retornos, marque como resolvido ou adie para outro dia.</p>
+      <p style="font-size:12px;color:#6a7181;margin:20px 0 0">Depois de renovar, marque como renovado no sistema para parar os avisos deste item. Nas demandas, registre o contato e combine a próxima ação, ou encerre quando estiver resolvido.</p>
     </div>
     <p style="font-size:12px;color:#6a7181;text-align:center;margin-top:16px">Você recebe este e-mail porque está cadastrado para lembretes da ${esc(empresa)}. Para mudar, acesse Configurações no sistema.</p>
   </div></body></html>`
 
   const texto = [
     `${appNome} · ${empresa}`, 'Lembrete de vencimentos', '',
-    ...ord.map((i) => `- ${i.titulo}${i.cliente_nome ? ' (' + i.cliente_nome + ')' : ''}: ${fmtData(i.vencimento)}, ${i.tipo === ACOMPANHAMENTO ? quandoRetorno(diasAte(i.vencimento, hoje)) : quando(diasAte(i.vencimento, hoje))}`),
+    ...ord.map((i) => `- ${i.titulo}${i.cliente_nome ? ' (' + i.cliente_nome + ')' : ''}: ${fmtData(i.vencimento)}, ${i.tipo === ACOMPANHAMENTO ? quandoRetorno(diasAte(i.vencimento, hoje)) : quando(diasAte(i.vencimento, hoje))}${i.tipo === ACOMPANHAMENTO && i.proxima_acao ? `\n  Próxima ação: ${i.proxima_acao}` : ''}${i.tipo === ACOMPANHAMENTO && i.responsavel_nome ? `\n  Responsável: ${i.responsavel_nome}` : ''}`),
     '', `Abrir o painel: ${appUrl}`,
   ].join('\n')
 

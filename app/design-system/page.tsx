@@ -12,6 +12,7 @@ import { Aviso } from '@/components/ui/Aviso'
 import { Vazio } from '@/components/ui/Vazio'
 import { LogoMarca } from '@/components/ui/Logo'
 import { ItemLinha } from '@/components/ItemLinha'
+import { AcompanhamentoForm } from '@/components/AcompanhamentoForm'
 import { hojeISO, somarDias } from '@/lib/datas'
 import { DemoModalToast, DemoUpload } from './Interativo'
 
@@ -32,6 +33,8 @@ function Secao({ id, titulo, children, sub }: { id: string; titulo: string; sub?
   )
 }
 
+async function demonstrarDemanda() { 'use server'; return { erro: 'Exemplo do catálogo. Nenhum dado foi salvo.' } }
+
 export default function DesignSystem() {
   const hoje = hojeISO()
   return (
@@ -39,10 +42,15 @@ export default function DesignSystem() {
       <Cabecalho titulo="Design System 2.0" sub="Catálogo vivo dos componentes do Prazo Certo. Toda tela nova usa estas peças. Guia completo em docs/design-system/README.md." />
 
       <nav className="chips compactos" style={{ marginBottom: 32 }} aria-label="Seções">
-        {[['conceito', 'Conceito'], ['tokens', 'Tokens'], ['componentes', 'Componentes'], ['layout', 'Layout'], ['icones', 'Ícones e logo'], ['voz', 'Tom de voz'], ['checklist', 'Checklist']].map(([id, r]) => (
+        {[['conceito', 'Conceito'], ['tokens', 'Tokens'], ['componentes', 'Componentes'], ['layout', 'Layout'], ['icones', 'Ícones e logo'], ['voz', 'Tom de voz'], ['demandas', 'Demandas'], ['checklist', 'Checklist']].map(([id, r]) => (
           <a key={id} href={`#${id}`} className="chip" style={{ textDecoration: 'none' }}><span className="chip-titulo">{r}</span></a>
         ))}
       </nav>
+
+      <Secao id="demandas" titulo="Demandas de climatização" sub="Item com situação, responsável e próxima ação. O prazo do vencimento vinculado é independente do retorno.">
+        <div className="lista demanda-grupo"><ItemLinha hoje={hoje} item={{ id:'catalogo', href:'/demo/acompanhamentos/retorno', titulo:'Aprovar troca do compressor', tipo:'acompanhamento', vencimento:hoje, antecedencia_dias:0, status:'ativo', recorrencia_meses:null, cliente_nome:'Hospital Santa Clara', etapa_demanda:'aguardando_cliente', categoria_demanda:'orcamento', responsavel_nome:'Vanderlei', proxima_acao:'Ligar para confirmar a aprovação do orçamento' }} /></div>
+        <div className="demanda-form-wrap"><AcompanhamentoForm acao={demonstrarDemanda} clientes={[]} responsaveis={[{ user_id:'exemplo',nome:'Vanderlei' }]} responsavelPadrao="exemplo" /></div>
+      </Secao>
 
       <Secao id="conceito" titulo="Conceito">
         <div className="card">

@@ -15,8 +15,8 @@ export default async function Novo() {
           <span>PMOC, laudo, ART, contrato ou manutenção com data para vencer.</span>
         </Link>
         <Link href="/acompanhamentos/novo" className="opcao">
-          <strong className="titulo-icone"><BellRing size={20} aria-hidden />Acompanhamento</strong>
-          <span>Um retorno curto: cobrar um orçamento, voltar para conferir um conserto.</span>
+          <strong className="titulo-icone"><BellRing size={20} aria-hidden />Demanda ou retorno</strong>
+          <span>Orçamento, peças, agendamento ou retorno após a manutenção do ar-condicionado.</span>
         </Link>
       </div>
     </div>
