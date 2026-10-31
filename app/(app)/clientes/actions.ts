@@ -31,7 +31,8 @@ export async function salvarCliente(fd: FormData) {
 export async function excluirCliente(fd: FormData) {
   const ctx = await exigirEmpresa()
   const supabase = await createClient()
-  await supabase.from('clientes').delete().eq('id', String(fd.get('id'))).eq('empresa_id', ctx.empresa.id)
+  const { error } = await supabase.from('clientes').delete().eq('id', String(fd.get('id'))).eq('empresa_id', ctx.empresa.id)
   revalidatePath('/clientes')
+  if (error) redirect(`/clientes?${qsToast('Cliente não excluído', error.code === '23503' ? 'Este cliente possui unidades ou planos vinculados. Preserve o cadastro e seu histórico.' : 'Não foi possível excluir o cliente. Tente novamente.', 'info')}`)
   redirect(`/clientes?${qsToast('Cliente excluído', 'Os vencimentos dele continuam, agora sem cliente.', 'info')}`)
 }

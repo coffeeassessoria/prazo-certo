@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BellRing, BookOpen, History, LayoutDashboard, Menu as IcoMenu, Plus, Settings, ShieldCheck, Users, X, Palette } from 'lucide-react'
+import { BellRing, BookOpen, History, FileText, Building2, LayoutDashboard, Menu as IcoMenu, Plus, Settings, ShieldCheck, Users, X, Palette } from 'lucide-react'
 
 function useAtual() {
   const path = usePathname()
@@ -31,6 +31,8 @@ export function Menu({ temEmpresa, superadmin, aoNavegar }: Props) {
           <Link href="/" {...a('/')} {...l}><LayoutDashboard size={20} />Painel</Link>
           <Link href="/itens/novo" {...a('/itens/novo')} {...l}><Plus size={20} />Novo vencimento</Link>
           <Link href="/acompanhamentos" {...a('/acompanhamentos')} {...l}><BellRing size={20} />Demandas e retornos</Link>
+          <Link href="/pmoc" {...a('/pmoc')} {...l}><FileText size={20} />Planos PMOC</Link>
+          <Link href="/unidades" {...a('/unidades')} {...l}><Building2 size={20} />Unidades e equipamentos</Link>
           <Link href="/clientes" {...a('/clientes')} {...l}><Users size={20} />Clientes</Link>
           <Link href="/?f=historico" {...a('/?f=historico')} {...l}><History size={20} />Histórico</Link>
           <Link href="/config" {...a('/config')} {...l}><Settings size={20} />Ajustes</Link>

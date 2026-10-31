@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { FileText, Trash2, UploadCloud } from 'lucide-react'
 
 /** Upload de arquivo do DS: área tracejada → linha do arquivo escolhido com opção de remover. */
-export function Upload({ name = 'anexo', atual, accept = '.pdf,image/*,.doc,.docx,.xls,.xlsx' }: { name?: string; atual?: string | null; accept?: string }) {
+export function Upload({ name = 'anexo', atual, accept = '.pdf,image/*,.doc,.docx,.xls,.xlsx', titulo = 'Arraste o PDF ou foto aqui', ajuda = 'PDF, JPG ou PNG até 10 MB. Foto do documento tirada em campo funciona.' }: { name?: string; atual?: string | null; accept?: string; titulo?: string; ajuda?: string }) {
   const ref = useRef<HTMLInputElement>(null)
   const [arquivo, setArquivo] = useState<File | null>(null)
   const [arrastando, setArrastando] = useState(false)
@@ -35,8 +35,8 @@ export function Upload({ name = 'anexo', atual, accept = '.pdf,image/*,.doc,.doc
             if (f && ref.current) { const dt = new DataTransfer(); dt.items.add(f); ref.current.files = dt.files; escolher(f) }
           }}>
           <span className="upload-icone"><UploadCloud size={20} /></span>
-          <span className="upload-titulo">Arraste o PDF ou foto aqui</span>
-          <span className="upload-sub">PDF, JPG ou PNG até 10 MB. Foto do documento tirada em campo funciona.</span>
+          <span className="upload-titulo">{titulo}</span>
+          <span className="upload-sub">{ajuda}</span>
           {atual && <span className="upload-sub">Atual: {atual}. Enviar outro substitui.</span>}
           <span className="btn sec peq">Selecionar arquivo</span>
         </label>

@@ -577,3 +577,12 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
   .demanda-filtros > *, .demanda-filtros .busca { width: 100%; min-width: 0; }
   .demanda-paginacao .btn { min-height: 44px; }
 }
+
+/* Identidade e PMOC: componentes do DS em A4 e na operação. */
+.documento-form-wrap { max-width: 880px; }
+.documento-secao { margin-block: var(--pc-space-6); }
+.documento-logo-preview { background: var(--pc-document-paper); border: 1px solid var(--pc-border); border-radius: var(--pc-radius-md); padding: var(--pc-space-4); margin-bottom: var(--pc-space-3); }
+.documento-logo-preview img { display: block; max-width: 100%; width: auto; height: auto; max-height: 120px; object-fit: contain; }
+.pmoc-rotina { min-width: 0; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-md); padding: var(--pc-space-4); margin-block: var(--pc-space-4); }
+.pmoc-rotina legend { font-weight: 600; padding-inline: var(--pc-space-2); color: var(--pc-text-secondary); }
+@media (max-width: 767px) { .documento-form-wrap .btn { min-height: 44px; } }

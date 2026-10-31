@@ -89,6 +89,7 @@ export default async function Clientes({ searchParams }: { searchParams: Promise
                   </span>
                 </div>
                 <div className="acoes">
+                  <Link href={`/unidades?cliente=${c.id}`} className="btn sec">Unidades e equipamentos</Link>
                   <Link href={`/itens/novo?cliente=${c.id}`} className="btn sec peq"><Plus size={14} />Vencimento</Link>
                   <Link href={`/clientes?editar=${c.id}`} className="btn ghost icone peq" aria-label={`Editar ${c.nome}`}><Pencil size={16} /></Link>
                   <form action={excluirCliente}>

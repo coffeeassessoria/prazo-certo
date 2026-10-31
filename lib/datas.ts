@@ -126,3 +126,8 @@ export function fmtDataExtenso(iso: string): string {
   const [a, m, d] = iso.slice(0, 10).split('-').map(Number)
   return `${d} de ${MESES_LONGOS[m - 1]} de ${a}`
 }
+
+/** Instante exibido no fuso da operação, sem trocar a data na virada UTC. */
+export function fmtInstante(iso: string): string {
+  return new Intl.DateTimeFormat('pt-BR', { timeZone: TZ, dateStyle: 'short', timeStyle: 'short' }).format(new Date(iso))
+}
