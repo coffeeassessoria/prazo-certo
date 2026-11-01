@@ -23,7 +23,7 @@ A data de retorno continua em `itens.vencimento` **somente para itens de tipo ac
 3. Publicar o código. No piloto, criar uma demanda vinculada a uma preventiva, registrar um retorno, concluir e reabrir. Conferir que o prazo da preventiva não mudou.
 4. Testar o e-mail em Ajustes e validar uma execução do cron. Se Google Agenda estiver configurada, conferir criação, alteração e encerramento do evento.
 
-A migração não foi aplicada no Supabase de produção por esta implementação. Não foram usados credenciais ou dados reais para os testes locais.
+**Estado atualizado em 31/10/2026:** a migração foi aplicada ao Supabase de produção `prazo-certo-sp` em 30/10/2026 e o código foi publicado no PR #1. Os testes locais continuam usando infraestrutura simulada; o piloto autenticado e o envio real de lembretes descritos acima ainda precisam ser concluídos. Veja `STATUS.md`.
 
 ## Histórico e isolamento
 

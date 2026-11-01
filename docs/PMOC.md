@@ -51,7 +51,7 @@ Unidades com planos e clientes com unidades não são excluídos por cascata; o 
 5. Cadastrar cliente, unidade, ambientes e aparelhos; preencher plano e emitir um rascunho. Completar as pendências, declarar revisão e preparar para assinatura.
 6. Registrar uma execução e gerar outra versão; baixar as duas e conferir que a primeira não mudou. Testar o anexo de projeto e o download autenticado de outra empresa (deve ser negado).
 
-As migrações não foram aplicadas ao Supabase de produção nesta implementação. O teste autenticado contra a instância real e o teste do storage real permanecem pendentes de acesso/configuração. O código permanece em PR de rascunho.
+**Estado atualizado em 31/10/2026:** as duas migrações foram aplicadas ao Supabase de produção `prazo-certo-sp` em 30/10/2026. Foram conferidas as tabelas novas com RLS e os buckets privados; o PR #1 foi mesclado e publicado. O PDF fictício de produção também foi baixado e inspecionado. O piloto operacional autenticado, incluindo upload e download no storage real, ainda precisa ser concluído; veja `STATUS.md`.
 
 ## Validação e demonstração
 
