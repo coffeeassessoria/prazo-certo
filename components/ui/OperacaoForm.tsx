@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { AssinaturaAtendimento } from "./AssinaturaAtendimento";
 import {
   conteudoAceite,
+  podeColetarAssinatura,
   criarAssinatura,
   semAssinatura,
 } from "@/lib/relatorios/assinatura";
@@ -789,18 +790,22 @@ export function OperacaoForm({
       <div className="acoes empilha">
         {!preservado && (
           <BotaoEnviar
+            className={
+              tipo === "servico" &&
+              !d.relatorio?.assinatura &&
+              podeColetarAssinatura(d)
+                ? "btn sec"
+                : "btn"
+            }
             disabled={fotosOcupadas || assinando || (revisando && !conflito)}
           >
-            {tipo === "servico" && d.estado === "concluida"
-              ? "Concluir e preservar"
-              : "Salvar"}{" "}
             {tipo === "servico"
-              ? "ordem de serviço"
-              : tipo === "demanda"
-                ? "demanda"
-                : tipo === "financeiro"
-                  ? "lançamento"
-                  : "orçamento"}
+              ? d.estado === "concluida"
+                ? d.relatorio?.assinatura
+                  ? "Enviar OS assinada"
+                  : "Concluir OS sem assinatura"
+                : "Salvar ordem de serviço"
+              : `Salvar ${tipo === "demanda" ? "demanda" : tipo === "financeiro" ? "lançamento" : "orçamento"}`}
           </BotaoEnviar>
         )}
         <button

@@ -1,7 +1,11 @@
 "use client";
 import { useRef, useState, type PointerEvent } from "react";
 import { baseDemo } from "@/lib/operacao/demo";
-import { criarAssinatura, semAssinatura } from "@/lib/relatorios/assinatura";
+import {
+  podeColetarAssinatura,
+  criarAssinatura,
+  semAssinatura,
+} from "@/lib/relatorios/assinatura";
 import { PenLine } from "lucide-react";
 import { Aviso } from "./Aviso";
 import { Confirmar } from "./Confirmar";
@@ -132,20 +136,7 @@ export function AssinaturaAtendimento({
       </section>
     );
   if (r.snapshot) return null;
-  const pronta =
-    d.estado === "concluida" &&
-    !!d.titulo.trim() &&
-    !!d.cliente_id &&
-    !!d.responsavel_id &&
-    !!r.unidade_id &&
-    r.equipamento_ids.length > 0 &&
-    !!r.executada_em &&
-    !!d.resultado?.trim() &&
-    !!d.checklist?.length &&
-    d.checklist.every((c) => c.feito) &&
-    r.ciencia.situacao === "presente" &&
-    r.ciencia.nome.trim().length >= 2 &&
-    r.ciencia.confirmada;
+  const pronta = podeColetarAssinatura(d);
   const ponto = (e: PointerEvent<SVGSVGElement>): Ponto => {
     const b = e.currentTarget.getBoundingClientRect();
     return [

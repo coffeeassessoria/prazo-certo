@@ -103,3 +103,21 @@ export function criarAssinatura(
     termo: TERMO_ACEITE,
   };
 }
+
+export function podeColetarAssinatura(d: Dados) {
+  if (!d.relatorio) return false;
+  return;
+  d.estado === "concluida" &&
+    !!d.titulo.trim() &&
+    !!d.cliente_id &&
+    !!d.responsavel_id &&
+    !!d.relatorio!.unidade_id &&
+    d.relatorio!.equipamento_ids.length > 0 &&
+    !!d.relatorio!.executada_em &&
+    !!d.resultado?.trim() &&
+    !!d.checklist?.length &&
+    d.checklist.every((c) => c.feito) &&
+    d.relatorio!.ciencia.situacao === "presente" &&
+    d.relatorio!.ciencia.nome.trim().length >= 2 &&
+    d.relatorio!.ciencia.confirmada;
+}
