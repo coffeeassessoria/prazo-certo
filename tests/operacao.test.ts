@@ -60,6 +60,7 @@ test("CSV aceita acentos, campos entre aspas e zeros à esquerda; aponta erros e
   assert.equal(r[0].cliente.observacoes, "Uma linha\noutra");
   assert.equal(r[1].duplicado, true);
   assert.ok(r[1].erros.length);
+  assert.equal(prepararLinhas(lerCSV('Nome;Telefone\nClima Teste;+55 66 99999-9999'))[0].erros.length,0);
   assert.throws(() => lerCSV('Nome\n"Sem fechar'));
   assert.throws(() =>
     prepararLinhas([

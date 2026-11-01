@@ -56,7 +56,7 @@ export function validarCliente(obj: unknown): ClienteImportado {
     throw new Error("Um dos campos excede o tamanho permitido.");
   if (c.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email))
     throw new Error("Revise o e-mail.");
-  if (CAMPOS.some((k) => /^[=+@]/.test(c[k])))
+  if (CAMPOS.some((k) => /^=/.test(c[k])))
     throw new Error("Substitua fórmulas por texto antes de importar.");
   return c;
 }
