@@ -60,9 +60,27 @@ async function publicar(
   for (const foto of envio.dados?.relatorio?.fotos || []) {
     const chaveFoto = `${usuario.id}:${usuario.empresa_id}`;
     const local = await lerFotoLocal(chaveFoto, foto.id);
-    if (!local || local.enviada) continue;
+    if (!local) continue;
     if (local.servico_id !== envio.id)
       throw new Error("A foto não pertence a este atendimento.");
+    if (local.enviada) {
+      const existente = await fetch(
+        `/api/operacao/fotos?id=${foto.id}&servico=${envio.id}`,
+        { method: "HEAD", cache: "no-store" },
+      );
+      if (existente.ok) continue;
+      if ([401, 403].includes(existente.status))
+        throw new ErroEnvio(
+          "Entre novamente na conta de origem para sincronizar as fotos.",
+          existente.status,
+        );
+      if (existente.status !== 404)
+        throw new Error(
+          "Não foi possível confirmar a foto. Tente sincronizar novamente.",
+        );
+      // A coleta de arquivos abandonados pode ter ocorrido enquanto a OS estava offline.
+      // O blob local permanece até confirmar a OS e permite restaurar o mesmo UUID.
+    }
     const resposta = await fetch(
       `/api/operacao/fotos?id=${foto.id}&servico=${envio.id}`,
       {
@@ -92,7 +110,10 @@ async function publicar(
     }),
   });
   const j = await r.json();
-  if (!r.ok) throw new ErroEnvio(j.erro, r.status);
+  if (!r.ok) {
+    if (r.status >= 500) throw new Error(j.erro);
+    throw new ErroEnvio(j.erro, r.status);
+  }
   for (const foto of envio.dados?.relatorio?.fotos || [])
     await removerFotoLocal(
       `${usuario.id}:${usuario.empresa_id}`,

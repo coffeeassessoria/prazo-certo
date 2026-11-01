@@ -5,7 +5,7 @@ import {
   caminhosFoto,
   excluirFotoSemUso,
 } from "@/lib/relatorios/armazenamento";
-import { MAX_FOTO_BYTES } from "@/lib/relatorios/modelo";
+import { MAX_FOTO_BYTES, linhaRpc } from "@/lib/relatorios/modelo";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 const uuid = (s: string | null): s is string =>
@@ -54,7 +54,24 @@ export async function POST(request: Request) {
       throw new Falha(e instanceof Error ? e.message : "Foto inválida.");
     }
     const admin = createAdminClient();
-    const { data: foto, error } = await admin.rpc("reservar_foto_servico", {
+    const { data: anterior } = await admin
+      .from("servico_fotos")
+      .select("id,estado")
+      .eq("empresa_id", usuario.empresa_id)
+      .eq("servico_id", servico)
+      .eq("id", id)
+      .maybeSingle();
+    if (anterior?.estado === "excluindo") {
+      try {
+        await excluirFotoSemUso(usuario.empresa_id, id);
+      } catch {
+        throw new Falha(
+          "A limpeza da foto ainda está sendo concluída. Tente sincronizar novamente.",
+          503,
+        );
+      }
+    }
+    const { data: reserva, error } = await admin.rpc("reservar_foto_servico", {
       p_empresa: usuario.empresa_id,
       p_autor: usuario.id,
       p_servico: servico,
@@ -64,8 +81,15 @@ export async function POST(request: Request) {
       p_largura: imagem.largura,
       p_altura: imagem.altura,
     });
+    const foto = linhaRpc(reserva);
     if (error || !foto)
       throw new Falha(error?.message || "Não foi possível reservar espaço.");
+    if (
+      foto.empresa_id !== usuario.empresa_id ||
+      foto.servico_id !== servico ||
+      foto.id !== id
+    )
+      throw new Falha("Reserva de foto indisponível.", 503);
     if (foto.estado === "pronta") return json({ id: foto.id });
     const caminhos = caminhosFoto(foto);
     for (const [i, arquivo] of [imagem.foto, imagem.miniatura].entries()) {
@@ -96,6 +120,30 @@ export async function POST(request: Request) {
         503,
       );
     return json({ id: foto.id });
+  } catch (e) {
+    return erroApi(e);
+  }
+}
+export async function HEAD(request: Request) {
+  try {
+    const { db, usuario } = await acesso();
+    const q = new URL(request.url).searchParams,
+      id = q.get("id"),
+      servico = q.get("servico");
+    if (!uuid(id) || !uuid(servico)) throw new Falha("Foto indisponível.", 404);
+    const { data, error } = await db
+      .from("servico_fotos")
+      .select("id")
+      .eq("empresa_id", usuario.empresa_id)
+      .eq("servico_id", servico)
+      .eq("id", id)
+      .eq("estado", "pronta")
+      .maybeSingle();
+    if (error) throw new Falha("Não foi possível conferir a foto.", 503);
+    return new Response(null, {
+      status: data ? 204 : 404,
+      headers: { "Cache-Control": "private, no-store" },
+    });
   } catch (e) {
     return erroApi(e);
   }

@@ -3,6 +3,10 @@ export const MAX_FOTOS = 20;
 export const MAX_FOTO_BYTES = 600_000;
 export const MAX_ORIGINAL_BYTES = 12_000_000;
 export const MAX_LOCAL_BYTES = 60_000_000;
+/** PostgREST pode representar uma linha composta como objeto ou lista unitária. */
+export const linhaRpc = <T>(
+  dados: T | T[] | null | undefined,
+): T | undefined => (Array.isArray(dados) ? dados[0] : (dados ?? undefined));
 export type Foto = {
   id: string;
   etapa: "antes" | "depois" | "evidencia";

@@ -1,5 +1,6 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { linhaRpc } from "./modelo";
 export const caminhosFoto = (f: {
   empresa_id: string;
   servico_id: string;
@@ -15,12 +16,13 @@ export async function excluirFotoSemUso(
   expirada = false,
 ) {
   const admin = createAdminClient();
-  const { data: foto, error } = await admin.rpc("descartar_foto_servico", {
+  const { data: reserva, error } = await admin.rpc("descartar_foto_servico", {
     p_empresa: empresa,
     p_id: id,
     p_expirada: expirada,
   });
   if (error) throw new Error(error.message);
+  const foto = linhaRpc(reserva);
   if (!foto?.id) return false;
   const { error: falha } = await admin.storage
     .from("evidencias")

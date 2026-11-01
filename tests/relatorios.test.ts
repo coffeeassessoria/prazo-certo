@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { PGlite } from "@electric-sql/pglite";
 import { indexedDB } from "fake-indexeddb";
 import { otimizarFoto, fotoParaPdf } from "../lib/relatorios/imagens";
-import { relatorioVazio } from "../lib/relatorios/modelo";
+import { relatorioVazio, linhaRpc } from "../lib/relatorios/modelo";
 import * as fotos from "../lib/relatorios/fotos-offline";
 import { gerarDocumentoOperacao } from "../lib/documentos/operacao";
 import { PDFDocument } from "pdf-lib";
@@ -48,6 +48,13 @@ insert into auth.users values('${admin}'),('${membro}'),('${externo}');
 insert into perfis(user_id,empresa_id,nome,papel) values('${admin}','${emp}','Admin','admin'),('${membro}','${emp}','Técnico','membro'),('${externo}','${outra}','Externo','admin');
 insert into clientes(id,empresa_id,nome) values('${cliente}','${emp}','Cliente A'),('${clienteB}','${outra}','Cliente B');
 `;
+test("resposta composta do Storage aceita objeto/lista do PostgREST e reserva ausente", () => {
+  const f = { id: foto, empresa_id: emp, servico_id: os };
+  assert.deepEqual(linhaRpc(f), f);
+  assert.deepEqual(linhaRpc([f]), f);
+  assert.equal(linhaRpc([]), undefined);
+  assert.equal(linhaRpc(null), undefined);
+});
 test("imagens: orientação, limites, miniaturas e remoção de metadados", async () => {
   const entrada = await sharp({
     create: { width: 2000, height: 1000, channels: 3, background: "navy" },
@@ -312,6 +319,30 @@ test("relatório SQL: isolamento, fotos, PMOC, ciência, retorno e preservação
         ).rows;
         assert.equal(candidatos.length, 1);
         assert.equal(candidatos[0].id, id(83));
+        await login(membro);
+      },
+    );
+    await t.test(
+      "foto sem vínculo coletada pode ser reenviada com o mesmo UUID da fila offline",
+      async () => {
+        await db.exec("reset role");
+        const descartada = await row(
+          "select * from descartar_foto_servico($1,$2,true)",
+          [emp, id(83)],
+        );
+        assert.equal(descartada.id, id(83));
+        await db.query(
+          "delete from servico_fotos where id=$1 and empresa_id=$2 and estado='excluindo'",
+          [id(83), emp],
+        );
+        const restaurada = await reservar(
+          id(83),
+          "b".repeat(64),
+          id(73),
+          600000,
+        );
+        assert.equal(restaurada.id, id(83));
+        assert.equal(restaurada.estado, "reservada");
         await login(membro);
       },
     );
