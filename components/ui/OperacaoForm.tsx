@@ -589,6 +589,7 @@ export function OperacaoForm({
           <>
             <RelatorioServico
               r={d.relatorio!}
+              registro={{ ...registro, dados: d }}
               base={base}
               cliente={d.cliente_id}
               servico={registro.id}

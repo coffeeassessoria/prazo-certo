@@ -1,4 +1,5 @@
 "use client";
+import { FotosRecuperaveis } from "./RelatorioServico";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FileText,
@@ -672,6 +673,18 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
                 reabrir conectado. Evite limpar os dados do navegador antes de
                 sincronizar.
               </p>
+            )}
+            {!demo && (
+              <FotosRecuperaveis
+                base={base}
+                registros={visiveis}
+                editando={editar?.id}
+                recuperar={(r) => {
+                  setTipo("servico");
+                  setEditar(r);
+                  setRevisao("");
+                }}
+              />
             )}
             {base.armazenamento && (
               <p className="dica">

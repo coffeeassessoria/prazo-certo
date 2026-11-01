@@ -1,13 +1,14 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Camera } from "lucide-react";
-import type { Base } from "@/lib/operacao/modelo";
+import type { Base, Registro } from "@/lib/operacao/modelo";
 import { MAX_FOTOS, type Relatorio, type Foto } from "@/lib/relatorios/modelo";
 import { comprimirFoto } from "@/lib/relatorios/fotos-cliente";
 import {
   guardarFoto,
   lerFotoLocal,
   removerFotoLocal,
+  listarFotosLocais,
 } from "@/lib/relatorios/fotos-offline";
 import { Aviso } from "./Aviso";
 import { Confirmar } from "./Confirmar";
@@ -74,6 +75,7 @@ function FotoImagem({
 }
 export function RelatorioServico({
   r,
+  registro,
   base,
   cliente,
   servico,
@@ -84,6 +86,7 @@ export function RelatorioServico({
   preservado = false,
 }: {
   r: Relatorio;
+  registro?: Registro;
   base: Base;
   cliente: string | null;
   servico: string;
@@ -136,6 +139,7 @@ export function RelatorioServico({
           servico_id: servico,
           blob,
           enviada: false,
+          rascunho: registro ? structuredClone(registro) : undefined,
         });
         alterar((a) => ({
           ...a,
@@ -545,4 +549,82 @@ export function DemoRelatorioServico() {
       />
     </div>
   );
+}
+
+/** Recupera fotos cujo formulário foi fechado antes de salvar a OS. Nunca apaga a fila. */
+export function FotosRecuperaveis({
+  base,
+  registros,
+  editando,
+  recuperar,
+}: {
+  base: Base;
+  registros: Registro[];
+  editando?: string;
+  recuperar: (r: Registro) => void;
+}) {
+  const [grupos, setGrupos] = useState<Registro[]>([]);
+  useEffect(() => {
+    let ativo = true;
+    void listarFotosLocais(`${base.usuario.id}:${base.usuario.empresa_id}`)
+      .then((fotos) => {
+        const usados = new Set(
+          registros.flatMap(
+            (r) => r.dados.relatorio?.fotos.map((f) => f.id) || [],
+          ),
+        );
+        const porServico = new Map<string, Registro>();
+        for (const f of fotos) {
+          if (usados.has(f.id) || !f.rascunho) continue;
+          let r = porServico.get(f.servico_id);
+          if (!r) {
+            const atual = registros.find((r) => r.id === f.servico_id);
+            if (atual?.dados.relatorio?.snapshot) continue;
+            r = structuredClone(atual || f.rascunho);
+            r.dados.relatorio ||= relatorioVazio("");
+            r.dados.relatorio.fotos = structuredClone(
+              atual?.dados.relatorio?.fotos || [],
+            );
+            porServico.set(f.servico_id, r);
+          }
+          r.dados.relatorio!.fotos.push({
+            id: f.id,
+            etapa: "evidencia",
+            legenda: "Foto recuperada do aparelho",
+            equipamento_id: null,
+          });
+        }
+        if (ativo) setGrupos([...porServico.values()]);
+      })
+      .catch(() => undefined);
+    return () => {
+      ativo = false;
+    };
+  }, [base, registros]);
+  const visiveis = grupos.filter((r) => r.id !== editando);
+  return visiveis.length ? (
+    <div className="card operacao-pilha">
+      <h2>Fotos de atendimentos ainda não salvos</h2>
+      <p className="dica">
+        Estas fotos continuam neste aparelho. Recupere-as e salve a OS para
+        entrar na fila de sincronização. Confira os dados e as legendas antes de
+        concluir.
+      </p>
+      {visiveis.map((r) => (
+        <div key={r.id} className="operacao-registro-topo">
+          <span>
+            {r.dados.titulo || "Atendimento sem título"} ·{" "}
+            {r.dados.relatorio!.fotos.length} foto(s)
+          </span>
+          <button
+            type="button"
+            className="btn sec"
+            onClick={() => recuperar(r)}
+          >
+            Recuperar fotos do atendimento
+          </button>
+        </div>
+      ))}
+    </div>
+  ) : null;
 }

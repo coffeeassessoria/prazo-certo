@@ -88,6 +88,8 @@ test("fotos offline: blobs duráveis, isolamento de contas, confirmação e limp
     enviada: false,
   };
   await fotos.guardarFoto(f);
+  assert.equal((await fotos.listarFotosLocais(f.chave)).length, 1);
+  assert.equal((await fotos.listarFotosLocais("outra:empresa")).length, 0);
   assert.equal(await fotos.lerFotoLocal("b:empresa", foto), undefined);
   assert.equal(await fotos.fotosPendentes(), 1);
   assert.equal(

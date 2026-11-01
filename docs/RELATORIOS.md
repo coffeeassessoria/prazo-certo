@@ -29,7 +29,7 @@ O PDF A4 usa o timbrado existente e inclui equipamentos, checklist, resultado, r
 
 ## Offline
 
-Fotos de produção ficam temporariamente em IndexedDB, em partição de usuário/empresa, com limite total local de 60 MB. Para trabalhar sem internet, preparar o aparelho conectado e **salvar a OS** depois de adicionar as fotos. Campos ainda não salvos e fotos de um formulário abandonado não representam um atendimento confirmado.
+Fotos de produção ficam temporariamente em IndexedDB, em partição de usuário/empresa, com limite total local de 60 MB. Para trabalhar sem internet, preparar o aparelho conectado e **salvar a OS** depois de adicionar as fotos. Fotos de um formulário fechado antes de salvar aparecem em “Fotos de atendimentos ainda não salvos”, com opção de recuperar o vínculo e então salvar a OS. Recuperação conserva a foto e uma referência do atendimento; não promete recuperar todas as edições posteriores dos campos. Ainda não representam atendimento confirmado.
 
 A sincronização envia primeiro cada imagem, conserva a confirmação local e depois envia a OS com o mesmo UUID da operação. A fila e os blobs sobrevivem ao recarregamento. Após confirmar a OS, remove a cópia local da foto; a consulta posterior de fotos já sincronizadas requer conexão. Não baixa automaticamente todo o acervo do cliente para o aparelho.
 

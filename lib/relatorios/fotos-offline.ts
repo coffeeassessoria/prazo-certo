@@ -1,3 +1,4 @@
+import type { Registro } from "@/lib/operacao/modelo";
 import { MAX_LOCAL_BYTES } from "./modelo";
 export type FotoLocal = {
   id: string;
@@ -5,6 +6,7 @@ export type FotoLocal = {
   servico_id: string;
   blob: Blob;
   enviada: boolean;
+  rascunho?: Registro;
 };
 const BANCO = "pc-fotos-v1";
 const demonstracao = new Map<string, FotoLocal>();
@@ -111,3 +113,14 @@ export const fotosPendentes = () =>
     p.onsuccess = () =>
       ok((p.result as FotoLocal[]).filter((f) => !f.enviada).length);
   });
+
+export const listarFotosLocais = (chave: string) =>
+  ehDemo(chave)
+    ? Promise.resolve(
+        [...demonstracao.values()].filter((f) => f.chave === chave),
+      )
+    : executar<FotoLocal[]>("readonly", (s, ok) => {
+        const p = s.getAll();
+        p.onsuccess = () =>
+          ok((p.result as FotoLocal[]).filter((f) => f.chave === chave));
+      });
