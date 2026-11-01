@@ -189,7 +189,7 @@ export async function gerarDocumentoOperacao(
       }
       if (snap)
         t.campo(
-          "Registro na plataforma",
+          snap.aceite?.demonstracao ? "Registro da demonstração" : "Registro na plataforma",
           new Date(snap.emitido_em).toLocaleString("pt-BR", {
             timeZone: "America/Cuiaba",
           }),

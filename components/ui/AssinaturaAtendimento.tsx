@@ -385,7 +385,7 @@ export function AssinaturaAtendimento({
               Limpar desenho
             </Confirmar>
             <button
-              className="btn sec"
+              className="btn"
               type="button"
               onClick={confirmar}
               disabled={
