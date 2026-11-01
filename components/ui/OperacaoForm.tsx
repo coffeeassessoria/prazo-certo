@@ -22,11 +22,15 @@ export function OperacaoForm({
   base,
   salvar,
   cancelar,
+  conflito,
+  revisando = false,
 }: {
   registro: Registro;
   base: Base;
   salvar: (d: Dados) => Promise<void>;
   cancelar: () => void;
+  conflito?: Registro;
+  revisando?: boolean;
 }) {
   const [d, setD] = useState<Dados>(registro.dados),
     [erro, setErro] = useState("");
@@ -83,6 +87,96 @@ export function OperacaoForm({
           {erro}
         </Aviso>
       )}
+      {revisando &&
+        (conflito ? (
+          <>
+            <Aviso
+              tipo="atencao"
+              titulo="Compare as duas versões antes de salvar"
+            >
+              Os dados abaixo são os que sua equipe salvou na plataforma. Seu
+              rascunho está nos campos de edição. Ao salvar, os campos editados
+              substituirão a versão atual.
+            </Aviso>
+            <details open className="operacao-item">
+              <summary>Dados atuais na plataforma</summary>
+              <dl className="operacao-comparacao">
+                {[
+                  ["Título", conflito.dados.titulo],
+                  [
+                    "Cliente",
+                    base.clientes.find(
+                      (c) => c.id === conflito.dados.cliente_id,
+                    )?.nome || "Sem cliente",
+                  ],
+                  [
+                    "Responsável",
+                    base.equipe.find(
+                      (p) => p.id === conflito.dados.responsavel_id,
+                    )?.nome || "Sem responsável",
+                  ],
+                  ["Situação", ESTADOS[conflito.tipo][conflito.dados.estado]],
+                  ["Data", conflito.dados.data.split("-").reverse().join("/")],
+                  ["Próxima ação", conflito.dados.proxima_acao],
+                  [
+                    "Serviços e materiais",
+                    conflito.dados.itens
+                      ?.map(
+                        (i) =>
+                          `${i.descricao} · ${i.quantidade_mil / 1000} × ${dinheiro(i.preco_centavos)}`,
+                      )
+                      .join("\n"),
+                  ],
+                  [
+                    "Desconto",
+                    conflito.tipo === "orcamento"
+                      ? dinheiro(conflito.dados.desconto_centavos)
+                      : "",
+                  ],
+                  [
+                    "Total",
+                    conflito.tipo === "orcamento"
+                      ? dinheiro(conflito.dados.total_centavos)
+                      : "",
+                  ],
+                  ["Condições de pagamento", conflito.dados.condicoes],
+                  [
+                    "Etapas",
+                    conflito.dados.checklist
+                      ?.map(
+                        (c) =>
+                          `${c.feito ? "Concluída" : "Pendente"}: ${c.descricao}`,
+                      )
+                      .join("\n"),
+                  ],
+                  ["Resultado", conflito.dados.resultado],
+                  [
+                    "Observações",
+                    conflito.dados.observacoes || "Sem observações",
+                  ],
+                ]
+                  .filter(([, v]) => !!v)
+                  .map(([k, v]) => (
+                    <div key={k}>
+                      <dt>{k}</dt>
+                      <dd>{v}</dd>
+                    </div>
+                  ))}
+              </dl>
+            </details>
+            <label className="operacao-consentimento">
+              <input type="checkbox" required />
+              Conferi os dados atuais e quero salvar a revisão nos campos
+              abaixo.
+            </label>
+          </>
+        ) : (
+          <Aviso tipo="erro" titulo="Versão atual indisponível">
+            Este registro não apareceu na consulta da plataforma. O rascunho
+            permanece salvo neste aparelho. Atualize a lista e confirme se o
+            registro ainda existe antes de revisar.
+          </Aviso>
+        ))}
       {congelado && (
         <Aviso titulo="Orçamento aprovado">
           Os valores estão preservados. Você pode atualizar as observações.
@@ -494,7 +588,7 @@ export function OperacaoForm({
         />
       </div>
       <div className="acoes empilha">
-        <BotaoEnviar>
+        <BotaoEnviar disabled={revisando && !conflito}>
           Salvar{" "}
           {tipo === "servico"
             ? "ordem de serviço"

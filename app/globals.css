@@ -609,3 +609,6 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .operacao-pilha summary{cursor:pointer;min-height:var(--pc-space-12);padding-block:var(--pc-space-3);font-weight:600}
 @media(max-width:767px){.operacao-valores{grid-template-columns:1fr}.operacao-check{flex-wrap:wrap}.operacao-check input:not([type=checkbox]){flex:1}.operacao-conexao .btn{width:100%}.operacao-abas .btn{flex:1 1 44%;font-size:var(--pc-text-sm)}.operacao-preco{width:100%}.operacao-baixa{align-items:stretch;flex-direction:column}}
 .sair-aviso{position:fixed;left:var(--pc-space-4);bottom:var(--pc-space-16);width:min(360px,calc(100vw - var(--pc-space-8)));background:var(--pc-surface);border:1px solid var(--pc-border);border-radius:var(--pc-radius-lg);box-shadow:var(--pc-shadow-lg);padding:var(--pc-space-4);z-index:100}
+.operacao-comparacao{display:grid;gap:var(--pc-space-3);margin-block:var(--pc-space-3)}
+.operacao-comparacao dt{font-weight:600;font-size:var(--pc-text-sm);color:var(--pc-text-secondary)}
+.operacao-comparacao dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}

@@ -633,6 +633,12 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
               <OperacaoForm
                 key={`${editar.id}-${revisao}`}
                 registro={editar}
+                revisando={!!revisao}
+                conflito={
+                  revisao
+                    ? base.registros.find((r) => r.id === editar.id)
+                    : undefined
+                }
                 base={base}
                 salvar={salvar}
                 cancelar={() => {
