@@ -1,3 +1,4 @@
+import { DemoRelatorioServico } from '@/components/ui/RelatorioServico'
 import Link from 'next/link'
 import {
   AlertTriangle, Building2, Calendar, CheckCircle2, Clock3, FileText, History, LayoutDashboard, Plus,
@@ -266,6 +267,8 @@ export default function DesignSystem() {
           ))}
         </div>
       </Secao>
+
+      <Secao id="relatorio" titulo="Relatório de manutenção" sub="Equipamentos, execução e evidências privadas. Exemplo fictício e interativo."><DemoRelatorioServico /></Secao>
 
       <Secao id="icones" titulo="Ícones e logo" sub="Lucide, traço 2px. 20px padrão, 16px em meta, 24px na navegação mobile. Sempre acompanhado de texto.">
         <div className="grade-2">

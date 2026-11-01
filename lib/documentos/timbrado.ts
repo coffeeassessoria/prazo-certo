@@ -285,6 +285,17 @@ export class Timbrado {
     }
     this.y -= 10
   }
+  async fotografia(bytes: Uint8Array, legenda: string) {
+    const img = await this.doc.embedJpg(bytes)
+    const escala = Math.min(W / img.width, 250 / img.height)
+    const largura = img.width * escala, altura = img.height * escala
+    const ls = this.linhas(legenda, W, 9)
+    this.garantir(altura + ls.length * 13 + 28)
+    this.page.drawImage(img, { x: M + (W - largura) / 2, y: this.y - altura, width: largura, height: altura })
+    this.y -= altura + 16
+    for (const l of ls) { this.desenhar(l, M, this.y, 9, this.normal, cor.apoio); this.y -= 13 }
+    this.y -= 12
+  }
   async finalizar() {
     const paginas = this.doc.getPages(),
       fonte = this.normal

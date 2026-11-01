@@ -1,3 +1,4 @@
+import type { Relatorio, CatalogoCampo } from "@/lib/relatorios/modelo";
 export type Tipo = "orcamento" | "servico" | "demanda" | "financeiro";
 export type Linha = {
   descricao: string;
@@ -6,6 +7,7 @@ export type Linha = {
   tipo: "servico" | "material";
 };
 export type Dados = {
+  relatorio?: Relatorio;
   titulo: string;
   cliente_id: string | null;
   responsavel_id?: string | null;
@@ -17,7 +19,11 @@ export type Dados = {
   total_centavos?: number;
   condicoes?: string;
   orcamento_id?: string | null;
-  checklist?: { descricao: string; feito: boolean }[];
+  checklist?: {
+    descricao: string;
+    feito: boolean;
+    rotina_id?: string | null;
+  }[];
   resultado?: string;
   proxima_acao?: string;
   natureza?: "receita" | "despesa";
@@ -59,6 +65,8 @@ export type Base = {
   }[];
   equipe: { id: string; nome: string }[];
   registros: Registro[];
+  campo?: CatalogoCampo;
+  armazenamento?: { usado: number; limite: number };
   sincronizado: string;
 };
 export const NOMES: Record<Tipo, string> = {

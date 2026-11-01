@@ -2,6 +2,10 @@
 
 Leia `CONTINUAR.md` para preparar outro notebook e `../AGENTS.md`/`../CLAUDE.md` para as regras de desenvolvimento.
 
+## Relatórios de manutenção e fotos
+
+Implementação na branch `codex/relatorios-fotos`: OS vinculada a unidade/aparelhos, ciência declarada, fotos privadas otimizadas, PDF A4, execução de rotinas PMOC e retorno para a próxima manutenção. Detalhes em `RELATORIOS.md`. Migração `20261031_relatorios_fotos.sql` aplicada no Supabase `prazo-certo-sp` em 31/10/2026 (consulta `28d4df83-32df-4059-82a0-4888f955a282`, Success). Verificação transacional `3271b1a3-f2d5-4c69-a891-af4e0301aa9b` confirmou relatório, snapshot, reenvio, PMOC, retorno, preservação e reserva de fotos; todos os dados fictícios foram revertidos por rollback. Conferidos bucket privado/limite e ausência de escrita direta pelo usuário. Grant explícito de leitura/exclusão ao service role aplicado na verificação e incluído na migração. 54 testes e build/typecheck passaram; teste de navegador recuperou a foto após recarregar offline e confirmou exatamente um upload/recibo na reconexão. Publicação será registrada após confirmação.
+
 ## Nova etapa — operação e offline
 
 Integrado à `main` pelo [PR #5](https://github.com/coffeeassessoria/prazo-certo/pull/5), merge `2dbdc16cce84a97bc687d09648d1a96588d17560`: orçamentos/PDF, OS/checklist/PDF, demandas offline, financeiro gerencial para administradores e importação CSV/XLSX de clientes. Detalhes, limites e validação em [OPERACAO.md](OPERACAO.md).

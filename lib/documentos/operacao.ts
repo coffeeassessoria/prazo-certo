@@ -6,10 +6,16 @@ export async function gerarDocumentoOperacao(
   identidade: IdentidadeDocumento,
   cliente: { nome?: string; documento?: string; endereco?: string } | null,
   logo?: Uint8Array,
+  fotos: { id: string; bytes: Uint8Array }[] = [],
 ) {
   const id = r.id,
     d = r.dados;
-  const titulo = r.tipo === "orcamento" ? "Orçamento" : "Ordem de serviço";
+  const titulo =
+    r.tipo === "orcamento"
+      ? "Orçamento"
+      : d.relatorio?.snapshot
+        ? "Relatório de manutenção"
+        : "Ordem de serviço";
   const t = await Timbrado.criar(
     identidade,
     `${titulo} ${id.slice(0, 8)} · versão ${r.versao}`,
@@ -55,11 +61,109 @@ export async function gerarDocumentoOperacao(
       true,
     );
   } else {
+    const rel = d.relatorio,
+      snap = rel?.snapshot;
+    if (rel) {
+      t.secao(snap ? "Atendimento realizado" : "Relatório em preparação");
+      t.campo(
+        "Tipo",
+        {
+          preventiva: "Manutenção preventiva",
+          corretiva: "Manutenção corretiva",
+          inspecao: "Inspeção",
+        }[rel.tipo_manutencao],
+      );
+      t.campo("Execução", rel.executada_em.split("-").reverse().join("/"));
+      t.campo("Horários", [rel.inicio, rel.fim].filter(Boolean).join(" até "));
+      t.campo("Unidade", snap?.unidade.nome);
+      t.campo("Local do atendimento", snap?.unidade.endereco);
+      t.campo("Técnico executor", snap?.tecnico);
+      if (snap?.equipamentos.length) {
+        t.secao("Equipamentos atendidos");
+        t.tabela(
+          [
+            { titulo: "Identificação / ambiente", largura: 181.28 },
+            { titulo: "Marca / modelo", largura: 170 },
+            { titulo: "Série / capacidade", largura: 160 },
+          ],
+          snap.equipamentos.map((e) => [
+            `${e.tag}\n${e.ambiente}`,
+            `${e.marca}\n${e.modelo}`,
+            `${e.serie || "Série não informada"}\n${e.capacidade_btu ? e.capacidade_btu + " BTU/h" : "Capacidade não informada"}`,
+          ]),
+        );
+      }
+    }
     t.secao("Etapas executadas");
     for (const c of d.checklist || [])
       t.paragrafo(`${c.feito ? "[Concluída]" : "[Pendente]"} ${c.descricao}`);
     t.secao("Resultado e recomendações");
     t.paragrafo(d.resultado || "Serviço ainda sem resultado registrado.");
+    if (rel) {
+      for (const [nome, valor] of [
+        ["Peças e materiais", rel.pecas],
+        ["Medições registradas", rel.medicoes],
+        ["Pendências e recomendações", rel.recomendacoes],
+      ]) {
+        t.secao(nome);
+        t.paragrafo(valor || "Não informado.");
+      }
+      if (rel.proxima_manutencao) {
+        t.campo(
+          "Próxima manutenção recomendada",
+          rel.proxima_manutencao.split("-").reverse().join("/"),
+        );
+        t.paragrafo(
+          snap?.retorno_id
+            ? "Retorno cadastrado para combinar o próximo atendimento com o cliente."
+            : "Data recomendada; o agendamento deve ser combinado com o cliente.",
+          true,
+        );
+      }
+      t.secao("Ciência do cliente");
+      t.campo(
+        "Acompanhamento",
+        {
+          presente:
+            "Representante tomou ciência, conforme declaração do técnico",
+          ausente: "Sem representante disponível",
+          recusou: "Representante não quis confirmar ciência",
+        }[rel.ciencia.situacao],
+      );
+      if (rel.ciencia.situacao !== "ausente") {
+        t.campo("Representante", rel.ciencia.nome);
+        t.campo("Cargo / função", rel.ciencia.cargo);
+      }
+      t.paragrafo(
+        "Registro informado pelo técnico. Não é assinatura eletrônica do cliente nem aprovação técnica das rotinas do PMOC.",
+        true,
+      );
+      if (snap)
+        t.campo(
+          "Registro na plataforma",
+          new Date(snap.emitido_em).toLocaleString("pt-BR", {
+            timeZone: "America/Cuiaba",
+          }),
+        );
+      if (rel.fotos.length) {
+        t.garantir(380);
+        t.secao("Registro fotográfico");
+        for (const [i, f] of rel.fotos.entries()) {
+          const arquivo = fotos.find((a) => a.id === f.id);
+          if (!arquivo)
+            throw new Error(
+              "Uma foto do relatório não pôde ser carregada. Tente gerar o PDF novamente.",
+            );
+          const equipamento = snap?.equipamentos.find(
+            (e) => e.id === f.equipamento_id,
+          );
+          await t.fotografia(
+            arquivo.bytes,
+            `${i + 1}. ${{ antes: "Antes do serviço", depois: "Depois do serviço", evidencia: "Registro do atendimento" }[f.etapa]} · ${equipamento?.tag || "Visão geral"}${f.legenda ? " · " + f.legenda : ""}`,
+          );
+        }
+      }
+    }
     t.paragrafo(
       "Relatório operacional. Este documento não substitui o plano PMOC nem comprova assinatura ou responsabilidade técnica.",
       true,

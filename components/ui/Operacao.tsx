@@ -1,4 +1,5 @@
 "use client";
+import { FotosRecuperaveis } from "./RelatorioServico";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FileText,
@@ -31,6 +32,11 @@ import {
   type Registro,
   type Tipo,
 } from "@/lib/operacao/modelo";
+import {
+  lerFotoLocal,
+  guardarFoto,
+  removerFotoLocal,
+} from "@/lib/relatorios/fotos-offline";
 import * as dispositivo from "@/lib/operacao/offline";
 class ErroEnvio extends Error {
   constructor(
@@ -50,6 +56,32 @@ async function publicar(
   o: Envio | Record<string, unknown>,
   usuario: Base["usuario"],
 ): Promise<Registro> {
+  const envio = o as Envio;
+  for (const foto of envio.dados?.relatorio?.fotos || []) {
+    const chaveFoto = `${usuario.id}:${usuario.empresa_id}`;
+    const local = await lerFotoLocal(chaveFoto, foto.id);
+    if (!local || local.enviada) continue;
+    if (local.servico_id !== envio.id)
+      throw new Error("A foto não pertence a este atendimento.");
+    const resposta = await fetch(
+      `/api/operacao/fotos?id=${foto.id}&servico=${envio.id}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": local.blob.type,
+          "x-pc-usuario": usuario.id,
+          "x-pc-empresa": usuario.empresa_id,
+        },
+        body: local.blob,
+      },
+    );
+    if (!resposta.ok) {
+      const j = await resposta.json();
+      if (resposta.status >= 500) throw new Error(j.erro);
+      throw new ErroEnvio(j.erro, resposta.status);
+    }
+    await guardarFoto({ ...local, enviada: true });
+  }
   const r = await fetch("/api/operacao", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -61,6 +93,11 @@ async function publicar(
   });
   const j = await r.json();
   if (!r.ok) throw new ErroEnvio(j.erro, r.status);
+  for (const foto of envio.dados?.relatorio?.fotos || [])
+    await removerFotoLocal(
+      `${usuario.id}:${usuario.empresa_id}`,
+      foto.id,
+    ).catch(() => undefined);
   return j;
 }
 const icones = {
@@ -280,6 +317,43 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
       dados: d,
     };
     if (demo) {
+      d = structuredClone(d);
+      if (
+        editar.tipo === "servico" &&
+        d.relatorio &&
+        d.estado === "concluida"
+      ) {
+        const rel = d.relatorio,
+          uni = base.campo?.unidades.find((u) => u.id === rel.unidade_id);
+        rel.snapshot = {
+          identidade: {
+            nome: base.usuario.empresa,
+            documento: "",
+            endereco: "Endereço fictício",
+            telefone: "",
+            email: "",
+          },
+          cliente: {
+            nome:
+              base.clientes.find((c) => c.id === d.cliente_id)?.nome ||
+              "Cliente fictício",
+          },
+          unidade: {
+            nome: uni?.nome || "Unidade fictícia",
+            endereco: uni?.endereco || "",
+          },
+          equipamentos: (
+            base.campo?.equipamentos.filter((e) =>
+              rel.equipamento_ids.includes(e.id),
+            ) || []
+          ).map((e) => ({ ...e, serie: "DEMONSTRAÇÃO" })),
+          tecnico:
+            base.equipe.find((e) => e.id === d.responsavel_id)?.nome ||
+            "Técnico fictício",
+          emitido_em: new Date().toISOString(),
+          registrado_por: base.usuario.id,
+        };
+      }
       const registro = { ...editar, dados: d, versao: editar.versao + 1 };
       atualizar({
         ...base,
@@ -355,6 +429,52 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
         },
       ];
     novo(t, d);
+  }
+  async function pdfDemo(r: Registro) {
+    setErro("");
+    try {
+      const { gerarDocumentoOperacao } = await import(
+        "@/lib/documentos/operacao"
+      );
+      const fotos: { id: string; bytes: Uint8Array }[] = [];
+      for (const foto of r.dados.relatorio?.fotos || []) {
+        const local = await lerFotoLocal(dispositivo.particao(base!), foto.id);
+        if (!local)
+          throw new Error(
+            "A foto da demonstração não está neste aparelho. Adicione novamente.",
+          );
+        fotos.push({
+          id: foto.id,
+          bytes: new Uint8Array(await local.blob.arrayBuffer()),
+        });
+      }
+      const snap = r.dados.relatorio?.snapshot;
+      const bytes = await gerarDocumentoOperacao(
+        r,
+        snap?.identidade || {
+          nome: base!.usuario.empresa,
+          documento: "",
+          endereco: "Endereço fictício",
+          telefone: "",
+          email: "",
+        },
+        snap?.cliente ||
+          base!.clientes.find((c) => c.id === r.dados.cliente_id) ||
+          null,
+        undefined,
+        fotos,
+      );
+      const url = URL.createObjectURL(
+        new Blob([new Uint8Array(bytes).buffer], { type: "application/pdf" }),
+      );
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "relatorio-demonstracao.pdf";
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } catch (e) {
+      setErro((e as Error).message);
+    }
   }
   async function baixar(r: Registro, f: FormData) {
     setErro("");
@@ -554,6 +674,29 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
                 sincronizar.
               </p>
             )}
+            {!demo && (
+              <FotosRecuperaveis
+                base={base}
+                registros={visiveis}
+                editando={editar?.id}
+                recuperar={(r) => {
+                  setTipo("servico");
+                  setEditar(r);
+                  setRevisao("");
+                }}
+              />
+            )}
+            {base.armazenamento && (
+              <p className="dica">
+                Fotos:{" "}
+                {(base.armazenamento.usado / 1048576).toLocaleString("pt-BR", {
+                  maximumFractionDigits: 1,
+                })}{" "}
+                MB de{" "}
+                {(base.armazenamento.limite / 1048576).toLocaleString("pt-BR")}{" "}
+                MB utilizados. Inclui miniaturas e envios em confirmação.
+              </p>
+            )}
             {fila
               .filter((p) => p.erro)
               .map((p) => (
@@ -640,6 +783,8 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
                     : undefined
                 }
                 base={base}
+                demo={demo}
+                offlineAtivo={!!chave}
                 salvar={salvar}
                 cancelar={() => {
                   setEditar(null);
@@ -787,6 +932,17 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
                                 )}
                               </>
                             )}
+                          {demo &&
+                            r.tipo === "servico" &&
+                            r.dados.relatorio?.snapshot && (
+                              <button
+                                className="btn ghost"
+                                onClick={() => void pdfDemo(r)}
+                              >
+                                <Download size={16} /> Baixar relatório de
+                                exemplo
+                              </button>
+                            )}
                           {(r.tipo === "orcamento" || r.tipo === "servico") &&
                             !demo &&
                             !pendente &&
@@ -862,8 +1018,9 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
                                       if (!form?.reportValidity()) return;
                                       const f = new FormData(form);
                                       try {
-                                        const { decimalBR } =
-                                          await import("@/lib/operacao/modelo");
+                                        const { decimalBR } = await import(
+                                          "@/lib/operacao/modelo"
+                                        );
                                         f.set(
                                           "centavos",
                                           String(
