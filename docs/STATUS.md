@@ -4,9 +4,9 @@ Leia `CONTINUAR.md` para preparar outro notebook e `../AGENTS.md`/`../CLAUDE.md`
 
 ## Nova etapa — operação e offline
 
-Implementação na branch `codex/operacao-orcamentos-offline`: orçamentos/PDF, OS/checklist/PDF, demandas offline, financeiro gerencial para administradores e importação CSV/XLSX de clientes. Detalhes, limites e validação em [OPERACAO.md](OPERACAO.md).
+Integrado à `main` pelo [PR #5](https://github.com/coffeeassessoria/prazo-certo/pull/5), merge `2dbdc16cce84a97bc687d09648d1a96588d17560`: orçamentos/PDF, OS/checklist/PDF, demandas offline, financeiro gerencial para administradores e importação CSV/XLSX de clientes. Detalhes, limites e validação em [OPERACAO.md](OPERACAO.md).
 
-Migração `20261031_operacao_offline.sql` aplicada no Supabase `prazo-certo-sp` em 31/10/2026 (horário local), com `Success. No rows returned`. Consulta de implantação `f5f8f671-32f0-4a06-9734-cc0c2b971fd6`. Entrega no PR #5. Conferidas as três tabelas com RLS e sem escrita direta para authenticated. Adicionadas referências geradas para impedir exclusão de clientes/responsáveis/orçamentos em uso. Teste transacional no banco real, com papel authenticated, executou orçamento, reenvio, aprovação, OS, recebível, baixa parcial, demanda e importação; todas as alterações de teste foram revertidas por rollback. Conferir o PR/deployment para o estado de publicação.
+Migração `20261031_operacao_offline.sql` aplicada no Supabase `prazo-certo-sp` em 31/10/2026 (horário local), com `Success. No rows returned`. Consulta de implantação `f5f8f671-32f0-4a06-9734-cc0c2b971fd6`. Entrega no PR #5. Conferidas as três tabelas com RLS e sem escrita direta para authenticated. Adicionadas referências geradas para impedir exclusão de clientes/responsáveis/orçamentos em uso. Teste transacional no banco real, com papel authenticated, executou orçamento, reenvio, aprovação, OS, recebível, baixa parcial, demanda e importação; todas as alterações de teste foram revertidas por rollback. Vercel confirmou a publicação em produção: [deployment](https://vercel.com/vinicius-arenales-projects/prazo-certo/AvTkGB2jZH2Hj251FhTQGpkKzfa3). Conferidos `/demo/operacao` e `/operacao` com HTTP 200; APIs de operação, importação e PDF devolvem 401 sem sessão; service worker publicado com no-store e escopo da aplicação.
 
 Build/typecheck e 45 testes passaram na preparação. Validação de navegador do offline usou API fictícia local, com queda real do servidor, reabertura, persistência e reconexão; o piloto no navegador com uma conta real da aplicação ainda é necessário.
 
@@ -42,7 +42,7 @@ Para desenvolvimento no mesmo projeto, não recriar o banco nem rodar o schema c
 
 ## Verificação já registrada
 
-- 30 testes passaram; incluem migrações em PGlite, isolamento, demandas, PMOC e PDF.
+- 45 testes passaram; incluem migrações em PGlite, isolamento, demandas, PMOC/PDF, orçamento, OS, financeiro, importação e IndexedDB.
 - Typecheck e build de produção passaram nas entregas funcionais e visuais; a correção dos prints também teve build concluído.
 - Temas claro/escuro e layout desktop/mobile foram inspecionados nas alterações do champanhe.
 - Página inicial corrigida conferida em desktop e 390 px, sem corte dos arquivos nem rolagem horizontal.
@@ -71,7 +71,7 @@ Esses registros não substituem um teste operacional completo com usuário e dad
 - Revalidar o modal `Confirmar` após a melhoria de confinamento de foco nesta branch.
 - Melhorar acesso rápido/navegação ativa do PMOC no celular e feedback de erros junto aos campos.
 - Revisar mensagens que misturam situação de prazo, processo e documento e pequenas inconsistências de linguagem do guia.
-- Aviso ao cliente final, resumo/cadastro por WhatsApp e cobrança recorrente. A importação de clientes está implementada na nova branch, aguardando publicação.
+- Aviso ao cliente final, resumo/cadastro por WhatsApp e cobrança recorrente. A importação de clientes foi publicada no PR #5.
 
 ## Escopo de PMOC
 

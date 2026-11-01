@@ -73,6 +73,6 @@ Os testes usam infraestrutura simulada/PGlite. Não substituem o piloto autentic
 Trabalhe em uma branch e revise antes de mesclar na `main`: a Vercel publica automaticamente os commits da `main`.
 Banco e migrations precisam estar preparados antes de publicar uma mudança que dependa deles.
 
-## Nova etapa em andamento
+## Operação comercial e offline
 
-A implementação de operação/offline está na branch `codex/operacao-orcamentos-offline`. Consulte `OPERACAO.md` e o início de `STATUS.md`; migração de 31/10 já aplicada; conferir o status do PR/deployment antes de publicar novas mudanças. Para retomar essa etapa em outro notebook, faça checkout dessa branch depois do clone.
+A etapa foi integrada à `main` no PR #5 e publicada. A migração de 31/10 já foi aplicada no Supabase. Consulte `OPERACAO.md` para o fluxo, limites do offline e roteiro de teste; o início de `STATUS.md` registra a publicação e as verificações. Para continuar em outro notebook, use a `main` atualizada depois do clone.
