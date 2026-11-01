@@ -80,3 +80,7 @@ A etapa foi integrada à `main` no PR #5 e publicada. A migração de 31/10 já 
 ## Relatórios de manutenção e fotos
 
 A evolução da OS está documentada em `RELATORIOS.md`. Precisa da migração incremental `20261031_relatorios_fotos.sql`, após `20261031_operacao_offline.sql`. O status da aplicação no banco e da publicação está em `STATUS.md`. Fotos usam o Supabase Storage privado existente; não há nova credencial.
+
+## Aceite assinado na OS
+
+A captura na tela está documentada em `ASSINATURAS.md`; a migração incremental é `20261101_assinatura_atendimento.sql`, após relatórios/fotos. Não requer serviço externo nem novas variáveis. Confira `STATUS.md` para implantação e limites de validação.

@@ -1,3 +1,4 @@
+import { DemoAssinaturaAtendimento } from '@/components/ui/AssinaturaAtendimento'
 import { DemoRelatorioServico } from '@/components/ui/RelatorioServico'
 import Link from 'next/link'
 import {
@@ -269,6 +270,7 @@ export default function DesignSystem() {
       </Secao>
 
       <Secao id="relatorio" titulo="Relatório de manutenção" sub="Equipamentos, execução e evidências privadas. Exemplo fictício e interativo."><DemoRelatorioServico /></Secao>
+      <Secao id="assinatura" titulo="Aceite do atendimento" sub="Assinatura na tela vinculada à OS. Exemplo fictício, sem envio à plataforma."><DemoAssinaturaAtendimento /></Secao>
 
       <Secao id="icones" titulo="Ícones e logo" sub="Lucide, traço 2px. 20px padrão, 16px em meta, 24px na navegação mobile. Sempre acompanhado de texto.">
         <div className="grade-2">
