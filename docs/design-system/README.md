@@ -175,3 +175,5 @@ O gerador usa `lib/documentos/timbrado.ts` para A4 com cabeçalho, logo e rodap�
 `Confirmar` aceita `aoConfirmar` assíncrono para ações locais, com carregamento e fechamento após a conclusão.
 
 `components/ui/RelatorioServico.tsx`: unidade, aparelhos, PMOC, materiais, medições, ciência declarada e galeria de fotos com legendas. Exemplo interativo em `#relatorio` no catálogo e na OS de `/demo/operacao`.
+
+`components/ui/AssinaturaAtendimento.tsx`: resumo para conferência, termo, desenho por ponteiro e recibo/pendência; seleção de tema por tokens e área responsiva com proporção preservada. Exemplo fictício em `#assinatura` no catálogo e fluxo completo na OS de `/demo/operacao`.

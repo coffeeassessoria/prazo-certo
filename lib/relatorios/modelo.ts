@@ -1,3 +1,4 @@
+import type { Assinatura, ReciboAceite } from "./assinatura";
 import type { IdentidadeDocumento } from "@/lib/pmoc";
 export const MAX_FOTOS = 20;
 export const MAX_FOTO_BYTES = 600_000;
@@ -33,9 +34,11 @@ export type Relatorio = {
     confirmada: boolean;
   };
   fotos: Foto[];
+  assinatura?: Assinatura;
   snapshot?: SnapshotRelatorio;
 };
 export type SnapshotRelatorio = {
+  aceite?: ReciboAceite;
   identidade: IdentidadeDocumento;
   cliente: { nome: string; documento?: string; endereco?: string };
   unidade: { nome: string; endereco: string };

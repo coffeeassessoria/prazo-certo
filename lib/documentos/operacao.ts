@@ -125,7 +125,9 @@ export async function gerarDocumentoOperacao(
         "Acompanhamento",
         {
           presente:
-            "Representante tomou ciência, conforme declaração do técnico",
+            rel.assinatura && snap?.aceite
+              ? "Representante assinou o aceite na tela"
+              : "Representante tomou ciência, conforme declaração do técnico",
           ausente: "Sem representante disponível",
           recusou: "Representante não quis confirmar ciência",
         }[rel.ciencia.situacao],
@@ -134,10 +136,57 @@ export async function gerarDocumentoOperacao(
         t.campo("Representante", rel.ciencia.nome);
         t.campo("Cargo / função", rel.ciencia.cargo);
       }
-      t.paragrafo(
-        "Registro informado pelo técnico. Não é assinatura eletrônica do cliente nem aprovação técnica das rotinas do PMOC.",
-        true,
-      );
+      if (rel.assinatura && snap?.aceite) {
+        t.secao("Aceite do atendimento na tela");
+        t.assinatura(rel.assinatura.tracos);
+        t.campo("Representante que assinou", rel.ciencia.nome);
+        t.campo("Cargo / função", rel.ciencia.cargo);
+        t.paragrafo(rel.assinatura.termo);
+        t.campo(
+          "Coleta no aparelho (horário declarado)",
+          new Date(rel.assinatura.capturada_em).toLocaleString("pt-BR", {
+            timeZone: "America/Cuiaba",
+          }),
+        );
+        t.campo(
+          snap.aceite.demonstracao
+            ? "Conclusão da demonstração (sem envio à plataforma)"
+            : "Recebido pela plataforma",
+          new Date(snap.aceite.recebido_em).toLocaleString("pt-BR", {
+            timeZone: "America/Cuiaba",
+          }),
+        );
+        t.campo("Fuso dos horários", "America/Cuiaba (UTC-4)");
+        t.campo("OS / versão aceita", `${id} / ${snap.aceite.versao}`);
+        t.campo("Registrado pela conta", snap.aceite.registrado_por);
+        t.campo(
+          "Registro SHA-256 do aceite e conteúdo preservado",
+          snap.aceite.sha256,
+        );
+        const contexto = JSON.parse(rel.assinatura.conteudo).apresentado;
+        t.campo(
+          "Identificação apresentada na coleta",
+          [
+            contexto.empresa,
+            contexto.cliente,
+            contexto.unidade,
+            contexto.unidade_endereco,
+            contexto.tecnico,
+            ...(contexto.equipamentos || []),
+          ]
+            .filter(Boolean)
+            .join("; "),
+        );
+        t.paragrafo(
+          "Assinatura desenhada na tela, sem certificado digital. A identidade do signatário foi informada na coleta e não foi verificada automaticamente. O registro SHA-256 identifica o conjunto preservado na plataforma; não é uma certificação digital do arquivo PDF.",
+          true,
+        );
+      } else {
+        t.paragrafo(
+          "Registro informado pelo técnico. Não há assinatura do cliente neste relatório nem aprovação técnica das rotinas do PMOC.",
+          true,
+        );
+      }
       if (snap)
         t.campo(
           "Registro na plataforma",
@@ -165,7 +214,7 @@ export async function gerarDocumentoOperacao(
       }
     }
     t.paragrafo(
-      "Relatório operacional. Este documento não substitui o plano PMOC nem comprova assinatura ou responsabilidade técnica.",
+      "Relatório operacional. Este documento não substitui o plano PMOC nem comprova responsabilidade técnica.",
       true,
     );
   }

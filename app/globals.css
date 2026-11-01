@@ -620,3 +620,12 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .relatorio-galeria .campo{min-width:0}.relatorio-galeria select,.relatorio-galeria input{width:100%}
 .relatorio-campos:disabled{opacity:1}.operacao-check select{max-width:100%;min-width:0;flex:1}
 @media(max-width:767px){.relatorio-galeria{grid-template-columns:1fr}.operacao-check select{flex-basis:100%}}
+
+/* Aceite manuscrito: traços privados preservados junto à OS. */
+.assinatura-area { position: relative; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-md); background: var(--pc-surface); }
+.assinatura-desenho { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; max-width: 600px; color: var(--pc-text); background: var(--pc-surface); border-radius: var(--pc-radius-md); }
+.assinatura-captura { touch-action: none; cursor: crosshair; user-select: none; }
+.assinatura-area > span { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; color: var(--pc-text-secondary); font-size: var(--pc-text-lg); }
+.assinatura-hash { overflow-wrap: anywhere; }
+.assinatura-resumo summary { cursor: pointer; padding-block: var(--pc-space-3); font-weight: 600; min-height: 44px; }
+.assinatura-resumo dd { white-space: pre-wrap; overflow-wrap: anywhere; }

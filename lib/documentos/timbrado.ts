@@ -285,6 +285,19 @@ export class Timbrado {
     }
     this.y -= 10
   }
+  assinatura(tracos: [number, number][][]) {
+    this.garantir(140)
+    const largura = 260, altura = 130, y = this.y - altura
+    this.page.drawRectangle({ x: M, y, width: largura, height: altura, color: rgb(1, 1, 1), borderColor: cor.borda, borderWidth: .5 })
+    for (const traco of tracos) for (let i = 1; i < traco.length; i++) {
+      this.page.drawLine({
+        start: { x: M + traco[i - 1][0] / 1000 * largura, y: y + altura - traco[i - 1][1] / 1000 * altura },
+        end: { x: M + traco[i][0] / 1000 * largura, y: y + altura - traco[i][1] / 1000 * altura },
+        thickness: 1, color: cor.texto,
+      })
+    }
+    this.y = y - 15
+  }
   async fotografia(bytes: Uint8Array, legenda: string) {
     const img = await this.doc.embedJpg(bytes)
     const escala = Math.min(W / img.width, 250 / img.height)

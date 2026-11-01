@@ -1,4 +1,5 @@
 "use client";
+import { validarTracos } from "@/lib/relatorios/assinatura";
 import { FotosRecuperaveis } from "./RelatorioServico";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -346,7 +347,20 @@ export function Operacao({ demo = false }: { demo?: boolean }) {
       ) {
         const rel = d.relatorio,
           uni = base.campo?.unidades.find((u) => u.id === rel.unidade_id);
+        if (rel.assinatura && !validarTracos(rel.assinatura.tracos))
+          throw new Error("Revise o desenho da assinatura.");
         rel.snapshot = {
+          ...(rel.assinatura
+            ? {
+                aceite: {
+                  demonstracao: true,
+                  sha256: "demonstração sem comprovante de servidor",
+                  recebido_em: new Date().toISOString(),
+                  registrado_por: base.usuario.id,
+                  versao: editar.versao + 1,
+                },
+              }
+            : {}),
           identidade: {
             nome: base.usuario.empresa,
             documento: "",

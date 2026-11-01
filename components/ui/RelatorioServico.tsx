@@ -415,8 +415,8 @@ export function RelatorioServico({
             </label>
           )}
           <p className="dica">
-            Registro informado pelo técnico. Não é assinatura eletrônica do
-            cliente.
+            Registro informado pelo técnico. Para coletar a assinatura do
+            representante, use o aceite ao final da OS antes de concluir.
           </p>
         </fieldset>
       </fieldset>

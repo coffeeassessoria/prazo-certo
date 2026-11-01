@@ -1,7 +1,13 @@
 "use client";
 import { RelatorioServico } from "./RelatorioServico";
 import { relatorioVazio, type Relatorio } from "@/lib/relatorios/modelo";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { AssinaturaAtendimento } from "./AssinaturaAtendimento";
+import {
+  conteudoAceite,
+  criarAssinatura,
+  semAssinatura,
+} from "@/lib/relatorios/assinatura";
 import { BotaoEnviar } from "./BotaoEnviar";
 import { Aviso } from "./Aviso";
 import { Confirmar } from "./Confirmar";
@@ -50,7 +56,9 @@ export function OperacaoForm({
         : {}),
     }),
     [erro, setErro] = useState(""),
-    [fotosOcupadas, setFotosOcupadas] = useState(false);
+    [fotosOcupadas, setFotosOcupadas] = useState(false),
+    [assinando, setAssinando] = useState(false);
+  const formulario = useRef<HTMLFormElement>(null);
   const preservado = !!registro.dados.relatorio?.snapshot;
   const alterarRelatorio = (
     patch: Partial<Relatorio> | ((a: Relatorio) => Relatorio),
@@ -118,6 +126,7 @@ export function OperacaoForm({
   }
   return (
     <form
+      ref={formulario}
       action={enviar}
       className="card operacao-pilha"
       aria-label="Editar registro"
@@ -127,7 +136,7 @@ export function OperacaoForm({
         <button
           type="button"
           className="btn ghost"
-          disabled={fotosOcupadas}
+          disabled={fotosOcupadas || assinando}
           onClick={cancelar}
         >
           Voltar à lista
@@ -274,7 +283,9 @@ export function OperacaoForm({
         </Aviso>
       )}
       <fieldset
-        disabled={preservado || fotosOcupadas}
+        disabled={
+          preservado || fotosOcupadas || assinando || !!d.relatorio?.assinatura
+        }
         className="relatorio-campos operacao-pilha"
       >
         <div className="campo">
@@ -743,9 +754,43 @@ export function OperacaoForm({
           />
         </div>
       </fieldset>
+      {tipo === "servico" && (
+        <AssinaturaAtendimento
+          key={conteudoAceite({ ...registro, dados: d }, base)}
+          registro={{ ...registro, dados: d }}
+          base={base}
+          bloqueado={fotosOcupadas || assinando || (revisando && !conflito)}
+          limpar={() => setD(semAssinatura(d))}
+          assinar={async (tracos) => {
+            if (!formulario.current?.reportValidity())
+              throw new Error(
+                "Preencha os campos indicados antes de coletar o aceite.",
+              );
+            const assinatura = criarAssinatura(
+              { ...registro, dados: d },
+              base,
+              tracos,
+            );
+            const novo = { ...d, relatorio: { ...d.relatorio!, assinatura } };
+            setErro("");
+            setAssinando(true);
+            setD(novo);
+            try {
+              await salvar(novo);
+            } catch (e) {
+              setErro((e as Error).message);
+              throw e;
+            } finally {
+              setAssinando(false);
+            }
+          }}
+        />
+      )}
       <div className="acoes empilha">
         {!preservado && (
-          <BotaoEnviar disabled={fotosOcupadas || (revisando && !conflito)}>
+          <BotaoEnviar
+            disabled={fotosOcupadas || assinando || (revisando && !conflito)}
+          >
             {tipo === "servico" && d.estado === "concluida"
               ? "Concluir e preservar"
               : "Salvar"}{" "}
@@ -761,7 +806,7 @@ export function OperacaoForm({
         <button
           type="button"
           className="btn ghost"
-          disabled={fotosOcupadas}
+          disabled={fotosOcupadas || assinando}
           onClick={cancelar}
         >
           {preservado ? "Voltar à lista" : "Cancelar edição"}

@@ -1,3 +1,5 @@
+import { criarAssinatura, type Assinatura } from "../lib/relatorios/assinatura";
+import { baseDemo } from "../lib/operacao/demo";
 import { randomBytes } from "node:crypto";
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -119,6 +121,7 @@ test("relatório SQL: isolamento, fotos, PMOC, ciência, retorno e preservação
       "20261030_pmoc_documentos.sql",
       "20261031_operacao_offline.sql",
       "20261031_relatorios_fotos.sql",
+      "20261101_assinatura_atendimento.sql",
     ])
       await db.exec(
         await readFile(
@@ -371,10 +374,146 @@ test("relatório SQL: isolamento, fotos, PMOC, ciência, retorno e preservação
           cargo: "Gestora",
           confirmada: true,
         };
+        const assinatura = criarAssinatura(
+          { id: os, tipo: "servico", versao: 1, dados: final },
+          {
+            ...baseDemo(),
+            usuario: { ...baseDemo().usuario, id: membro, empresa_id: emp },
+          },
+          [
+            [
+              [100, 400],
+              [150, 300],
+              [200, 600],
+              [300, 500],
+              [400, 300],
+              [500, 500],
+            ],
+          ],
+        );
+        const assinado: Dados = {
+          ...final,
+          relatorio: { ...final.relatorio, assinatura },
+        };
+        await assert.rejects(
+          salvar({ ...assinado, resultado: "Mudou após assinar" }, 1),
+          /mudou depois/,
+        );
+        await assert.rejects(
+          salvar(
+            {
+              ...assinado,
+              relatorio: {
+                ...assinado.relatorio!,
+                ciencia: { ...final.relatorio.ciencia, nome: "Outra pessoa" },
+              },
+            },
+            1,
+          ),
+          /mudou depois/,
+        );
+        for (const patch of [
+          { termo: "Termo falso" },
+          { formato: 2 },
+          { tracos: [[[100, 100]]] },
+          {
+            tracos: [
+              [
+                [100, 100],
+                [101, 101],
+                [102, 102],
+                [103, 103],
+                [104, 104],
+                [105, 105],
+              ],
+            ],
+          },
+          {
+            tracos: [
+              [
+                [100, 100],
+                [100, 100],
+                [100, 100],
+                [100, 100],
+                [100, 100],
+                [1001, 100],
+              ],
+            ],
+          },
+          {
+            conteudo: JSON.stringify({
+              ...JSON.parse(assinatura.conteudo),
+              os: id(999),
+            }),
+          },
+          {
+            conteudo: JSON.stringify({
+              ...JSON.parse(assinatura.conteudo),
+              empresa: outra,
+            }),
+          },
+          {
+            conteudo: JSON.stringify({
+              ...JSON.parse(assinatura.conteudo),
+              coletor: admin,
+            }),
+          },
+          {
+            conteudo: JSON.stringify({
+              ...JSON.parse(assinatura.conteudo),
+              versao: 0,
+            }),
+          },
+        ])
+          await assert.rejects(
+            salvar(
+              {
+                ...assinado,
+                relatorio: {
+                  ...assinado.relatorio!,
+                  assinatura: { ...assinatura, ...patch } as Assinatura,
+                },
+              },
+              1,
+            ),
+          );
         const op = crypto.randomUUID(),
-          a = await salvar(final, 1, op),
-          b = await salvar(final, 1, op);
+          a = await salvar(assinado, 1, op),
+          b = await salvar(assinado, 1, op);
         assert.deepEqual(a, b);
+        assert.match(
+          a.dados.relatorio.snapshot.aceite.sha256,
+          /^[a-f0-9]{64}$/,
+        );
+        assert.equal(a.dados.relatorio.snapshot.aceite.versao, 2);
+        assert.equal(a.dados.relatorio.snapshot.aceite.registrado_por, membro);
+        assert.deepEqual(a.dados.relatorio.assinatura, assinatura);
+        const imagem = await sharp({
+          create: { width: 600, height: 300, channels: 3, background: "navy" },
+        })
+          .jpeg()
+          .toBuffer();
+        const pdf = await gerarDocumentoOperacao(
+          a,
+          a.dados.relatorio.snapshot.identidade,
+          a.dados.relatorio.snapshot.cliente,
+          undefined,
+          [{ id: foto, bytes: imagem }],
+        );
+        await mkdir("tmp", { recursive: true });
+        await writeFile("tmp/relatorio-assinado.pdf", pdf);
+        const doc = await PDFDocument.load(pdf);
+        assert.ok(doc.getPageCount() >= 2);
+        for (const p of doc.getPages()) {
+          assert.ok(Math.abs(p.getWidth() - 595.28) < 0.1);
+          assert.ok(Math.abs(p.getHeight() - 841.89) < 0.1);
+        }
+
+        const confere = await row(
+          `select encode(sha256(convert_to(jsonb_build_object('assinatura',dados->'relatorio'->'assinatura','snapshot',(dados->'relatorio'->'snapshot')-'aceite','fotos',jsonb_build_array(jsonb_build_object('id',$2::uuid,'sha256',repeat('a',64))),'empresa',empresa_id,'os',id,'versao',versao,'registrado_por',(dados->'relatorio'->'snapshot'->'aceite'->>'registrado_por')::uuid,'recebido_em',(dados->'relatorio'->'snapshot'->'aceite'->>'recebido_em')::timestamptz)::text,'UTF8')),'hex') hash from operacao_registros where id=$1`,
+          [os, foto],
+        );
+        assert.equal(confere.hash, a.dados.relatorio.snapshot.aceite.sha256);
         assert.equal(a.dados.relatorio.snapshot.tecnico, "Técnico");
         assert.ok(a.dados.relatorio.snapshot.retorno_id);
         assert.equal(
