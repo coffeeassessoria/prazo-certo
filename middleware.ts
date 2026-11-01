@@ -6,7 +6,7 @@ const PUBLICAS = ['/login', '/inicio', '/guia', '/privacidade', '/termos', '/esq
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request })
   const path = request.nextUrl.pathname
-  if (['/operacao', '/sw.js', '/api/operacao', '/api/operacao/pdf', '/api/importacao'].includes(path) || PUBLICAS.some((p) => path.startsWith(p))) return response
+  if (['/operacao', '/sw.js', '/api/operacao', '/api/operacao/pdf', '/api/operacao/fotos', '/api/importacao'].includes(path) || PUBLICAS.some((p) => path.startsWith(p))) return response
   // Antes de configurar o Supabase, só a demonstração e o login funcionam
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL) return NextResponse.redirect(new URL('/demo', request.url))
 
