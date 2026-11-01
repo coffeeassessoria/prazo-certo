@@ -72,3 +72,7 @@ git diff --check
 Os testes usam infraestrutura simulada/PGlite. Não substituem o piloto autenticado e os testes das integrações externas descritos no status.
 Trabalhe em uma branch e revise antes de mesclar na `main`: a Vercel publica automaticamente os commits da `main`.
 Banco e migrations precisam estar preparados antes de publicar uma mudança que dependa deles.
+
+## Nova etapa em andamento
+
+A implementação de operação/offline está na branch `codex/operacao-orcamentos-offline`. Consulte `OPERACAO.md` e o início de `STATUS.md`; migração de 31/10 já aplicada; conferir o status do PR/deployment antes de publicar novas mudanças. Para retomar essa etapa em outro notebook, faça checkout dessa branch depois do clone.

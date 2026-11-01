@@ -584,3 +584,28 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .pmoc-rotina { min-width: 0; border: 1px solid var(--pc-border); border-radius: var(--pc-radius-md); padding: var(--pc-space-4); margin-block: var(--pc-space-4); }
 .pmoc-rotina legend { font-weight: 600; padding-inline: var(--pc-space-2); color: var(--pc-text-secondary); }
 @media (max-width: 767px) { .documento-form-wrap .btn { min-height: 44px; } }
+
+/* Operação comercial, execução de campo e importação · DS 2.0 */
+.operacao-pilha{display:flex;flex-direction:column;gap:var(--pc-space-4);min-width:0}
+.operacao-conexao,.operacao-registro-topo{display:flex;justify-content:space-between;align-items:center;gap:var(--pc-space-4);flex-wrap:wrap}
+.operacao-conexao strong{display:flex;align-items:center;gap:var(--pc-space-2)}
+.operacao-abas{display:flex;flex-wrap:wrap;gap:var(--pc-space-2);padding-block:var(--pc-space-2)}
+.operacao-abas .btn{min-height:var(--pc-space-12)}
+.operacao-abas .operacao-selecionado{background:var(--pc-accent-soft);color:var(--pc-accent-text);border-color:var(--pc-accent-border)}
+.operacao-item{border:1px solid var(--pc-border);border-radius:var(--pc-radius-md);padding:var(--pc-space-4);min-width:0}
+.operacao-item legend{padding-inline:var(--pc-space-2);font-weight:600}
+.operacao-valores{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--pc-space-4)}
+.operacao-total{display:flex;flex-direction:column;justify-content:center;gap:var(--pc-space-2)}
+.operacao-total strong,.operacao-preco{font-size:var(--pc-text-xl);font-weight:700}
+.operacao-check{display:flex;gap:var(--pc-space-2);align-items:center;min-width:0}
+.operacao-check input[type=checkbox],.operacao-consentimento input{width:var(--pc-space-6);height:var(--pc-space-6);flex-shrink:0;accent-color:var(--pc-accent)}
+.operacao-check input:not([type=checkbox]){width:100%;min-width:0}
+.operacao-consentimento{display:flex;gap:var(--pc-space-3);align-items:center;margin-block:var(--pc-space-4);min-height:var(--pc-space-12)}
+.operacao-registro h2{font-size:var(--pc-text-lg);margin-block:var(--pc-space-2);overflow-wrap:anywhere}
+.operacao-registro .acoes{margin-top:var(--pc-space-4)}
+.operacao-registro p{overflow-wrap:anywhere}
+.operacao-rodape{display:flex;gap:var(--pc-space-4);flex-wrap:wrap;padding-block:var(--pc-space-4)}
+.operacao-baixa{display:flex;align-items:flex-end;gap:var(--pc-space-4);flex-wrap:wrap;margin-block:var(--pc-space-4)}
+.operacao-pilha summary{cursor:pointer;min-height:var(--pc-space-12);padding-block:var(--pc-space-3);font-weight:600}
+@media(max-width:767px){.operacao-valores{grid-template-columns:1fr}.operacao-check{flex-wrap:wrap}.operacao-check input:not([type=checkbox]){flex:1}.operacao-conexao .btn{width:100%}.operacao-abas .btn{flex:1 1 44%;font-size:var(--pc-text-sm)}.operacao-preco{width:100%}.operacao-baixa{align-items:stretch;flex-direction:column}}
+.sair-aviso{position:fixed;left:var(--pc-space-4);bottom:var(--pc-space-16);width:min(360px,calc(100vw - var(--pc-space-8)));background:var(--pc-surface);border:1px solid var(--pc-border);border-radius:var(--pc-radius-lg);box-shadow:var(--pc-shadow-lg);padding:var(--pc-space-4);z-index:100}

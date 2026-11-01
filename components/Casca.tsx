@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Suspense } from 'react'
-import { LogOut } from 'lucide-react'
+import { Sair } from './ui/Sair'
 import { Abas, Menu, MenuGaveta } from './Navegacao'
 import { Logo } from './ui/Logo'
 import { TemaToggle } from './ui/TemaToggle'
@@ -44,9 +44,7 @@ export function Casca({
           <div className="sidebar-rodape">
             <span className="avatar" aria-hidden>{iniciais(quem)}</span>
             <span className="sidebar-quem"><b>{quem}</b>{email && nome && <span>{email}</span>}</span>
-            <form action="/sair" method="post">
-              <button className="btn ghost icone peq" aria-label="Sair do sistema" title="Sair"><LogOut size={16} /></button>
-            </form>
+            <Sair />
           </div>
         </aside>
         <main className="pc-main">

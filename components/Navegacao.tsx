@@ -30,6 +30,7 @@ export function Menu({ temEmpresa, superadmin, aoNavegar }: Props) {
         <>
           <Link href="/" {...a('/')} {...l}><LayoutDashboard size={20} />Painel</Link>
           <Link href="/itens/novo" {...a('/itens/novo')} {...l}><Plus size={20} />Novo vencimento</Link>
+          <a href="/operacao" {...a('/operacao')} {...l}><FileText size={20} />Orçamentos e serviços</a>
           <Link href="/acompanhamentos" {...a('/acompanhamentos')} {...l}><BellRing size={20} />Demandas e retornos</Link>
           <Link href="/pmoc" {...a('/pmoc')} {...l}><FileText size={20} />Planos PMOC</Link>
           <Link href="/unidades" {...a('/unidades')} {...l}><Building2 size={20} />Unidades e equipamentos</Link>

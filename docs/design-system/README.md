@@ -165,3 +165,11 @@ Estilos usam tokens em `app/globals.css`; exemplos no catálogo `#documentos` e 
 O gerador usa `lib/documentos/timbrado.ts` para A4 com cabeçalho, logo e rodapé em todas as páginas.
 
 `components/ui/InventarioUnidade.tsx`: lista e formulários de ambientes/equipamentos, usados pela operação, catálogo e demonstração.
+
+## Operação comercial e de campo
+
+`components/ui/OperacaoForm.tsx`: orçamento com itens e desconto, execução de OS com checklist, demanda e lançamento gerencial.
+`components/ui/Operacao.tsx`: conexão, fila de envios, revisão de conflitos e abas da operação. Exemplo em `/demo/operacao`.
+`components/ui/ImportarClientes.tsx`: modelo CSV, upload CSV/XLSX, prévia por linha e confirmação de importação.
+`components/ui/Sair.tsx`: confere os envios locais antes de sair e limpa os cadastros offline.
+`Confirmar` aceita `aoConfirmar` assíncrono para ações locais, com carregamento e fechamento após a conclusão.
