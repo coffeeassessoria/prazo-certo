@@ -4,6 +4,7 @@ import { indexedDB } from "fake-indexeddb";
 import { baseDemo } from "../lib/operacao/demo";
 import {
   criarAssinatura,
+  podeColetarAssinatura,
   semAssinatura,
   validarTracos,
   type Tracos,
@@ -121,4 +122,22 @@ test("assinatura offline sobrevive à retomada, fica isolada por conta e sai da 
     a,
   );
   await offline.limpar();
+});
+
+test("a coleta só fica disponível com atendimento concluído e representante identificado", () => {
+  const b = baseDemo(),
+    r = structuredClone(b.registros.find((r) => r.tipo === "servico")!);
+  assert.equal(podeColetarAssinatura(r.dados), false);
+  r.dados.estado = "concluida";
+  r.dados.resultado = "Funcionamento conferido";
+  r.dados.checklist = r.dados.checklist!.map((c) => ({ ...c, feito: true }));
+  r.dados.relatorio!.ciencia = {
+    situacao: "presente",
+    nome: "Ana Oliveira",
+    cargo: "Gestora",
+    confirmada: true,
+  };
+  assert.equal(podeColetarAssinatura(r.dados), true);
+  r.dados.relatorio!.ciencia.situacao = "recusou";
+  assert.equal(podeColetarAssinatura(r.dados), false);
 });

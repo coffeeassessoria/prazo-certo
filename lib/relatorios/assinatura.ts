@@ -106,8 +106,8 @@ export function criarAssinatura(
 
 export function podeColetarAssinatura(d: Dados) {
   if (!d.relatorio) return false;
-  return;
-  d.estado === "concluida" &&
+  return (
+    d.estado === "concluida" &&
     !!d.titulo.trim() &&
     !!d.cliente_id &&
     !!d.responsavel_id &&
@@ -119,5 +119,6 @@ export function podeColetarAssinatura(d: Dados) {
     d.checklist.every((c) => c.feito) &&
     d.relatorio!.ciencia.situacao === "presente" &&
     d.relatorio!.ciencia.nome.trim().length >= 2 &&
-    d.relatorio!.ciencia.confirmada;
+    d.relatorio!.ciencia.confirmada
+  );
 }
