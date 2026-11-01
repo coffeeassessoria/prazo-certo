@@ -1,3 +1,4 @@
+import { relatorioVazio } from "@/lib/relatorios/modelo";
 import { hoje, vazio, type Base } from "./modelo";
 export function baseDemo(): Base {
   const uid = "00000000-0000-4000-8000-000000000001",
@@ -18,6 +19,54 @@ export function baseDemo(): Base {
       },
     ],
     equipe: [{ id: uid, nome: "Carlos Silva" }],
+    armazenamento: { usado: 0, limite: 524288000 },
+    campo: {
+      unidades: [
+        {
+          id: "00000000-0000-4000-8000-000000000011",
+          cliente_id: cid,
+          nome: "Unidade Centro",
+          endereco: "Rua de exemplo, 100 · endereço fictício",
+        },
+      ],
+      equipamentos: [
+        {
+          id: "00000000-0000-4000-8000-000000000012",
+          unidade_id: "00000000-0000-4000-8000-000000000011",
+          tag: "AC-01",
+          marca: "Marca de exemplo",
+          modelo: "Split 12.000 BTU/h",
+          ambiente: "Recepção",
+        },
+        {
+          id: "00000000-0000-4000-8000-000000000013",
+          unidade_id: "00000000-0000-4000-8000-000000000011",
+          tag: "AC-02",
+          marca: "Marca de exemplo",
+          modelo: "Split 18.000 BTU/h",
+          ambiente: "Administrativo",
+        },
+      ],
+      planos: [
+        {
+          id: "00000000-0000-4000-8000-000000000014",
+          unidade_id: "00000000-0000-4000-8000-000000000011",
+          titulo: "PMOC · Unidade Centro",
+          rotinas: [
+            {
+              id: "filtros",
+              aplicacao: "Filtros",
+              atividade: "Inspecionar filtros e registrar condições",
+            },
+            {
+              id: "dreno",
+              aplicacao: "Drenagem",
+              atividade: "Conferir bandeja e escoamento",
+            },
+          ],
+        },
+      ],
+    },
     sincronizado: new Date().toISOString(),
     registros: [
       {
@@ -51,11 +100,22 @@ export function baseDemo(): Base {
           titulo: "Manutenção preventiva · recepção",
           cliente_id: cid,
           estado: "em_andamento",
+          relatorio: {
+            ...relatorioVazio(hoje()),
+            unidade_id: "00000000-0000-4000-8000-000000000011",
+            equipamento_ids: ["00000000-0000-4000-8000-000000000012"],
+            plano_id: "00000000-0000-4000-8000-000000000014",
+          },
           checklist: [
-            { descricao: "Inspecionar filtros e serpentinas", feito: true },
+            {
+              descricao: "Inspecionar filtros e serpentinas",
+              feito: true,
+              rotina_id: "filtros",
+            },
             {
               descricao: "Conferir drenagem e registrar o resultado",
               feito: false,
+              rotina_id: "dreno",
             },
           ],
         },

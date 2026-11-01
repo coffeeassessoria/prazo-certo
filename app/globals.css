@@ -612,3 +612,11 @@ a.aviso-link:hover { text-decoration: none; border-color: var(--pc-brand-700); }
 .operacao-comparacao{display:grid;gap:var(--pc-space-3);margin-block:var(--pc-space-3)}
 .operacao-comparacao dt{font-weight:600;font-size:var(--pc-text-sm);color:var(--pc-text-secondary)}
 .operacao-comparacao dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* Evidências do relatório de campo */
+.relatorio-campos{border:0;padding:0;margin:0;min-width:0}
+.relatorio-galeria{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--pc-space-4)}
+.relatorio-foto-imagem{display:block;width:100%;height:auto;max-height:calc(var(--pc-space-16) * 4);object-fit:contain;background:var(--pc-bg);border-radius:var(--pc-radius-sm)}
+.relatorio-galeria .campo{min-width:0}.relatorio-galeria select,.relatorio-galeria input{width:100%}
+.relatorio-campos:disabled{opacity:1}.operacao-check select{max-width:100%;min-width:0;flex:1}
+@media(max-width:767px){.relatorio-galeria{grid-template-columns:1fr}.operacao-check select{flex-basis:100%}}

@@ -76,3 +76,7 @@ Banco e migrations precisam estar preparados antes de publicar uma mudança que 
 ## Operação comercial e offline
 
 A etapa foi integrada à `main` no PR #5 e publicada. A migração de 31/10 já foi aplicada no Supabase. Consulte `OPERACAO.md` para o fluxo, limites do offline e roteiro de teste; o início de `STATUS.md` registra a publicação e as verificações. Para continuar em outro notebook, use a `main` atualizada depois do clone.
+
+## Relatórios de manutenção e fotos
+
+A evolução da OS está documentada em `RELATORIOS.md`. Precisa da migração incremental `20261031_relatorios_fotos.sql`, após `20261031_operacao_offline.sql`. O status da aplicação no banco e da publicação está em `STATUS.md`. Fotos usam o Supabase Storage privado existente; não há nova credencial.

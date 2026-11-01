@@ -22,7 +22,7 @@ A sincronização acontece com a página aberta: ao reconectar, voltar à janela
 
 Ao sair, dados sincronizados podem ser limpos. Se houver pendências, o usuário pode sincronizar ou encerrar a sessão mantendo os envios bloqueados para o próximo acesso autenticado. A rota de saída também bloqueia o acesso offline, inclusive quando acionada fora da nova tela.
 
-O navegador pode remover o armazenamento, especialmente em modo privado, falta de espaço ou limpeza manual. A aplicação solicita persistência quando disponível, mas a concessão depende do navegador. Não limpar dados nem trocar de aparelho antes de sincronizar. PDF, importação, financeiro, fotos/anexos e emissão PMOC continuam precisando de conexão; o checklist desta OS ainda não alimenta automaticamente as execuções do PMOC.
+O navegador pode remover o armazenamento, especialmente em modo privado, falta de espaço ou limpeza manual. A aplicação solicita persistência quando disponível, mas a concessão depende do navegador. Não limpar dados nem trocar de aparelho antes de sincronizar. PDF, importação, financeiro, anexos gerais e emissão PMOC continuam precisando de conexão. A evolução em `RELATORIOS.md` acrescenta fotos offline e integração das etapas vinculadas com as execuções do PMOC.
 
 ## Banco e implantação
 
@@ -43,4 +43,4 @@ As APIs precisam das mesmas variáveis Supabase que a aplicação já utiliza; n
 - PDFs usam o mesmo timbrado A4 já existente; teste de paginação para orçamento e OS com conteúdo longo.
 - Dependências auditadas; overrides de PostCSS, uuid e minimatch eliminam os avisos conhecidos do `npm audit` nesta instalação. Revalidar compatibilidade ao atualizar ExcelJS/Next.
 
-Ainda fora desta etapa: catálogo próprio com custos/margem, parcelamento automático, recorrência financeira, estorno de baixas, assinatura/aceite externo de proposta, fotos offline, agenda completa offline e vínculo automático da OS com rotinas/execuções do PMOC. O financeiro é gerencial e não faz conciliação bancária.
+Ainda fora desta etapa: catálogo próprio com custos/margem, parcelamento automático, recorrência financeira, estorno de baixas, assinatura/aceite externo de proposta, agenda completa offline e assinatura eletrônica do relatório. Fotos offline e vínculo com execuções PMOC foram acrescentados em `RELATORIOS.md`. O financeiro é gerencial e não faz conciliação bancária.

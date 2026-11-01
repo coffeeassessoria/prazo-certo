@@ -1,3 +1,7 @@
+import {
+  limparFotosLocais,
+  fotosPendentes,
+} from "@/lib/relatorios/fotos-offline";
 import type { Base, Operacao, Pendente, Registro } from "./modelo";
 export type Dispositivo = { base: Base; fila: Pendente[] };
 const BANCO = "prazo-certo-operacao-v1",
@@ -171,6 +175,7 @@ export async function limpar() {
     tx.onerror = () => reject(tx.error);
   });
   db.close();
+  await limparFotosLocais();
   localStorage.removeItem(PONTEIRO);
 }
 export async function substituirEnvio(
@@ -190,12 +195,13 @@ export async function substituirEnvio(
 }
 export async function pendentesTotais() {
   const db = await abrir();
+  const fotos = await fotosPendentes();
   return new Promise<number>((resolve, reject) => {
     const tx = db.transaction(TABELA, "readonly"),
       p = tx.objectStore(TABELA).getAll();
     p.onsuccess = () =>
       resolve(
-        (p.result as Dispositivo[]).reduce((n, d) => n + d.fila.length, 0),
+        (p.result as Dispositivo[]).reduce((n, d) => n + d.fila.length, fotos),
       );
     p.onerror = () => reject(p.error);
     tx.oncomplete = () => db.close();

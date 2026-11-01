@@ -1,3 +1,4 @@
+import { limparFotosAbandonadas } from '@/lib/relatorios/armazenamento'
 import { NextResponse, type NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { emailConfigurado, enviarEmail } from '@/lib/email'
@@ -13,6 +14,8 @@ export async function GET(req: NextRequest) {
   if (!segredo || req.headers.get('authorization') !== `Bearer ${segredo}`) {
     return NextResponse.json({ ok: false }, { status: 401 })
   }
+  let fotosRemovidas = 0
+  try { fotosRemovidas = await limparFotosAbandonadas() } catch { console.error('[fotos] Falha na limpeza de evidências abandonadas') }
   if (!emailConfigurado()) return NextResponse.json({ ok: false, motivo: 'smtp-nao-configurado' })
 
   const admin = createAdminClient()
@@ -78,5 +81,5 @@ export async function GET(req: NextRequest) {
       resultado[emp.id] = { erro: e.message }
     }
   }
-  return NextResponse.json({ ok: true, hoje, resultado })
+  return NextResponse.json({ ok: true, hoje, resultado, fotosRemovidas })
 }
