@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: nome,
     short_name: nome,
     description: 'Vencimentos de documentos, contratos e manutenções',
-    start_url: '/',
+    start_url: '/operacao',
     display: 'standalone',
     background_color: '#f3f5f6',
     theme_color: '#155179',

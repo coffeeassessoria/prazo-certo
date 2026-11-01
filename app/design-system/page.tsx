@@ -61,6 +61,7 @@ export default function DesignSystem() {
         </div>
       </Secao>
 
+      <Secao id="operacao" titulo="Orçamentos e execução de serviços" sub="OperacaoForm e ImportarClientes reutilizam campos, avisos, botões e métricas. O fluxo completo pode ser experimentado na demonstração."><a className="btn sec" href="/demo/operacao">Experimentar operação comercial e de campo</a></Secao>
       <Secao id="demandas" titulo="Demandas de climatização" sub="Item com situação, responsável e próxima ação. O prazo do vencimento vinculado é independente do retorno.">
         <div className="lista demanda-grupo"><ItemLinha hoje={hoje} item={{ id:'catalogo', href:'/demo/acompanhamentos/retorno', titulo:'Aprovar troca do compressor', tipo:'acompanhamento', vencimento:hoje, antecedencia_dias:0, status:'ativo', recorrencia_meses:null, cliente_nome:'Hospital Santa Clara', etapa_demanda:'aguardando_cliente', categoria_demanda:'orcamento', responsavel_nome:'Vanderlei', proxima_acao:'Ligar para confirmar a aprovação do orçamento' }} /></div>
         <div className="demanda-form-wrap"><AcompanhamentoForm acao={demonstrarDemanda} clientes={[]} responsaveis={[{ user_id:'exemplo',nome:'Vanderlei' }]} responsavelPadrao="exemplo" /></div>

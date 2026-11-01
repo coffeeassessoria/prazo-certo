@@ -48,6 +48,7 @@ export default async function Clientes({ searchParams }: { searchParams: Promise
         acao={!mostrarForm && total > 0 ? <Link href="/clientes?novo=1" className="btn"><Plus size={16} />Novo cliente</Link> : undefined}
       />
 
+      {!mostrarForm && <p><Link href="/clientes/importar" className="btn sec">Importar planilha de clientes</Link></p>}
       {mostrarForm && (
         <form action={salvarCliente} className="card" style={{ marginBottom: 24, maxWidth: 880 }}>
           <div className="card-topo"><h2>{editando ? `Editar ${editando.nome}` : 'Novo cliente'}</h2></div>
