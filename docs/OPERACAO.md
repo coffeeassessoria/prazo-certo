@@ -28,7 +28,7 @@ O navegador pode remover o armazenamento, especialmente em modo privado, falta d
 
 Aplicar **somente** `supabase/migrations/20261031_operacao_offline.sql` no projeto `prazo-certo-sp`, depois das duas migrações de 30/10. A mesma definição está anexada em `supabase/schema.sql` para bancos novos. Não executar o schema completo na produção existente.
 
-A migração adiciona versão aos itens e três tabelas (`operacao_registros`, `operacao_recibos`, `operacao_eventos`). Leitura por empresa ativa; financeiro somente para administradores. Escrita dos registros e recibos exclusivamente pelas funções autenticadas. Não remove dados existentes. Os drops recriam apenas gatilhos e políticas da própria migração.
+A migração adiciona versão aos itens e três tabelas (`operacao_registros`, `operacao_recibos`, `operacao_eventos`). Leitura por empresa ativa; financeiro somente para administradores. Escrita dos registros e recibos exclusivamente pelas funções autenticadas. Referências geradas impedem excluir clientes, responsáveis ou propostas ainda vinculados a registros da operação. Não remove dados existentes. Os drops recriam apenas gatilhos e políticas da própria migração.
 
 APIs verificam sessão, empresa ativa, conta de origem e origem da requisição. O cliente não escolhe a empresa da gravação: a função deriva a empresa de `auth.uid()`. Valores são recalculados no Postgres em centavos, com arredondamento por linha. Alterações da operação são auditadas; demandas reutilizam o histórico existente.
 

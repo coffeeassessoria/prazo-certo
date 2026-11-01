@@ -263,6 +263,11 @@ test("operação SQL: isolamento, reenvio, conflitos, OS, financeiro e importaç
       await assert.rejects(salvar("orcamento", qid, 1, dados), /indisponível/);
       await login(admin);
     });
+    await t.test('cadastro usado em orçamento não pode ser excluído',async()=>{
+      await db.exec('reset role');
+      await assert.rejects(db.query('delete from clientes where id=$1',[cliente]),/foreign key/);
+      await login(admin);
+    });
     let aprovado: any;
     await t.test(
       "aprovação preserva valores e não cria recebimento",

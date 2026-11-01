@@ -616,6 +616,11 @@ create table if not exists public.operacao_registros (
  dados jsonb not null, versao integer not null default 1,
  created_by uuid not null references auth.users(id), created_at timestamptz not null default now(), updated_at timestamptz not null default now()
 );
+-- Referências geradas impedem exclusão de cadastros ainda usados pela operação.
+alter table public.operacao_registros add column if not exists cliente_id uuid generated always as (nullif(dados->>'cliente_id','')::uuid) stored references public.clientes(id) on delete restrict;
+alter table public.operacao_registros add column if not exists responsavel_id uuid generated always as (nullif(dados->>'responsavel_id','')::uuid) stored references public.perfis(user_id) on delete restrict;
+alter table public.operacao_registros add column if not exists orcamento_id uuid generated always as (nullif(dados->>'orcamento_id','')::uuid) stored references public.operacao_registros(id) on delete restrict;
+create index if not exists operacao_cliente_idx on public.operacao_registros(cliente_id);
 create index if not exists operacao_empresa_tipo on public.operacao_registros(empresa_id,tipo,updated_at desc);
 create unique index if not exists operacao_os_orcamento on public.operacao_registros(empresa_id,(dados->>'orcamento_id')) where tipo='servico' and dados->>'orcamento_id' is not null;
 create unique index if not exists operacao_receita_orcamento on public.operacao_registros(empresa_id,(dados->>'orcamento_id')) where tipo='financeiro' and dados->>'orcamento_id' is not null;
