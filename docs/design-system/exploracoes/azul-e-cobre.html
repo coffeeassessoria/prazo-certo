@@ -1,0 +1,51 @@
+<div id="pc-paleta-cobre">
+  <style>
+    #pc-paleta-cobre { color: var(--foreground); }
+    #pc-paleta-cobre .pc-combinacao { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 28px; align-items: center; padding: 20px 0; }
+    #pc-paleta-cobre figure { margin: 0; }
+    #pc-paleta-cobre .pc-circulo { width: 220px; height: 220px; position: relative; }
+    #pc-paleta-cobre .pc-anel { position: absolute; inset: 20px; border-radius: 50%; background: conic-gradient(#f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00); }
+    #pc-paleta-cobre .pc-anel::after { content: ''; position: absolute; inset: 16px; border-radius: 50%; background: var(--background); }
+    #pc-paleta-cobre .pc-circulo svg { position: relative; width: 100%; height: 100%; overflow: visible; }
+    #pc-paleta-cobre .pc-lista { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 22px 18px; }
+    #pc-paleta-cobre .pc-cor { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    #pc-paleta-cobre .pc-amostra { width: 56px; height: 68px; flex: none; }
+    #pc-paleta-cobre .pc-nome { font-weight: 500; }
+    #pc-paleta-cobre .pc-dados { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+    #pc-paleta-cobre .pc-faixa { height: 18px; display: flex; gap: 5px; margin-top: 18px; }
+    #pc-paleta-cobre .pc-azul { background: #155179; }
+    #pc-paleta-cobre .pc-cobre { background: #c77848; }
+    #pc-paleta-cobre .pc-escuro { background: #9b542f; }
+    #pc-paleta-cobre .pc-claro { background: #e6a071; }
+    #pc-paleta-cobre figcaption { text-align: center; margin-top: 8px; }
+    @media(max-width:600px) {
+      #pc-paleta-cobre .pc-combinacao { grid-template-columns: 1fr; gap: 24px; }
+      #pc-paleta-cobre figure { justify-self: center; }
+    }
+    @media(max-width:380px) { #pc-paleta-cobre .pc-lista { grid-template-columns: 1fr; } }
+  </style>
+  <div class="pc-combinacao">
+    <figure>
+      <div class="pc-circulo" role="img" aria-label="Círculo de matizes HSL. Azul da marca em 204 graus e família cobre próxima de 24 graus, em posições opostas.">
+        <div class="pc-anel" aria-hidden="true"></div>
+        <svg viewBox="0 0 220 220" aria-hidden="true">
+          <line x1="75.4" y1="187.7" x2="144.6" y2="32.3" stroke="var(--foreground)" stroke-width="1" stroke-dasharray="3 5" opacity="0.45" />
+          <circle cx="75.4" cy="187.7" r="10" fill="#155179" stroke="var(--foreground)" stroke-width="2" />
+          <circle cx="144.6" cy="32.3" r="10" fill="#c77848" stroke="var(--foreground)" stroke-width="2" />
+          <text x="110" y="104" text-anchor="middle" fill="var(--foreground)" font-size="14" font-weight="500">Azul + cobre</text>
+          <text x="110" y="125" text-anchor="middle" fill="var(--muted-foreground)" font-size="12">204° ↔ 24°</text>
+        </svg>
+      </div>
+      <figcaption class="text-small text-muted">Harmonia complementar · HSL</figcaption>
+    </figure>
+    <div>
+      <div class="pc-lista">
+        <div class="pc-cor"><span class="pc-amostra pc-azul" aria-hidden="true"></span><div class="pc-dados"><span class="pc-nome">Azul atual</span><code>#155179</code><span class="text-small text-muted">Base da identidade</span></div></div>
+        <div class="pc-cor"><span class="pc-amostra pc-cobre" aria-hidden="true"></span><div class="pc-dados"><span class="pc-nome">Cobre suave</span><code>#C77848</code><span class="text-small text-muted">Detalhes de marca</span></div></div>
+        <div class="pc-cor"><span class="pc-amostra pc-escuro" aria-hidden="true"></span><div class="pc-dados"><span class="pc-nome">Cobre escuro</span><code>#9B542F</code><span class="text-small text-muted">5,67:1 com branco</span></div></div>
+        <div class="pc-cor"><span class="pc-amostra pc-claro" aria-hidden="true"></span><div class="pc-dados"><span class="pc-nome">Cobre claro</span><code>#E6A071</code><span class="text-small text-muted">8,48:1 com #0F141A</span></div></div>
+      </div>
+      <div class="pc-faixa" aria-hidden="true"><span class="pc-azul" style="flex:8"></span><span class="pc-cobre" style="flex:1"></span></div>
+    </div>
+  </div>
+</div>

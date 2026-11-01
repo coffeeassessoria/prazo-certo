@@ -1,6 +1,12 @@
 node_modules
 .next
 .env
-.env.local
+.env.*
+!.env.example
+.vercel/
+.venv/
+__pycache__/
+*.py[cod]
+.DS_Store
 next-env.d.ts
 *.tsbuildinfo

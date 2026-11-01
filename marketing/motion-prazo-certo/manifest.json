@@ -1,0 +1,55 @@
+{
+  "title": "Prazo Certo — orçamento e próximo retorno",
+  "size": [
+    1080,
+    1920
+  ],
+  "fps": 24,
+  "duration_seconds": 26,
+  "audio": null,
+  "video": "prazo-certo-motion-vertical.mp4",
+  "cover": "capa.png",
+  "storyboard": "roteiro-visual.jpg",
+  "brand": {
+    "navy": "#0f324b",
+    "champagne": "#d6be86",
+    "font": "Work Sans"
+  },
+  "source": "Capturas da demonstração real em https://prazo-certo-xi.vercel.app/demo/acompanhamentos",
+  "data": "Fictícios; nenhuma conta operacional ou dado de cliente utilizado.",
+  "composition": "Enquadramentos, deslocamento, realces e texto editorial sobre capturas reais.",
+  "scenes": [
+    {
+      "start": 0,
+      "end": 4,
+      "title": "O orçamento saiu. E o retorno?"
+    },
+    {
+      "start": 4,
+      "end": 9,
+      "title": "Comece pelo orçamento."
+    },
+    {
+      "start": 9,
+      "end": 14,
+      "title": "Uma próxima ação. Uma data."
+    },
+    {
+      "start": 14,
+      "end": 20,
+      "title": "Veja o que precisa de atenção."
+    },
+    {
+      "start": 20,
+      "end": 26,
+      "title": "Peça uma demonstração"
+    }
+  ],
+  "limitations": "Primeira versão sem locução ou trilha. Sem promessa de resultado comercial. Anúncio não publicado.",
+  "validation": {
+    "decode_exit_code": 0,
+    "decode_errors": "",
+    "file_bytes": 1312116,
+    "visual_review": "Cinco cenas conferidas após revisão dos enquadramentos."
+  }
+}

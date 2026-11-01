@@ -16,6 +16,12 @@ Interface: **Design System 2.0** — guia em `docs/design-system/README.md`, cat
 
 Stack: Next.js 15 + Supabase (Postgres, Auth, Storage). Hospedagem: Vercel **ou** sua VPS (Docker).
 
+## Retomar o projeto em outro computador
+
+Veja [docs/CONTINUAR.md](docs/CONTINUAR.md) para clonar, instalar, configurar as variáveis e continuar o desenvolvimento.
+O estado atual, as publicações e as pendências estão em [docs/STATUS.md](docs/STATUS.md).
+O primeiro vídeo e seu projeto editável estão em [marketing/motion-prazo-certo](marketing/motion-prazo-certo/README.md); o plano de aquisição está em [docs/AQUISICAO.md](docs/AQUISICAO.md).
+
 ---
 
 ## 1. Supabase (banco + login) — ~10 min
@@ -137,7 +143,7 @@ supabase/schema.sql         tabelas + isolamento entre empresas (RLS)
 
 A área de acompanhamentos agora permite atribuir responsável, situação, próxima ação e histórico de contatos. Pode ser vinculada a uma manutenção, PMOC ou contrato sem mudar o prazo original. O e-mail-resumo mostra o próximo passo e quem cuida.
 
-**Antes de publicar esta atualização:** aplicar `supabase/migrations/20261030_demandas_climatizacao.sql` no Supabase usado pela aplicação. A Vercel publica cada push na main; aplicar a migração antes de mesclar. Detalhes de ativação, migração dos acompanhamentos existentes e limites em [docs/DEMANDAS.md](docs/DEMANDAS.md).
+**Produção existente:** a migração `supabase/migrations/20261030_demandas_climatizacao.sql` foi aplicada em 30/10/2026 e o módulo foi publicado no PR #1. Para outra instalação anterior, aplicar a migração antes de publicar o código. Detalhes de ativação, migração dos acompanhamentos existentes e limites em [docs/DEMANDAS.md](docs/DEMANDAS.md).
 
 Demonstração: `/demo/acompanhamentos` (lista), `/demo/acompanhamentos/novo` (cadastro) e `/demo/acompanhamentos/retorno` (simulação de contato). Verificações: `npm test`, `npm run typecheck` e `npm run build`.
 
@@ -145,7 +151,7 @@ Demonstração: `/demo/acompanhamentos` (lista), `/demo/acompanhamentos/novo` (c
 
 Unidades, ambientes e equipamentos alimentam planos PMOC com atividades editáveis, registro de execução e PDFs A4 versionados. O administrador cadastra nome, contatos e logo da prestadora em **Ajustes → Logo e timbrado**.
 
-Aplicar também `supabase/migrations/20261030_pmoc_documentos.sql` **antes de publicar**. Detalhes de base técnica, ativação, privacidade e limites em [docs/PMOC.md](docs/PMOC.md). Demonstração: `/demo/pmoc`.
+A migração `supabase/migrations/20261030_pmoc_documentos.sql` também foi aplicada à produção em 30/10/2026, antes da publicação. Para outra instalação anterior, aplicar a migração antes do código. Detalhes de base técnica, ativação, privacidade e limites em [docs/PMOC.md](docs/PMOC.md). Demonstração: `/demo/pmoc`.
 
 ## Próximos passos sugeridos
 

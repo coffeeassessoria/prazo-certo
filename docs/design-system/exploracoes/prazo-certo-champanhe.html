@@ -1,0 +1,223 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap">
+<div id="prazo-champanhe-preview" aria-label="Prazo Certo com dourado champanhe">
+  <style>
+    #prazo-champanhe-preview {
+      --pc-bg: light-dark(#f3f5f6,#121821);
+      --pc-surface: light-dark(#fff,#1a212b);
+      --pc-soft: light-dark(#f6f8f9,#1e2936);
+      --pc-text: light-dark(#16181d,#f0f3f6);
+      --pc-muted: light-dark(#6a7181,#9aa5b5);
+      --pc-border: light-dark(#dddfe4,#3a4554);
+      --pc-blue: light-dark(#155179,#a8d0e6);
+      --pc-action-blue: light-dark(#155179,#4a9ac4);
+      --pc-blue-ink: light-dark(#fff,#0f141a);
+      --pc-accent: light-dark(#b69a5b,#d6be86);
+      --pc-accent-ink: #0f141a;
+      --pc-accent-nav: light-dark(#806328,#d6be86);
+      --pc-accent-soft: light-dark(#f4efe3,#302b20);
+      --pc-accent-line: light-dark(#b69a5b,#d6be86);
+      --pc-danger: light-dark(#b42318,#fca5a5);
+      --pc-danger-bg: light-dark(#fef3f2,#2a1515);
+      --pc-warning: light-dark(#92400e,#fde68a);
+      --pc-warning-bg: light-dark(#fef3c7,#2a2010);
+      --pc-green: light-dark(#166534,#86efac);
+      --pc-green-bg: light-dark(#dcfce7,#12261a);
+      color: var(--pc-text); font: 400 14px/1.5 'Work Sans',system-ui,-apple-system,sans-serif;
+    }
+    #prazo-champanhe-preview * { box-sizing: border-box; }
+    #prazo-champanhe-preview button, #prazo-champanhe-preview input, #prazo-champanhe-preview select { font: inherit; }
+    #prazo-champanhe-preview button, #prazo-champanhe-preview summary { cursor: var(--cursor-interaction,pointer); }
+    #prazo-champanhe-preview button { color: inherit; }
+    #prazo-champanhe-preview svg { width: 18px; height: 18px; flex: none; }
+    #prazo-champanhe-preview h1, #prazo-champanhe-preview h2, #prazo-champanhe-preview p { margin: 0; }
+    #prazo-champanhe-preview .pc-window { background: var(--pc-bg); border: 1px solid var(--pc-border); border-radius: 12px; overflow: hidden; }
+    #prazo-champanhe-preview .pc-top { min-height: 67px; background: var(--pc-surface); border-bottom: 1px solid var(--pc-border); display: flex; align-items: center; justify-content: space-between; padding: 12px 22px; gap: 16px; }
+    #prazo-champanhe-preview .pc-brand { display: flex; align-items: center; gap: 11px; }
+    #prazo-champanhe-preview .pc-mark { position: relative; display: grid; place-items: center; background: #155179; color: #fff; border-radius: 8px; height: 35px; width: 35px; }
+    #prazo-champanhe-preview .pc-mark::before { content: ''; position: absolute; border: 2px solid #155179; background: var(--pc-surface); width: 8px; height: 8px; border-radius: 50%; top: -3px; left: 13px; }
+    #prazo-champanhe-preview .pc-paper { display: grid; place-items: center; width: 20px; height: 22px; background: #fff; border-radius: 3px; }
+    #prazo-champanhe-preview .pc-mark svg { width: 17px; height: 17px; color: #15803d; }
+    #prazo-champanhe-preview .pc-brand strong { display: block; font-size: 14px; font-weight: 700; }
+    #prazo-champanhe-preview .pc-brand small { display: block; color: var(--pc-muted); font-size: 11px; }
+    #prazo-champanhe-preview .pc-theme { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--pc-border); border-radius: 6px; padding: 8px 10px; min-height: 38px; background: var(--pc-surface); }
+    #prazo-champanhe-preview .pc-body { display: grid; grid-template-columns: 215px minmax(0,1fr); }
+    #prazo-champanhe-preview .pc-side { display: flex; flex-direction: column; background: var(--pc-surface); border-right: 1px solid var(--pc-border); padding: 23px 12px 16px; }
+    #prazo-champanhe-preview .pc-nav { display: grid; gap: 5px; }
+    #prazo-champanhe-preview .pc-nav-item { display: flex; align-items: center; gap: 10px; padding: 12px 10px; color: var(--pc-muted); text-decoration: none; border-left: 3px solid transparent; border-radius: 6px; font-size: 12px; }
+    #prazo-champanhe-preview .pc-nav-item.pc-current { color: var(--pc-accent-nav); background: var(--pc-accent-soft); border-left-color: var(--pc-accent-line); font-weight: 600; }
+    #prazo-champanhe-preview .pc-account { display: flex; align-items: center; gap: 9px; margin-top: auto; padding: 65px 10px 0; font-size: 12px; }
+    #prazo-champanhe-preview .pc-avatar { width: 31px; height: 31px; display: grid; place-items: center; background: light-dark(#d8eaf5,#123a4f); color: var(--pc-blue); border-radius: 50%; }
+    #prazo-champanhe-preview .pc-account small { display: block; color: var(--pc-muted); font-size: 11px; }
+    #prazo-champanhe-preview .pc-main { min-width: 0; padding: 28px 25px 30px; }
+    #prazo-champanhe-preview .pc-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
+    #prazo-champanhe-preview .pc-heading h1 { font-size: 25px; line-height: 1.2; font-weight: 700; letter-spacing: -.5px; }
+    #prazo-champanhe-preview .pc-sub { font-size: 12px; color: var(--pc-muted); margin-top: 7px; }
+    #prazo-champanhe-preview .pc-primary { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 41px; border: 1px solid transparent; border-radius: 6px; padding: 10px 14px; background: var(--pc-accent); color: var(--pc-accent-ink); font-weight: 600; font-size: 13px; white-space: nowrap; }
+    #prazo-champanhe-preview .pc-primary:hover { filter: brightness(.94); }
+    #prazo-champanhe-preview .pc-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px; margin-bottom: 21px; }
+    #prazo-champanhe-preview .pc-stat { padding: 17px 13px; background: var(--pc-surface); border: 1px solid var(--pc-border); border-radius: 12px; }
+    #prazo-champanhe-preview .pc-stat b { display: block; font-size: 28px; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    #prazo-champanhe-preview .pc-stat span { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; margin-top: 6px; }
+    #prazo-champanhe-preview .pc-stat small { color: var(--pc-muted); font-size: 11px; }
+    #prazo-champanhe-preview .pc-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    #prazo-champanhe-preview .pc-danger { color: var(--pc-danger); }
+    #prazo-champanhe-preview .pc-warning { color: var(--pc-warning); }
+    #prazo-champanhe-preview .pc-toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 22px; }
+    #prazo-champanhe-preview .pc-search { flex: 1; min-width: 170px; display: flex; gap: 8px; align-items: center; border: 1px solid var(--pc-border); background: var(--pc-surface); padding: 9px 11px; border-radius: 6px; color: var(--pc-muted); }
+    #prazo-champanhe-preview .pc-search input { min-width: 0; width: 100%; color: var(--pc-text); background: transparent; border: 0; padding: 0; outline-offset: 4px; font-size: 12px; }
+    #prazo-champanhe-preview input::placeholder { color: var(--pc-muted); opacity: 1; }
+    #prazo-champanhe-preview .pc-filter { border: 1px solid var(--pc-border); background: var(--pc-surface); color: var(--pc-text); border-radius: 6px; padding: 10px; font-size: 12px; max-width: 100%; }
+    #prazo-champanhe-preview .pc-group { margin-top: 19px; }
+    #prazo-champanhe-preview .pc-group h2 { font-size: 14px; font-weight: 600; margin-bottom: 9px; }
+    #prazo-champanhe-preview .pc-item { display: flex; gap: 12px; align-items: center; padding: 16px; border: 1px solid var(--pc-border); border-radius: 12px; background: var(--pc-surface); }
+    #prazo-champanhe-preview .pc-date { position: relative; display: flex; flex: none; align-items: center; flex-direction: column; justify-content: center; width: 48px; height: 53px; border-radius: 8px; background: var(--pc-soft); color: var(--pc-blue); }
+    #prazo-champanhe-preview .pc-date::before { content: ''; width: 7px; height: 7px; background: var(--pc-surface); border-radius: 50%; position: absolute; top: 4px; }
+    #prazo-champanhe-preview .pc-date b { font-size: 20px; line-height: 1.1; margin-top: 6px; }
+    #prazo-champanhe-preview .pc-date small { font-size: 11px; font-weight: 600; }
+    #prazo-champanhe-preview .pc-date.pc-late { background: var(--pc-danger-bg); color: var(--pc-danger); }
+    #prazo-champanhe-preview .pc-date.pc-today { background: var(--pc-warning-bg); color: var(--pc-warning); }
+    #prazo-champanhe-preview .pc-item-main { min-width: 0; flex: 1; }
+    #prazo-champanhe-preview .pc-item-main strong { display: block; font-size: 13px; font-weight: 600; }
+    #prazo-champanhe-preview .pc-meta { color: var(--pc-muted); font-size: 11px; margin-top: 3px; }
+    #prazo-champanhe-preview .pc-next { color: var(--pc-text); font-size: 11px; margin-top: 7px; }
+    #prazo-champanhe-preview .pc-badge { flex: none; display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border-radius: 999px; font-size: 11px; font-weight: 500; background: var(--pc-soft); color: var(--pc-muted); }
+    #prazo-champanhe-preview .pc-badge.pc-late { color: var(--pc-danger); background: var(--pc-danger-bg); }
+    #prazo-champanhe-preview .pc-badge.pc-today { color: var(--pc-warning); background: var(--pc-warning-bg); }
+    #prazo-champanhe-preview .pc-footer { display: flex; gap: 6px; align-items: center; margin-top: 25px; color: var(--pc-muted); font-size: 11px; }
+    #prazo-champanhe-preview .pc-footer svg { width: 14px; height: 14px; color: var(--pc-blue); }
+    #prazo-champanhe-preview .pc-empty { padding: 20px; color: var(--pc-muted); text-align: center; }
+    #prazo-champanhe-preview .pc-mobile-title { display: none; }
+    #prazo-champanhe-preview dialog { padding: 24px; background: var(--pc-surface); color: var(--pc-text); border: 1px solid var(--pc-border); border-radius: 16px; max-width: min(470px,calc(100vw - 32px)); width: 100%; }
+    #prazo-champanhe-preview dialog::backdrop { background: rgb(0 0 0 / .45); }
+    #prazo-champanhe-preview dialog h2 { font-size: 20px; font-weight: 600; margin-bottom: 16px; }
+    #prazo-champanhe-preview .pc-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 13px; font-size: 13px; }
+    #prazo-champanhe-preview .pc-field input { padding: 10px; border: 1px solid var(--pc-border); border-radius: 6px; background: var(--pc-bg); color: var(--pc-text); width: 100%; font-size: 16px; }
+    #prazo-champanhe-preview .pc-dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    #prazo-champanhe-preview .pc-secondary { min-height: 41px; padding: 9px 14px; background: var(--pc-surface); color: var(--pc-text); border: 1px solid var(--pc-border); border-radius: 6px; }
+    #prazo-champanhe-preview[data-accent="cobre"] { --pc-accent: light-dark(#9b542f,#e6a071); --pc-accent-ink: light-dark(#fff,#0f141a); --pc-accent-nav: light-dark(#9b542f,#e6a071); --pc-accent-soft: light-dark(#f8ede6,#35251f); --pc-accent-line: light-dark(#c77848,#e6a071); }
+    #prazo-champanhe-preview[data-accent="azul"] { --pc-accent: var(--pc-action-blue); --pc-accent-ink: var(--pc-blue-ink); --pc-accent-nav: var(--pc-blue); --pc-accent-soft: light-dark(#f0f7fc,#0f2a3a); --pc-accent-line: var(--pc-action-blue); }
+    @media(max-width:800px) {
+      #prazo-champanhe-preview .pc-body { grid-template-columns: 170px minmax(0,1fr); }
+      #prazo-champanhe-preview .pc-nav-item { padding: 10px 6px; font-size: 11px; gap: 7px; }
+      #prazo-champanhe-preview .pc-main { padding: 24px 18px; }
+      #prazo-champanhe-preview .pc-heading h1 { font-size: 23px; }
+      #prazo-champanhe-preview .pc-badge { align-self: flex-start; }
+      #prazo-champanhe-preview .pc-item { flex-wrap: wrap; }
+      #prazo-champanhe-preview .pc-item-main { flex-basis: calc(100% - 65px); }
+      #prazo-champanhe-preview .pc-badge { margin-left: 60px; }
+    }
+    @media(max-width:600px) {
+      #prazo-champanhe-preview .pc-body { display: block; }
+      #prazo-champanhe-preview .pc-side { display: none; }
+      #prazo-champanhe-preview .pc-main { padding: 22px 16px; }
+      #prazo-champanhe-preview .pc-heading h1 { font-size: 23px; }
+      #prazo-champanhe-preview .pc-heading { gap: 15px; }
+      #prazo-champanhe-preview .pc-primary { min-height: 44px; }
+      #prazo-champanhe-preview .pc-heading > .pc-primary { width: 100%; }
+      #prazo-champanhe-preview .pc-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      #prazo-champanhe-preview .pc-theme { min-height: 44px; }
+      #prazo-champanhe-preview .pc-top { padding: 12px 16px; }
+      #prazo-champanhe-preview .pc-search input, #prazo-champanhe-preview .pc-filter { font-size: 16px; }
+      #prazo-champanhe-preview .pc-toolbar { align-items: stretch; }
+      #prazo-champanhe-preview .pc-search { width: 100%; flex-basis: 100%; }
+      #prazo-champanhe-preview .pc-filter { flex: 1; }
+    }
+  </style>
+  <div class="pc-window">
+    <header class="pc-top">
+      <div class="pc-brand"><span class="pc-mark"><span class="pc-paper"><i data-lucide="check" aria-hidden="true"></i></span></span><div><strong>Prazo Certo</strong><small>ClimaTech · Demonstração</small></div></div>
+      <button type="button" class="pc-theme" data-theme-toggle aria-label="Alternar tema claro e escuro"><i data-lucide="sun-moon" aria-hidden="true"></i><span>Tema</span></button>
+    </header>
+    <div class="pc-body">
+      <aside class="pc-side">
+        <nav class="pc-nav" aria-label="Navegação da prévia">
+          <span class="pc-nav-item"><i data-lucide="layout-dashboard" aria-hidden="true"></i>Painel</span>
+          <span class="pc-nav-item"><i data-lucide="plus" aria-hidden="true"></i>Novo vencimento</span>
+          <span class="pc-nav-item pc-current" aria-current="page"><i data-lucide="bell-ring" aria-hidden="true"></i>Demandas e retornos</span>
+          <span class="pc-nav-item"><i data-lucide="file-text" aria-hidden="true"></i>Planos PMOC</span>
+          <span class="pc-nav-item"><i data-lucide="building-2" aria-hidden="true"></i>Unidades e equipamentos</span>
+          <span class="pc-nav-item"><i data-lucide="users" aria-hidden="true"></i>Clientes</span>
+          <span class="pc-nav-item"><i data-lucide="history" aria-hidden="true"></i>Histórico</span>
+          <span class="pc-nav-item"><i data-lucide="settings" aria-hidden="true"></i>Ajustes</span>
+        </nav>
+        <div class="pc-account"><span class="pc-avatar">V</span><div><strong>Vanderlei</strong><small>ClimaTech</small></div></div>
+      </aside>
+      <main class="pc-main">
+        <div class="pc-heading"><div><h1>Demandas e retornos</h1><p class="pc-sub">Orçamentos, peças, visitas e retornos da sua empresa.</p></div><button type="button" class="pc-primary" data-new><i data-lucide="plus" aria-hidden="true"></i>Nova demanda</button></div>
+        <div class="pc-stats">
+          <div class="pc-stat"><b>1</b><span class="pc-danger"><i class="pc-dot" aria-hidden="true"></i>Atrasada</span><small>na empresa</small></div>
+          <div class="pc-stat"><b>1</b><span class="pc-warning"><i class="pc-dot" aria-hidden="true"></i>Para hoje</span><small>retorno combinado</small></div>
+          <div class="pc-stat"><b>1</b><span>Meus retornos</span><small>hoje e atrasados</small></div>
+          <div class="pc-stat"><b data-count>3</b><span>Em aberto</span><small>total na empresa</small></div>
+        </div>
+        <div class="pc-toolbar"><label class="pc-search"><i data-lucide="search" aria-hidden="true"></i><input data-search aria-label="Buscar demanda" placeholder="Buscar demanda ou próxima ação" /></label><select class="pc-filter" data-period aria-label="Filtrar período"><option value="all">Todas em aberto</option><option value="today">Hoje e atrasadas</option><option value="late">Só atrasadas</option></select></div>
+        <div data-items>
+          <section class="pc-group" data-kind="late"><h2>Atrasadas</h2><article class="pc-item"><div class="pc-date pc-late"><b>28</b><small>OUT</small></div><div class="pc-item-main"><strong>Aprovar troca do compressor da recepção</strong><p class="pc-meta">Hospital Santa Clara · Aguardando cliente · Vanderlei</p><p class="pc-next">Próxima ação: ligar para confirmar aprovação do orçamento</p></div><span class="pc-badge pc-late"><i class="pc-dot" aria-hidden="true"></i>2 dias de atraso</span></article></section>
+          <section class="pc-group" data-kind="today"><h2>Para hoje</h2><article class="pc-item"><div class="pc-date pc-today"><b>30</b><small>OUT</small></div><div class="pc-item-main"><strong>Confirmar chegada do motor do ventilador</strong><p class="pc-meta">Mercado Central · Aguardando fornecedor · Ana</p><p class="pc-next">Próxima ação: consultar a previsão com a distribuidora</p></div><span class="pc-badge pc-today"><i class="pc-dot" aria-hidden="true"></i>Retorno hoje</span></article></section>
+          <section class="pc-group" data-kind="next"><h2>Próximas</h2><article class="pc-item"><div class="pc-date"><b>02</b><small>NOV</small></div><div class="pc-item-main"><strong>Agendar a manutenção preventiva</strong><p class="pc-meta">Clínica Boa Vista · A fazer · Vanderlei</p><p class="pc-next">Próxima ação: combinar a visita e a liberação de acesso</p></div><span class="pc-badge">Em 3 dias</span></article></section>
+        </div>
+        <p class="pc-empty" data-empty hidden>Nenhuma demanda corresponde à busca.</p>
+        <p class="pc-footer"><i data-lucide="shield-check" aria-hidden="true"></i>O retorno da demanda preserva o prazo da manutenção.</p>
+      </main>
+    </div>
+  </div>
+  <dialog data-dialog aria-labelledby="pc-cobre-dialog-titulo">
+    <form data-new-form>
+      <h2 id="pc-cobre-dialog-titulo">Nova demanda</h2>
+      <label class="pc-field">O que precisa ser resolvido?<input name="titulo" required maxlength="180" /></label>
+      <label class="pc-field">Qual é a próxima ação?<input name="acao" required maxlength="300" /></label>
+      <div class="pc-dialog-actions"><button type="button" class="pc-secondary" data-cancel>Cancelar</button><button type="submit" class="pc-primary">Criar demanda</button></div>
+    </form>
+  </dialog>
+  <script>
+    (() => {
+      const root = document.getElementById('prazo-champanhe-preview');
+      const settings = { cor: 'champanhe' };
+      const dialog = root.querySelector('[data-dialog]');
+      const form = root.querySelector('[data-new-form]');
+      const search = root.querySelector('[data-search]');
+      const period = root.querySelector('[data-period]');
+      function renderColor() { root.dataset.accent = settings.cor; }
+      function filter() {
+        const q = search.value.trim().toLocaleLowerCase('pt-BR');
+        let visible = 0;
+        root.querySelectorAll('[data-kind]').forEach(section => {
+          const dateMatch = period.value === 'all' || (period.value === 'today' && section.dataset.kind !== 'next') || (period.value === 'late' && section.dataset.kind === 'late');
+          section.hidden = !dateMatch || !section.textContent.toLocaleLowerCase('pt-BR').includes(q);
+          if (!section.hidden) visible++;
+        });
+        root.querySelector('[data-empty]').hidden = visible !== 0;
+      }
+      root.querySelector('[data-theme-toggle]').addEventListener('click', () => {
+        const rgb = getComputedStyle(root.querySelector('.pc-window')).backgroundColor.match(/[\d.]+/g);
+        const dark = rgb && (Number(rgb[0]) + Number(rgb[1]) + Number(rgb[2])) < 380;
+        root.style.colorScheme = dark ? 'light' : 'dark';
+      });
+      search.addEventListener('input', filter);
+      period.addEventListener('change', filter);
+      root.querySelector('[data-new]').addEventListener('click', () => dialog.showModal());
+      root.querySelector('[data-cancel]').addEventListener('click', () => dialog.close());
+      form.addEventListener('submit', event => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const section = document.createElement('section');
+        section.className = 'pc-group'; section.dataset.kind = 'next';
+        const h2 = document.createElement('h2'); h2.textContent = 'Nova demanda';
+        const item = document.createElement('article'); item.className = 'pc-item';
+        const body = document.createElement('div'); body.className = 'pc-item-main';
+        const title = document.createElement('strong'); title.textContent = data.get('titulo');
+        const meta = document.createElement('p'); meta.className = 'pc-meta'; meta.textContent = 'A fazer · Vanderlei';
+        const next = document.createElement('p'); next.className = 'pc-next'; next.textContent = 'Próxima ação: ' + data.get('acao');
+        body.append(title,meta,next); item.append(body); section.append(h2,item);
+        root.querySelector('[data-items]').append(section);
+        root.querySelector('[data-count]').textContent = String(root.querySelectorAll('[data-kind]').length);
+        form.reset(); dialog.close(); filter();
+      });
+      renderColor();
+      if (globalThis.Tweak) {
+        const tweak = new Tweak({container:root,onChange:renderColor});
+        tweak.addSelect(settings,'cor',{label:'Cor de destaque',reference:'--pc-accent',options:[{label:'Champanhe',value:'champanhe'},{label:'Cobre',value:'cobre'},{label:'Azul original',value:'azul'}]});
+      }
+    })();
+  </script>
+</div>
