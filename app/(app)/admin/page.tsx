@@ -9,7 +9,8 @@ import { Selo } from '@/components/ui/Selo'
 import { Confirmar } from '@/components/ui/Confirmar'
 import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
 import { gerarSenha } from '@/lib/usuarios'
-import { acessarEmpresa, adicionarUsuarioEmpresa, alternarAtivo, criarEmpresa, resetarSenha } from './actions'
+import { acessarEmpresa, adicionarUsuarioEmpresa, alternarAtivo, alterarPlano, criarEmpresa, resetarSenha } from './actions'
+import { ROTULO_STATUS } from '@/lib/stripe'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,7 +37,15 @@ export default async function Admin() {
   }
   const comGoogle = new Set((conexoes ?? []).map((c) => c.empresa_id))
   const ativas = (empresas ?? []).filter((e) => e.ativo)
-  const mrr = ativas.reduce((t, e) => t + Number(e.valor_mensal ?? 0), 0)
+  const mrr = ativas.filter((e) => e.plano !== 'cortesia').reduce((t, e) => t + Number(e.valor_mensal ?? 0), 0)
+  const indicacoes = new Map<string, number>()
+  for (const e of empresas ?? []) if (e.indicado_por) indicacoes.set(e.indicado_por, (indicacoes.get(e.indicado_por) ?? 0) + 1)
+  const nomeEmpresa = new Map((empresas ?? []).map((e) => [e.id, e.nome]))
+  const app = process.env.APP_URL || 'https://prazo-certo-xi.vercel.app'
+  const planoSelo = (e: any): [string, any] =>
+    e.plano === 'cortesia' ? ['Cortesia', 'info']
+      : e.plano === 'assinatura' ? [ROTULO_STATUS[e.assinatura_status] ?? 'Aguardando',  e.assinatura_status === 'active' || e.assinatura_status === 'trialing' ? 'ok' : e.assinatura_status === 'past_due' ? 'atencao' : 'vencido']
+      : ['Mensal', 'neutro']
   const semEmpresas = !empresas?.length
 
   return (
@@ -85,8 +94,25 @@ export default async function Admin() {
         <details style={{ marginBottom: 12 }}>
           <summary>Mais dados (opcional)</summary>
           <div className="linha" style={{ marginTop: 8 }}>
-            <div className="campo"><label htmlFor="a-valor">Mensalidade em R$</label><input id="a-valor" name="valor" inputMode="decimal" placeholder="97,00" /></div>
+            <div className="campo"><label htmlFor="a-valor">Mensalidade em R$</label><input id="a-valor" name="valor" inputMode="decimal" placeholder="119,90" /></div>
             <div className="campo"><label htmlFor="a-whats">WhatsApp do cliente</label><input id="a-whats" name="whatsapp" inputMode="tel" placeholder="(66) 99999-9999" /></div>
+          </div>
+          <div className="linha">
+            <div className="campo">
+              <label htmlFor="a-plano">Plano</label>
+              <select id="a-plano" name="plano" defaultValue="mensal">
+                <option value="mensal">Cobrança combinada (Pix, boleto)</option>
+                <option value="cortesia">Cortesia (grátis)</option>
+              </select>
+              <span className="dica">Quem assina pela página de vendas entra sozinho como cartão.</span>
+            </div>
+            <div className="campo">
+              <label htmlFor="a-ind">Indicado por <span className="opcional">(opcional)</span></label>
+              <select id="a-ind" name="indicado_por" defaultValue="">
+                <option value="">Ninguém</option>
+                {(empresas ?? []).map((e) => <option key={e.id} value={e.id}>{e.nome}</option>)}
+              </select>
+            </div>
           </div>
           <div className="campo"><label htmlFor="a-cnpj">CNPJ</label><input id="a-cnpj" name="documento" inputMode="numeric" /></div>
         </details>
@@ -114,7 +140,15 @@ export default async function Admin() {
                   const s = stats.get(e.id)
                   return (
                     <tr key={e.id}>
-                      <td><strong style={{ fontWeight: 500 }}>{e.nome}</strong>{e.documento && <div className="dica">{e.documento}</div>}</td>
+                      <td>
+                        <strong style={{ fontWeight: 500 }}>{e.nome}</strong>{e.documento && <div className="dica">{e.documento}</div>}
+                        {e.indicado_por && <div className="dica">Indicado por {nomeEmpresa.get(e.indicado_por) ?? '—'}</div>}
+                        <details>
+                          <summary className="dica" style={{ minHeight: 28 }}>Indicações: {indicacoes.get(e.id) ?? 0}</summary>
+                          <div className="dica" style={{ maxWidth: 220 }}>Link de indicação: o site com <code className="cmd" style={{ userSelect: 'all' }}>?ref={e.codigo_indicacao}</code> no fim</div>
+                          <a className="dica" href={`${app}/?ref=${e.codigo_indicacao}`} target="_blank" rel="noreferrer">Abrir o link</a>
+                        </details>
+                      </td>
                       <td>
                         {us.map((u) => (
                           <details key={u.user_id}>
@@ -130,7 +164,17 @@ export default async function Admin() {
                       </td>
                       <td>{s?.ativos ?? 0}{s?.vencidos ? <> <Selo peq tom="vencido">{s.vencidos} vencidos</Selo></> : null}</td>
                       <td className="sec">{comGoogle.has(e.id) ? 'Conectada' : '—'}</td>
-                      <td className="sec">{e.valor_mensal != null ? `${brl(e.valor_mensal)}/mês` : '—'}</td>
+                      <td>
+                        <Selo peq tom={planoSelo(e)[1]}>{planoSelo(e)[0]}</Selo>
+                        <div className="dica">{e.plano === 'cortesia' ? 'sem cobrança' : `${e.plano === 'assinatura' ? 'cartão' : 'combinado'}${e.valor_mensal != null ? ` · ${brl(e.valor_mensal)}/mês` : ''}`}</div>
+                        {e.plano !== 'assinatura' && (
+                          <form action={alterarPlano}>
+                            <input type="hidden" name="id" value={e.id} />
+                            <input type="hidden" name="plano" value={e.plano === 'cortesia' ? 'mensal' : 'cortesia'} />
+                            <BotaoEnviar className="btn ghost peq" carregando="Salvando…">{e.plano === 'cortesia' ? 'Passar a cobrar' : 'Tornar cortesia'}</BotaoEnviar>
+                          </form>
+                        )}
+                      </td>
                       <td><Selo peq tom={e.ativo ? 'ok' : 'vencido'}>{e.ativo ? 'Ativa' : 'Suspensa'}</Selo></td>
                       <td>
                         <div className="acoes" style={{ flexWrap: 'nowrap' }}>

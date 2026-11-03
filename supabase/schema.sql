@@ -1016,3 +1016,22 @@ drop trigger if exists z_validar_assinatura_servico on public.operacao_registros
 create trigger z_validar_assinatura_servico before insert or update on public.operacao_registros
  for each row execute function privado.validar_assinatura_servico();
 commit;
+
+-- Migração (03/11/2026): assinaturas pela Stripe, cortesia e indicações
+-- plano: 'mensal' = cobrança combinada por fora; 'cortesia' = grátis, nunca bloqueado; 'assinatura' = Stripe (webhook controla o acesso)
+alter table public.empresas
+  add column if not exists stripe_customer_id     text unique,
+  add column if not exists stripe_subscription_id text unique,
+  add column if not exists assinatura_status      text,
+  add column if not exists assinatura_fim         timestamptz,
+  add column if not exists indicado_por           uuid references public.empresas(id) on delete set null,
+  add column if not exists codigo_indicacao       text unique default lower(substr(md5(gen_random_uuid()::text), 1, 8));
+alter table public.empresas drop constraint if exists empresas_plano_check;
+alter table public.empresas add constraint empresas_plano_check check (plano in ('mensal','cortesia','assinatura'));
+create index if not exists empresas_indicado_por_idx on public.empresas(indicado_por);
+create table if not exists public.stripe_eventos (
+  id          text primary key,
+  tipo        text not null,
+  recebido_em timestamptz not null default now()
+);
+alter table public.stripe_eventos enable row level security;  -- sem políticas: só o servidor (service role)

@@ -94,3 +94,11 @@ export async function emailTeste(_prev: Resultado, _fd: FormData): Promise<Resul
     return { ok: false, msg: `Não foi possível enviar: ${e.message}` }
   }
 }
+
+/** Cliente já cadastrado (plano mensal) passa a pagar com cartão pela Stripe. */
+export async function assinarComCartao() {
+  const ctx = await exigirAdminEmpresa()
+  const { criarCheckout } = await import('@/lib/stripe')
+  const url = await criarCheckout({ empresaId: ctx.empresa.id, email: ctx.email })
+  redirect(url)
+}

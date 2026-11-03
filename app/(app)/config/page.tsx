@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CalendarDays, KeyRound, LogOut, Mail, MessageCircle, RotateCcw, Send, Settings, UserPlus, Users } from 'lucide-react'
+import { CalendarDays, CreditCard, KeyRound, LogOut, Mail, MessageCircle, RotateCcw, Send, Settings, UserPlus, Users } from 'lucide-react'
 import { exigirEmpresa } from '@/lib/contexto'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -7,6 +7,7 @@ import { googleConfigurado } from '@/lib/google'
 import { emailConfigurado } from '@/lib/email'
 import { fmtData } from '@/lib/datas'
 import { fmtTelefone } from '@/lib/telefone'
+import { ROTULO_STATUS, stripeConfigurado } from '@/lib/stripe'
 import { Cabecalho } from '@/components/ui/Cabecalho'
 import { Aviso } from '@/components/ui/Aviso'
 import { Selo } from '@/components/ui/Selo'
@@ -14,7 +15,7 @@ import { Confirmar } from '@/components/ui/Confirmar'
 import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
 import { TemaToggle } from '@/components/ui/TemaToggle'
 import { FormResultado } from '@/components/FormResultado'
-import { adicionarUsuario, desconectarGoogle, emailTeste, salvarLembretes, salvarWhatsapp, trocarSenha } from './actions'
+import { adicionarUsuario, assinarComCartao, desconectarGoogle, emailTeste, salvarLembretes, salvarWhatsapp, trocarSenha } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,11 +36,15 @@ export default async function Config({ searchParams }: { searchParams: Promise<{
   const ehAdmin = ctx.papel === 'admin' || ctx.superadmin
   const e = ctx.empresa
 
-  const [{ data: conexao }, { data: usuarios }, { data: envios }] = await Promise.all([
+  const [{ data: conexao }, { data: usuarios }, { data: envios }, { data: plano }] = await Promise.all([
     createAdminClient().from('google_conexoes').select('google_email, updated_at').eq('empresa_id', e.id).maybeSingle(),
     supabase.from('perfis').select('user_id, nome, email, papel').eq('empresa_id', e.id).eq('is_superadmin', false).order('nome'),
     supabase.from('lembretes_enviados').select('id, marco, enviado_em, itens(titulo)').eq('empresa_id', e.id).order('enviado_em', { ascending: false }).limit(8),
+    createAdminClient().from('empresas').select('plano, valor_mensal, stripe_customer_id, assinatura_status, assinatura_fim').eq('id', e.id).maybeSingle(),
   ])
+  const st = plano?.assinatura_status ?? ''
+  const tomAssinatura = plano?.plano === 'cortesia' ? 'info' : plano?.plano !== 'assinatura' ? 'neutro' : st === 'active' || st === 'trialing' ? 'ok' : st === 'past_due' ? 'atencao' : 'vencido'
+  const rotuloPlano = plano?.plano === 'cortesia' ? 'Cortesia' : plano?.plano === 'assinatura' ? ROTULO_STATUS[st] ?? 'Assinatura' : 'Cobrança combinada'
   const bot = process.env.NEXT_PUBLIC_WHATSAPP_BOT
 
   return (
@@ -51,6 +56,37 @@ export default async function Config({ searchParams }: { searchParams: Promise<{
         acao={ehAdmin ? <a href="/bem-vindo?refazer=1" className="btn sec"><RotateCcw size={16} />Refazer configuração inicial</a> : undefined}
       />
       {sp.erro && ERROS[sp.erro] && <Aviso tipo="erro" titulo="Google Agenda não conectada">{ERROS[sp.erro]}</Aviso>}
+
+      {ehAdmin && plano && (
+        <div className="card">
+          <div className="card-topo">
+            <h2><CreditCard size={18} aria-hidden />Assinatura</h2>
+            <Selo peq tom={tomAssinatura as any}>{rotuloPlano}</Selo>
+          </div>
+          {plano.plano === 'cortesia' ? (
+            <p className="muted">Sua empresa usa o Prazo Certo como cortesia da Coffee Assessoria. Não há cobrança.</p>
+          ) : plano.plano === 'assinatura' ? (
+            <>
+              <p className="muted">
+                {st === 'past_due'
+                  ? 'A última cobrança não passou. Atualize o cartão para não perder o acesso.'
+                  : st === 'canceled' ? 'A assinatura foi cancelada.'
+                  : <>Cobrança no cartão{plano.valor_mensal ? ` de R$ ${Number(plano.valor_mensal).toLocaleString('pt-BR', { minimumFractionDigits: 2 })} por mês` : ''}{plano.assinatura_fim ? `. Próxima cobrança em ${fmtData(plano.assinatura_fim)}` : ''}.</>}
+              </p>
+              {plano.stripe_customer_id && <a href="/api/stripe/portal" className="btn sec" style={{ marginTop: 12 }}><CreditCard size={16} />Gerenciar assinatura e cartão</a>}
+            </>
+          ) : (
+            <>
+              <p className="muted">A mensalidade está combinada diretamente com a Coffee Assessoria.{stripeConfigurado() ? ' Se preferir, passe a pagar no cartão de crédito, com cobrança automática todo mês.' : ''}</p>
+              {stripeConfigurado() && (
+                <form action={assinarComCartao} style={{ marginTop: 12 }}>
+                  <BotaoEnviar className="btn sec" carregando="Abrindo pagamento…"><CreditCard size={16} />Pagar com cartão</BotaoEnviar>
+                </form>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       <div className="card"><h2>Logo e timbrado dos documentos</h2><p className="muted">Cadastre a identidade da sua empresa para gerar PMOC e futuros documentos em A4.</p><Link className="btn sec" href="/config/documentos">Configurar logo e timbrado</Link></div>
 

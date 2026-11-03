@@ -28,7 +28,9 @@ export async function criarEmpresa(_prev: Resultado, fd: FormData): Promise<Resu
       .insert({
         nome,
         documento: txt(fd, 'documento') || null,
-        valor_mensal: valor ? Number(valor) : null,
+        plano: txt(fd, 'plano') === 'cortesia' ? 'cortesia' : 'mensal',
+        indicado_por: txt(fd, 'indicado_por') || null,
+        valor_mensal: txt(fd, 'plano') === 'cortesia' ? 0 : valor ? Number(valor) : null,
         whatsapp_numeros: whats.length >= 12 ? [whats] : [],
       })
       .select('id').single()
@@ -85,4 +87,16 @@ export async function acessarEmpresa(fd: FormData) {
   await createAdminClient().from('perfis').update({ empresa_id: txt(fd, 'id') || null }).eq('user_id', ctx.userId)
   revalidatePath('/', 'layout')
   redirect(txt(fd, 'id') ? '/' : '/admin')
+}
+
+/** Alterna entre cortesia e cobrança combinada. Assinaturas da Stripe são controladas pelo webhook. */
+export async function alterarPlano(fd: FormData) {
+  await exigirSuperadmin()
+  const admin = createAdminClient()
+  const id = txt(fd, 'id')
+  const plano = txt(fd, 'plano') === 'cortesia' ? 'cortesia' : 'mensal'
+  const { data: emp } = await admin.from('empresas').select('plano').eq('id', id).maybeSingle()
+  if (!emp || emp.plano === 'assinatura') return
+  await admin.from('empresas').update({ plano, ...(plano === 'cortesia' ? { valor_mensal: 0, ativo: true } : {}) }).eq('id', id)
+  revalidatePath('/admin')
 }

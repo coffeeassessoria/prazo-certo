@@ -6,6 +6,8 @@ import {
 } from 'lucide-react'
 import { Logo } from '@/components/ui/Logo'
 import { TemaToggle } from '@/components/ui/TemaToggle'
+import { Aviso } from '@/components/ui/Aviso'
+import { codigoValido, stripeConfigurado } from '@/lib/stripe'
 
 export const metadata: Metadata = {
   title: 'Prazo Certo · Controle de PMOC, laudos, contratos e manutenções',
@@ -14,14 +16,13 @@ export const metadata: Metadata = {
 
 const PRECO = process.env.NEXT_PUBLIC_PRECO_MENSAL || '119,90'
 const WHATS = process.env.NEXT_PUBLIC_WHATSAPP_VENDAS
-const ASSINAR = process.env.NEXT_PUBLIC_LINK_ASSINATURA
 const CONTATO = WHATS
   ? `https://wa.me/${WHATS}?text=${encodeURIComponent('Olá! Quero conhecer o Prazo Certo para a minha empresa.')}`
   : 'mailto:lembretes@coffeeassessoria.com.br?subject=Quero%20conhecer%20o%20Prazo%20Certo'
 
-function CtaPrincipal({ grande = true }: { grande?: boolean }) {
-  return ASSINAR
-    ? <a href={ASSINAR} className={`btn ${grande ? 'grande' : ''}`}><Check size={18} />Assinar por R$ {PRECO}/mês</a>
+function CtaPrincipal({ grande = true, assinar }: { grande?: boolean; assinar: string | null }) {
+  return assinar
+    ? <a href={assinar} className={`btn ${grande ? 'grande' : ''}`}><Check size={18} />Assinar por R$ {PRECO}/mês</a>
     : <a href={CONTATO} className={`btn ${grande ? 'grande' : ''}`} target="_blank" rel="noreferrer"><MessageCircle size={18} />Quero usar na minha empresa</a>
 }
 
@@ -45,7 +46,11 @@ const PERGUNTAS = [
   { p: 'Como começo?', r: 'Fale com a gente. Criamos o seu acesso no mesmo dia; no primeiro login você responde 7 perguntas e já cadastra o primeiro vencimento.' },
 ]
 
-export default function Inicio() {
+export default async function Inicio({ searchParams }: { searchParams: Promise<{ ref?: string; erro?: string }> }) {
+  const sp = await searchParams
+  const ref = codigoValido(sp.ref)
+  // Stripe configurada: Checkout próprio (com indicação). Senão, link de pagamento avulso, se houver.
+  const assinar = stripeConfigurado() ? `/assinar${ref ? `?ref=${ref}` : ''}` : process.env.NEXT_PUBLIC_LINK_ASSINATURA || null
   return (
     <div className="lp">
       <header className="lp-topo">
@@ -75,7 +80,7 @@ export default function Inicio() {
                 Por e-mail, na Google Agenda e no celular.
               </p>
               <div className="lp-ctas">
-                <CtaPrincipal />
+                <CtaPrincipal assinar={assinar} />
                 <a href="#como-funciona" className="btn sec grande">Ver como funciona</a>
               </div>
               <ul className="lp-garantias">
@@ -163,6 +168,7 @@ export default function Inicio() {
         <section className="lp-secao" id="preco">
           <div className="lp-in lp-preco-in">
             <div>
+              {sp.erro === 'assinatura' && <Aviso tipo="erro" titulo="Não foi possível abrir o pagamento">Tente de novo em alguns minutos ou fale com a gente pelo WhatsApp.</Aviso>}
               <span className="lp-eyebrow">Preço</span>
               <h2>Um plano, tudo incluso</h2>
               <p className="lp-sub">Sem taxa de adesão e sem fidelidade. Criamos o seu acesso e você começa no mesmo dia.</p>
@@ -176,8 +182,8 @@ export default function Inicio() {
                   <li key={x}><Check size={16} aria-hidden />{x}</li>
                 ))}
               </ul>
-              <CtaPrincipal />
-              {ASSINAR && <a href={CONTATO} className="btn ghost cheio" target="_blank" rel="noreferrer"><MessageCircle size={16} />Tirar dúvidas antes</a>}
+              <CtaPrincipal assinar={assinar} />
+              {assinar && <a href={CONTATO} className="btn ghost cheio" target="_blank" rel="noreferrer"><MessageCircle size={16} />Tirar dúvidas antes</a>}
             </div>
           </div>
         </section>
@@ -202,7 +208,7 @@ export default function Inicio() {
             <FileText size={28} aria-hidden />
             <h2>Seu próximo vencimento já está chegando.</h2>
             <p>Comece hoje e receba o primeiro lembrete amanhã às 7h.</p>
-            <CtaPrincipal />
+            <CtaPrincipal assinar={assinar} />
           </div>
         </section>
       </main>
