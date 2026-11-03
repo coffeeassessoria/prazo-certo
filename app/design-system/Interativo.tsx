@@ -27,3 +27,13 @@ export function DemoModalToast() {
 export function DemoUpload() {
   return <Upload name="demo" />
 }
+
+/** Fale com a gente: botão flutuante (canto inferior direito; ícone acima das abas no celular) + painel. */
+export function DemoFaleConosco() {
+  return (
+    <div className="acoes">
+      <button type="button" className="btn sec" onClick={() => window.dispatchEvent(new Event('pc-fale-conosco'))}>Abrir o painel Fale com a gente</button>
+      <span className="dica">O botão flutuante já aparece nesta página. Enviar daqui grava uma mensagem real.</span>
+    </div>
+  )
+}

@@ -5,6 +5,8 @@ import { Abas, Menu, MenuGaveta } from './Navegacao'
 import { Logo } from './ui/Logo'
 import { TemaToggle } from './ui/TemaToggle'
 import { ToastDaUrl } from './ui/Toast'
+import { FaleConosco } from './ui/FaleConosco'
+import { RegistroUso } from './RegistroUso'
 
 function iniciais(nome: string) {
   return nome.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join('') || '?'
@@ -53,6 +55,8 @@ export function Casca({
       </div>
       {temEmpresa && <Suspense><Abas superadmin={superadmin} /></Suspense>}
       <Suspense><ToastDaUrl /></Suspense>
+      <Suspense><RegistroUso /></Suspense>
+      {temEmpresa && <FaleConosco />}
     </>
   )
 }

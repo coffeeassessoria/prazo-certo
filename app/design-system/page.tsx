@@ -20,7 +20,7 @@ import { PmocForm } from '@/components/ui/PmocForm'
 import { exemploPmoc } from '@/lib/pmoc-demo'
 import { AcompanhamentoForm } from '@/components/AcompanhamentoForm'
 import { hojeISO, somarDias } from '@/lib/datas'
-import { DemoModalToast, DemoUpload } from './Interativo'
+import { DemoFaleConosco, DemoModalToast, DemoUpload } from './Interativo'
 
 export const metadata = { title: 'Design System 2.0 · Prazo Certo' }
 
@@ -257,6 +257,11 @@ export default function DesignSystem() {
           <div className="card">
             <div className="card-topo"><h2>Modal de confirmação e toast</h2></div>
             <DemoModalToast />
+          </div>
+
+          <div className="card">
+            <div className="card-topo"><h2>Fale com a gente</h2><span className="dica">botão flutuante · sugestão, problema, reclamação, elogio</span></div>
+            <DemoFaleConosco />
           </div>
         </div>
       </Secao>

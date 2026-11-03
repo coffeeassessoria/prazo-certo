@@ -100,3 +100,12 @@ export async function alterarPlano(fd: FormData) {
   await admin.from('empresas').update({ plano, ...(plano === 'cortesia' ? { valor_mensal: 0, ativo: true } : {}) }).eq('id', id)
   revalidatePath('/admin')
 }
+
+export async function marcarMensagem(fd: FormData) {
+  await exigirSuperadmin()
+  const status = txt(fd, 'status')
+  if (!['lido', 'resolvido'].includes(status)) return
+  await createAdminClient().from('feedbacks').update({ status }).eq('id', txt(fd, 'id'))
+  revalidatePath('/admin/mensagens')
+  revalidatePath('/admin')
+}

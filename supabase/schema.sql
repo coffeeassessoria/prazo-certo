@@ -1035,3 +1035,42 @@ create table if not exists public.stripe_eventos (
   recebido_em timestamptz not null default now()
 );
 alter table public.stripe_eventos enable row level security;  -- sem políticas: só o servidor (service role)
+
+-- Migração (03/11/2026): uso do sistema e mensagens dos clientes
+create table if not exists public.acessos (
+  id          bigint generated always as identity primary key,
+  user_id     uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  empresa_id  uuid default privado.minha_empresa() references public.empresas(id) on delete cascade,
+  secao       text not null check (char_length(secao) <= 60),
+  caminho     text not null check (char_length(caminho) <= 200),
+  dispositivo text check (dispositivo in ('celular','computador')),
+  criado_em   timestamptz not null default now()
+);
+create index if not exists acessos_criado_idx  on public.acessos(criado_em desc);
+create index if not exists acessos_empresa_idx on public.acessos(empresa_id, criado_em desc);
+create index if not exists acessos_user_idx    on public.acessos(user_id, criado_em desc);
+alter table public.acessos enable row level security;
+drop policy if exists acessos_insert on public.acessos;
+create policy acessos_insert on public.acessos for insert to authenticated
+  with check (user_id = (select auth.uid()) and empresa_id is not distinct from (select privado.minha_empresa()));
+
+create table if not exists public.feedbacks (
+  id          uuid primary key default gen_random_uuid(),
+  empresa_id  uuid default privado.minha_empresa() references public.empresas(id) on delete cascade,
+  user_id     uuid default auth.uid() references auth.users(id) on delete set null,
+  tipo        text not null check (tipo in ('sugestao','problema','reclamacao','elogio')),
+  mensagem    text not null check (char_length(mensagem) between 3 and 4000),
+  pagina      text check (char_length(pagina) <= 200),
+  status      text not null default 'novo' check (status in ('novo','lido','resolvido')),
+  criado_em   timestamptz not null default now()
+);
+create index if not exists feedbacks_criado_idx on public.feedbacks(criado_em desc);
+create index if not exists feedbacks_empresa_idx on public.feedbacks(empresa_id);
+create index if not exists feedbacks_user_idx on public.feedbacks(user_id);
+alter table public.feedbacks enable row level security;
+drop policy if exists feedbacks_insert on public.feedbacks;
+create policy feedbacks_insert on public.feedbacks for insert to authenticated
+  with check (user_id = (select auth.uid()) and empresa_id is not distinct from (select privado.minha_empresa()) and status = 'novo');
+drop policy if exists feedbacks_select on public.feedbacks;
+create policy feedbacks_select on public.feedbacks for select to authenticated
+  using (user_id = (select auth.uid()));

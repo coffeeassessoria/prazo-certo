@@ -1,4 +1,5 @@
-import { Building2, Eye, KeyRound, LogOut, PauseCircle, PlayCircle, ShieldCheck, UserPlus } from 'lucide-react'
+import Link from 'next/link'
+import { Activity, Building2, Eye, MessageSquareText, KeyRound, LogOut, PauseCircle, PlayCircle, ShieldCheck, UserPlus } from 'lucide-react'
 import { exigirSuperadmin } from '@/lib/contexto'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { hojeISO } from '@/lib/datas'
@@ -21,11 +22,12 @@ export default async function Admin() {
   const admin = createAdminClient()
   const hoje = hojeISO()
 
-  const [{ data: empresas }, { data: perfis }, { data: itens }, { data: conexoes }] = await Promise.all([
+  const [{ data: empresas }, { data: perfis }, { data: itens }, { data: conexoes }, { count: novasMensagens }] = await Promise.all([
     admin.from('empresas').select('*').order('created_at'),
     admin.from('perfis').select('user_id, empresa_id, nome, email, papel').eq('is_superadmin', false),
     admin.from('itens').select('empresa_id, vencimento').eq('status', 'ativo'),
     admin.from('google_conexoes').select('empresa_id'),
+    admin.from('feedbacks').select('id', { count: 'exact', head: true }).eq('status', 'novo'),
   ])
 
   const stats = new Map<string, { ativos: number; vencidos: number }>()
@@ -61,6 +63,10 @@ export default async function Admin() {
           </form>
         ) : undefined}
       />
+      <div className="acoes" style={{ marginBottom: 24 }}>
+        <Link href="/admin/uso" className="btn sec"><Activity size={16} />Uso do sistema</Link>
+        <Link href="/admin/mensagens" className="btn sec"><MessageSquareText size={16} />Mensagens dos clientes{novasMensagens ? <span className="msg-novo" style={{ marginLeft: 4 }}>{novasMensagens} {novasMensagens === 1 ? 'nova' : 'novas'}</span> : null}</Link>
+      </div>
 
       <div className="metricas">
         <Metrica valor={empresas?.length ?? 0} rotulo="Empresas" apoio="cadastradas" />

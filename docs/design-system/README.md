@@ -88,6 +88,7 @@ Os tokens mudam sozinhos. Primário no escuro = champanhe `#d6be86` com texto `#
 | Toast | confirmação após ação, some em 5s | na action: `redirect(\`/?${qsToast('PMOC renovado', 'Próximo em 30/11/2026.')}\`)` |
 | Logo | etiqueta azul + visto verde | `<Logo sub="Empresa" />` / `<LogoMarca grande />` |
 | Tema | alternar claro/escuro | `<TemaToggle comTexto />` |
+| Fale com a gente | botão flutuante + painel de sugestão/problema/reclamação/elogio; já incluso na `Casca` | `<FaleConosco />` · abrir pelo menu: `window.dispatchEvent(new Event('pc-fale-conosco'))` |
 
 Estados obrigatórios em todo interativo: padrão, hover, foco visível (anel), ativo, desabilitado, carregando, erro.
 
