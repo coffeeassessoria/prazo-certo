@@ -674,3 +674,33 @@ td.num { font-variant-numeric: tabular-nums; }
 .msg-novo { font-size: var(--pc-text-xs); font-weight: 600; color: var(--pc-accent-text); background: var(--pc-accent-soft); border-radius: var(--pc-radius-pill); padding: 2px 8px; }
 .msg-texto { margin: var(--pc-space-3) 0; white-space: pre-wrap; line-height: 1.6; }
 .msg-rodape { display: flex; flex-wrap: wrap; gap: var(--pc-space-3); align-items: center; justify-content: space-between; }
+
+/* Página de vendas: ciclo do serviço e grupos de recursos */
+.lp-ciclo { list-style: none; padding: 0; margin: 0 0 var(--pc-space-8); display: flex; flex-direction: column; gap: var(--pc-space-12); }
+.lp-ciclo li { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--pc-space-12); align-items: center; }
+.lp-ciclo li:nth-child(even) .lp-ciclo-texto { order: 2; }
+.lp-ciclo-texto p { margin: 0; color: var(--pc-text-secondary); font-size: var(--pc-text-base); line-height: 1.7; max-width: 46ch; }
+.lp-ciclo-texto h3 { font-size: var(--pc-text-xl); margin-bottom: var(--pc-space-3); }
+.lp-ciclo-img { margin: 0; min-width: 0; display: flex; justify-content: center; }
+.lp-ciclo-img img { display: block; width: 100%; height: auto; max-height: 520px; object-fit: cover; object-position: top; border-radius: var(--pc-radius-md); border: 1px solid var(--pc-border); box-shadow: var(--pc-shadow-md); background: #fff; }
+.lp-ciclo-celular .lp-ciclo-img img { width: auto; max-width: 300px; border-radius: 24px; border: 6px solid var(--pc-neutral-900); }
+.lp-grupos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--pc-space-6); }
+.lp-grupo { background: var(--pc-bg); border: 1px solid var(--pc-border); border-radius: var(--pc-radius-lg); padding: var(--pc-space-6); }
+.lp-grupo h3 { font-size: var(--pc-text-lg); margin: 0; }
+.lp-grupo-d { margin: 4px 0 var(--pc-space-5); font-size: var(--pc-text-sm); color: var(--pc-text-secondary); }
+.lp-grupo ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--pc-space-4); }
+.lp-grupo li { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: var(--pc-space-3); align-items: start; }
+.lp-grupo li .lp-recurso-ico { width: 36px; height: 36px; margin: 0; }
+.lp-grupo li b { display: block; font-size: var(--pc-text-sm); font-weight: 600; }
+.lp-grupo li span span { display: block; font-size: var(--pc-text-sm); color: var(--pc-text-secondary); line-height: 1.5; margin-top: 2px; }
+@media (max-width: 1023px) {
+  .lp-grupos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lp-ciclo li { grid-template-columns: minmax(0, 1fr); gap: var(--pc-space-5); }
+  .lp-ciclo li:nth-child(even) .lp-ciclo-texto { order: 0; }
+}
+@media (max-width: 767px) {
+  .lp-grupos { grid-template-columns: minmax(0, 1fr); }
+  .lp-ciclo { gap: var(--pc-space-10); }
+  .lp-ciclo-img img { max-height: 420px; }
+  .lp-ciclo-celular .lp-ciclo-img img { max-width: 240px; }
+}
