@@ -18,8 +18,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
       AWS_DEFAULT_REGION: auto
-      R2: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
-      BUCKET: ${{ secrets.R2_BUCKET }}
+      R2: https://372da0a8e3168bd7b64f905e63161ec1.r2.cloudflarestorage.com
+      BUCKET: prazo-certo-backup
     steps:
       - uses: actions/checkout@v4
 
@@ -47,7 +47,7 @@ jobs:
 
       - name: Copiar anexos
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_URL: https://aujxgakmvlthpdndohht.supabase.co
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           npm ci --no-audit --no-fund --ignore-scripts
