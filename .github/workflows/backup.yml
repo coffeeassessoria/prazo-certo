@@ -1,0 +1,83 @@
+# Backup noturno do Prazo Certo: banco completo + anexos, criptografado, enviado ao Cloudflare R2.
+# Guarda 30 dias de cópias diárias e 12 meses de cópias mensais (dia 1).
+# Se falhar, o GitHub envia e-mail para quem mantém o repositório.
+name: Backup noturno
+
+on:
+  schedule:
+    - cron: '17 6 * * *'   # 02:17 em Cuiabá
+  workflow_dispatch:
+
+concurrency: backup
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      BUCKET: ${{ secrets.R2_BUCKET }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+
+      - name: Instalar cliente PostgreSQL 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Copiar banco
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          mkdir -p backup
+          PG=/usr/lib/postgresql/17/bin
+          # Esquemas da aplicação e usuários (auth); o resto o Supabase recria sozinho
+          $PG/pg_dump "$DB_URL" --no-owner --no-privileges -n public -n privado -n auth -n storage \
+            --format=custom --file=backup/banco.dump
+          $PG/pg_restore --list backup/banco.dump | grep -c "TABLE DATA" | xargs -I{} echo "Tabelas com dados: {}"
+          test $(stat -c%s backup/banco.dump) -gt 10000
+
+      - name: Copiar anexos
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          npm ci --no-audit --no-fund --ignore-scripts
+          node scripts/backup-anexos.mjs backup
+
+      - name: Compactar e criptografar
+        env:
+          SENHA: ${{ secrets.BACKUP_PASSPHRASE }}
+        run: |
+          test -n "$SENHA"
+          echo "Backup de $(date -u +%FT%TZ), commit $GITHUB_SHA" > backup/LEIA-ME.txt
+          tar -czf prazo-certo.tar.gz backup
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$SENHA" --symmetric --cipher-algo AES256 -o prazo-certo.tar.gz.gpg prazo-certo.tar.gz
+          ls -lh prazo-certo.tar.gz.gpg
+
+      - name: Enviar ao R2
+        run: |
+          DIA=$(TZ=America/Cuiaba date +%F)
+          aws s3 cp prazo-certo.tar.gz.gpg "s3://$BUCKET/diario/$DIA.tar.gz.gpg" --endpoint-url "$R2" --only-show-errors
+          if [ "$(TZ=America/Cuiaba date +%d)" = "01" ]; then
+            aws s3 cp prazo-certo.tar.gz.gpg "s3://$BUCKET/mensal/$(TZ=America/Cuiaba date +%Y-%m).tar.gz.gpg" --endpoint-url "$R2" --only-show-errors
+          fi
+          aws s3 ls "s3://$BUCKET/diario/$DIA.tar.gz.gpg" --endpoint-url "$R2"
+
+      - name: Apagar cópias antigas
+        run: |
+          LIMITE_D=$(date -d '30 days ago' +%F); LIMITE_M=$(date -d '12 months ago' +%Y-%m)
+          aws s3 ls "s3://$BUCKET/diario/" --endpoint-url "$R2" | awk '{print $4}' | while read f; do
+            [ -n "$f" ] && [ "${f%%.*}" \< "$LIMITE_D" ] && aws s3 rm "s3://$BUCKET/diario/$f" --endpoint-url "$R2" --only-show-errors || true
+          done
+          aws s3 ls "s3://$BUCKET/mensal/" --endpoint-url "$R2" | awk '{print $4}' | while read f; do
+            [ -n "$f" ] && [ "${f%%.*}" \< "$LIMITE_M" ] && aws s3 rm "s3://$BUCKET/mensal/$f" --endpoint-url "$R2" --only-show-errors || true
+          done
