@@ -1,0 +1,65 @@
+# Teste de restauração: baixa o último backup do R2, descriptografa, restaura num Postgres vazio
+# e compara a quantidade de linhas de cada tabela com a produção. Roda todo dia 2 e quando chamado.
+name: Teste de restauração do backup
+
+on:
+  schedule:
+    - cron: '43 7 2 * *'
+  workflow_dispatch:
+
+jobs:
+  restaurar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      pg:
+        image: postgres:17
+        env: { POSTGRES_PASSWORD: teste }
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      R2: https://372da0a8e3168bd7b64f905e63161ec1.r2.cloudflarestorage.com
+      BUCKET: prazo-certo-backup
+      LOCAL: postgresql://postgres:teste@localhost:5432/postgres
+    steps:
+      - name: Instalar cliente PostgreSQL 17
+        run: |
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSo /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client-17
+
+      - name: Baixar e abrir o último backup
+        env: { SENHA: '${{ secrets.BACKUP_PASSPHRASE }}' }
+        run: |
+          ULTIMO=$(aws s3 ls "s3://$BUCKET/diario/" --endpoint-url "$R2" | awk '{print $4}' | sort | tail -1)
+          echo "Testando: $ULTIMO"
+          aws s3 cp "s3://$BUCKET/diario/$ULTIMO" b.gpg --endpoint-url "$R2" --only-show-errors
+          gpg --batch --pinentry-mode loopback --passphrase "$SENHA" -d b.gpg | tar -xz
+          echo "Anexos no backup: $(find backup/anexos -type f 2>/dev/null | wc -l)"
+
+      - name: Restaurar num banco vazio
+        run: |
+          PG=/usr/lib/postgresql/17/bin
+          # Papéis que o Supabase usa nas políticas de segurança
+          for r in anon authenticated service_role supabase_auth_admin supabase_storage_admin authenticator; do
+            psql "$LOCAL" -qc "do \$\$ begin create role $r; exception when duplicate_object then null; end \$\$;"
+          done
+          psql "$LOCAL" -qc "create schema if not exists extensions; create extension if not exists pgcrypto schema extensions; create extension if not exists \"uuid-ossp\" schema extensions;"
+          $PG/pg_restore -d "$LOCAL" --no-owner --no-privileges backup/banco.dump 2> erros.txt || true
+          echo "Avisos do restore (esperados em itens internos do Supabase): $(wc -l < erros.txt)"
+
+      - name: Comparar com a produção
+        env: { PROD: '${{ secrets.SUPABASE_DB_URL }}' }
+        run: |
+          Q="select table_schema||'.'||table_name from information_schema.tables where table_schema in ('public','privado') and table_type='BASE TABLE' order by 1"
+          falhas=0
+          for t in $(psql "$PROD" -Atc "$Q"); do
+            p=$(psql "$PROD" -Atc "select count(*) from $t"); l=$(psql "$LOCAL" -Atc "select count(*) from $t" 2>/dev/null || echo "faltando")
+            if [ "$p" = "$l" ]; then echo "ok    $t: $l"; elif [ "$l" != "faltando" ] && [ "$l" -le "$p" ]; then echo "ok*   $t: backup $l, produção $p (criado depois do backup)"; else echo "ERRO  $t: backup $l, produção $p"; falhas=$((falhas+1)); fi
+          done
+          u=$(psql "$LOCAL" -Atc "select count(*) from auth.users"); echo "Usuários no backup: $u"
+          test "$falhas" = 0 && test "$u" -gt 0
