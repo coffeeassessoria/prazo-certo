@@ -5,10 +5,22 @@ import { ACOMPANHAMENTO, diasAte, fmtData, ROTULO_TIPO } from '@/lib/datas'
  *  - "antecedencia": ao entrar na janela de aviso escolhida (ex.: 30 dias antes)
  *  - "7d": 7 dias antes   - "1d": 1 dia antes   - "hoje": no dia
  *  - "atraso-N": depois de vencido, uma vez por semana (N = semana do atraso)
+ * Com lista de avisos (itens.avisos_dias, ex.: [7, 5, 3, 1]) avisa em cada um desses dias;
+ * o maior se chama "antecedencia" e 7/1 mantêm "7d"/"1d", para itens antigos não receberem de novo.
  * Acompanhamentos só avisam no dia do retorno e, se ficarem sem resposta, a cada 2 dias.
  * O marco leva a data, para um acompanhamento adiado voltar a avisar na nova data.
  */
-export function marcoDoDia(dias: number, antecedencia: number, tipo?: string, vencimento?: string): string | null {
+export function marcoDoDia(dias: number, antecedencia: number, tipo?: string, vencimento?: string, avisos?: number[] | null): string | null {
+  if (tipo !== ACOMPANHAMENTO && avisos?.length) {
+    if (dias < 0) return `atraso-${Math.floor((-dias - 1) / 7)}`
+    if (dias === 0) return 'hoje'
+    const alvo = [...avisos].sort((a, b) => a - b).find((n) => n >= dias)
+    if (alvo === undefined) return null
+    if (alvo === 1) return '1d'
+    if (alvo === 7) return '7d'
+    if (alvo === Math.max(...avisos)) return 'antecedencia'
+    return `aviso-${alvo}`
+  }
   if (tipo === ACOMPANHAMENTO) {
     if (dias > 0) return null
     if (dias === 0) return `ret-${vencimento}`

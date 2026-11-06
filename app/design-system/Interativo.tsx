@@ -5,6 +5,7 @@ import { Trash2 } from 'lucide-react'
 import { Confirmar } from '@/components/ui/Confirmar'
 import { Toast } from '@/components/ui/Toast'
 import { Upload } from '@/components/ui/Upload'
+import { CampoData } from '@/components/ui/CampoData'
 
 /** Demonstrações que precisam de interação (modal, toast, upload). */
 export function DemoModalToast() {
@@ -22,6 +23,10 @@ export function DemoModalToast() {
       {toast > 0 && <Toast key={toast} titulo="PMOC do Frigorífico Boi Bom renovado" descricao="Próximo vencimento em 30/11/2026." aoFechar={() => setToast(0)} />}
     </div>
   )
+}
+
+export function DemoData() {
+  return <CampoData id="demo-data" name="demo_data" />
 }
 
 export function DemoUpload() {

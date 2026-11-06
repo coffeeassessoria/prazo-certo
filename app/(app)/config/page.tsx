@@ -88,6 +88,8 @@ export default async function Config({ searchParams }: { searchParams: Promise<{
         </div>
       )}
 
+      <div className="card"><h2>Tipos de documento</h2><p className="muted">Os atalhos do cadastro de vencimento. Crie tipos novos com avisos padrão e perguntas próprias, como número da apólice ou seguradora.</p><Link className="btn sec" href="/config/tipos">Gerenciar tipos de documento</Link></div>
+
       <div className="card"><h2>Logo e timbrado dos documentos</h2><p className="muted">Cadastre a identidade da sua empresa para gerar PMOC e futuros documentos em A4.</p><Link className="btn sec" href="/config/documentos">Configurar logo e timbrado</Link></div>
 
       <div className="card">

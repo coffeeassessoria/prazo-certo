@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 import { finalizarEvento, removerEvento, semFalhar, sincronizarEvento } from '@/lib/google'
 import { qsToast } from '@/lib/toast'
 import { ACOMPANHAMENTO, fmtData } from '@/lib/datas'
+import { normalizarAvisos, type Resposta } from '@/lib/modelos'
 
 type Supa = Awaited<ReturnType<typeof createClient>>
 
@@ -25,6 +26,35 @@ async function resolverCliente(supabase: Supa, empresaId: string, fd: FormData):
     return data.id
   }
   return txt(fd, 'cliente_id') || null
+}
+
+async function resolverColaborador(supabase: Supa, empresaId: string, fd: FormData): Promise<string | null> {
+  const novo = txt(fd, 'colaborador_novo')
+  if (novo) {
+    const { data: existente } = await supabase
+      .from('colaboradores').select('id').eq('empresa_id', empresaId).ilike('nome', novo).maybeSingle()
+    if (existente) return existente.id
+    const { data, error } = await supabase.from('colaboradores')
+      .insert({ empresa_id: empresaId, nome: novo, funcao: txt(fd, 'colaborador_funcao') || null }).select('id').single()
+    if (error) throw new Error(error.message)
+    return data.id
+  }
+  return txt(fd, 'colaborador_id') || null
+}
+
+/** Respostas das perguntas do tipo de documento (no máx. 30, textos curtos). */
+function lerRespostas(fd: FormData): Resposta[] {
+  try {
+    const lista = JSON.parse(txt(fd, 'dados') || '[]')
+    if (!Array.isArray(lista)) return []
+    return lista.slice(0, 30)
+      .map((r: any) => ({
+        rotulo: String(r?.rotulo ?? '').trim().slice(0, 80),
+        tipo: ['texto', 'data', 'numero', 'sim_nao'].includes(r?.tipo) ? r.tipo : 'texto',
+        valor: String(r?.valor ?? '').trim().slice(0, 500),
+      }))
+      .filter((r) => r.rotulo && r.valor)
+  } catch { return [] }
 }
 
 async function enviarAnexo(supabase: Supa, empresaId: string, itemId: string, fd: FormData) {
@@ -61,14 +91,20 @@ export async function salvarItem(fd: FormData) {
   const empresaId = ctx.empresa.id
   const id = txt(fd, 'id')
 
+  const lidos = normalizarAvisos(txt(fd, 'avisos'))
+  const avisos = lidos.length ? lidos : normalizarAvisos([ctx.empresa.antecedencia_padrao || 30, 7, 1])
   const campos = {
     titulo: txt(fd, 'titulo'),
     tipo: txt(fd, 'tipo') || 'documento',
     descricao: txt(fd, 'descricao') || null,
     vencimento: txt(fd, 'vencimento'),
     recorrencia_meses: numOuNull(txt(fd, 'recorrencia_meses')),
-    antecedencia_dias: Number(txt(fd, 'antecedencia_dias') || ctx.empresa.antecedencia_padrao || 30),
+    avisos_dias: avisos,
+    antecedencia_dias: avisos[0],
+    modelo: txt(fd, 'modelo') || null,
+    dados: lerRespostas(fd),
     cliente_id: await resolverCliente(supabase, empresaId, fd),
+    colaborador_id: await resolverColaborador(supabase, empresaId, fd),
   }
   if (!campos.titulo || !/^\d{4}-\d{2}-\d{2}$/.test(campos.vencimento)) {
     throw new Error('Preencha o título e a data de vencimento.')
@@ -121,6 +157,10 @@ export async function renovarItem(fd: FormData) {
       vencimento: novoVenc,
       recorrencia_meses: atual.recorrencia_meses,
       antecedencia_dias: atual.antecedencia_dias,
+      avisos_dias: atual.avisos_dias,
+      colaborador_id: atual.colaborador_id,
+      modelo: atual.modelo,
+      dados: atual.dados ?? [],
       item_anterior_id: atual.id,
       created_by: ctx.userId,
     })

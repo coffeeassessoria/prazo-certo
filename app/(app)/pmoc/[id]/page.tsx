@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CampoData } from '@/components/ui/CampoData'
 import { notFound } from 'next/navigation'
 import { Download, FileText, Pencil } from 'lucide-react'
 import { exigirEmpresa } from '@/lib/contexto'
@@ -281,14 +282,7 @@ export default async function Plano({
           </div>
           <div className="campo">
             <label htmlFor="ex-data">Data da execução</label>
-            <input
-              id="ex-data"
-              name="data_execucao"
-              type="date"
-              required
-              max={hojeISO()}
-              defaultValue={hojeISO()}
-            />
+            <CampoData id="ex-data" name="data_execucao" required max={hojeISO()} defaultValue={hojeISO()} />
           </div>
           <div className="campo">
             <label htmlFor="ex-executado">Executado por</label>

@@ -5,12 +5,14 @@ import { Cabecalho } from '@/components/ui/Cabecalho'
 import { Aviso } from '@/components/ui/Aviso'
 import { salvarItem } from '../actions'
 
-export default async function NovoItem({ searchParams }: { searchParams: Promise<{ cliente?: string; primeiro?: string }> }) {
-  const { cliente, primeiro } = await searchParams
+export default async function NovoItem({ searchParams }: { searchParams: Promise<{ cliente?: string; primeiro?: string; modelo?: string }> }) {
+  const { cliente, primeiro, modelo } = await searchParams
   const ctx = await exigirEmpresa()
   const supabase = await createClient()
-  const { data: clientes } = await supabase
-    .from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome')
+  const [{ data: clientes }, { data: colaboradores }] = await Promise.all([
+    supabase.from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome'),
+    supabase.from('colaboradores').select('id, nome, funcao').eq('empresa_id', ctx.empresa.id).eq('ativo', true).order('nome'),
+  ])
 
   return (
     <div style={{ maxWidth: 880 }}>
@@ -24,7 +26,7 @@ export default async function NovoItem({ searchParams }: { searchParams: Promise
           Agora cadastre um documento, contrato ou manutenção que você precisa acompanhar.
         </Aviso>
       )}
-      <ItemForm acao={salvarItem} clientes={clientes ?? []} clientePadrao={cliente}
+      <ItemForm acao={salvarItem} clientes={clientes ?? []} colaboradores={colaboradores ?? []} clientePadrao={cliente} modeloInicial={modelo}
         modelos={ctx.empresa.modelos} antecedenciaPadrao={ctx.empresa.antecedencia_padrao} />
     </div>
   )

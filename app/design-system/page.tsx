@@ -20,7 +20,7 @@ import { PmocForm } from '@/components/ui/PmocForm'
 import { exemploPmoc } from '@/lib/pmoc-demo'
 import { AcompanhamentoForm } from '@/components/AcompanhamentoForm'
 import { hojeISO, somarDias } from '@/lib/datas'
-import { DemoFaleConosco, DemoModalToast, DemoUpload } from './Interativo'
+import { DemoData, DemoFaleConosco, DemoModalToast, DemoUpload } from './Interativo'
 
 export const metadata = { title: 'Design System 2.0 · Prazo Certo' }
 
@@ -178,6 +178,7 @@ export default function DesignSystem() {
           </div>
 
           <div className="grade-2">
+            <div className="card"><div className="card-topo"><h2>Data digitável</h2></div><div className="campo"><label htmlFor="demo-data">Data de vencimento</label><DemoData /><span className="dica">Digite só os números (dd/mm/aaaa) ou toque no calendário.</span></div></div>
             <div className="card"><div className="card-topo"><h2>Upload de arquivo</h2></div><DemoUpload /></div>
             <div className="card">
               <div className="card-topo"><h2>Card de métrica</h2></div>

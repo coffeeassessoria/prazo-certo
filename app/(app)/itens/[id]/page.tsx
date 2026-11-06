@@ -1,3 +1,4 @@
+import { Fragment } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { exigirEmpresa } from '@/lib/contexto'
@@ -17,6 +18,8 @@ import { concluirItem, excluirItem, reabrirItem, renovarItem, salvarItem } from 
 import { registrarContato, salvarDemanda } from '../../acompanhamentos/actions'
 import { CATEGORIAS, ETAPAS, type Etapa } from '@/lib/demandas'
 import { Aviso } from '@/components/ui/Aviso'
+import { CampoData } from '@/components/ui/CampoData'
+import { avisosDoItem, type Resposta } from '@/lib/modelos'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,11 +36,12 @@ export default async function DetalheItem({
   const hoje = hojeISO()
 
   const { data: item } = await supabase
-    .from('itens').select('*, clientes(id, nome, telefone, contato)')
+    .from('itens').select('*, clientes(id, nome, telefone, contato), colaboradores(id, nome, funcao)')
     .eq('id', id).eq('empresa_id', ctx.empresa.id).maybeSingle()
   if (!item) notFound()
 
   const cliente: any = Array.isArray(item.clientes) ? item.clientes[0] : item.clientes
+  const colaborador: any = Array.isArray(item.colaboradores) ? item.colaboradores[0] : item.colaboradores
   const acomp = item.tipo === ACOMPANHAMENTO
 
   if (acomp) {
@@ -123,12 +127,14 @@ export default async function DetalheItem({
   }
 
   if (sp.editar) {
-    const { data: clientes } = await supabase
-      .from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome')
+    const [{ data: clientes }, { data: colaboradores }] = await Promise.all([
+      supabase.from('clientes').select('id, nome').eq('empresa_id', ctx.empresa.id).order('nome'),
+      supabase.from('colaboradores').select('id, nome, funcao').eq('empresa_id', ctx.empresa.id).eq('ativo', true).order('nome'),
+    ])
     return (
       <div style={{ maxWidth: 880 }}>
         <Cabecalho voltar={{ href: `/itens/${id}`, rotulo: 'Cancelar edição' }} titulo="Editar vencimento" sub={item.titulo} />
-        <ItemForm acao={salvarItem} clientes={clientes ?? []} item={item} modelos={ctx.empresa.modelos} antecedenciaPadrao={ctx.empresa.antecedencia_padrao} />
+        <ItemForm acao={salvarItem} clientes={clientes ?? []} colaboradores={colaboradores ?? []} item={item} voltaTipo={`/itens/${id}?editar=1`} modelos={ctx.empresa.modelos} antecedenciaPadrao={ctx.empresa.antecedencia_padrao} />
       </div>
     )
   }
@@ -174,7 +180,12 @@ export default async function DetalheItem({
           </div>
           <dl className="detalhes">
             <dt>Repetição</dt><dd style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Repeat size={14} aria-hidden />{rotuloRecorrencia(item.recorrencia_meses)}</dd>
-            <dt>Primeiro aviso</dt><dd style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Bell size={14} aria-hidden />{item.antecedencia_dias} dias antes, por e-mail</dd>
+            <dt>Avisos</dt><dd style={{ display: 'flex', gap: 6, alignItems: 'center' }}><Bell size={14} aria-hidden />{avisosDoItem(item).map((d) => (d === 1 ? '1 dia' : `${d} dias`)).join(', ')} antes e no dia, por e-mail</dd>
+            {colaborador && <><dt>Colaborador</dt><dd><Link href={`/colaboradores?ver=${colaborador.id}`}>{colaborador.nome}</Link>{colaborador.funcao ? ` · ${colaborador.funcao}` : ''}</dd></>}
+            {item.modelo && item.modelo !== item.titulo && <><dt>Tipo de documento</dt><dd>{item.modelo}</dd></>}
+            {((item.dados ?? []) as Resposta[]).map((r) => (
+              <Fragment key={r.rotulo}><dt>{r.rotulo}</dt><dd>{r.tipo === 'data' ? fmtData(r.valor) : r.valor}</dd></Fragment>
+            ))}
             <dt>Google Agenda</dt><dd>{item.google_event_id ? 'Na agenda, com alerta' : 'Não conectada. Conecte em Ajustes.'}</dd>
             {item.descricao && (<><dt>Observações</dt><dd style={{ whiteSpace: 'pre-wrap' }}>{item.descricao}</dd></>)}
             {cliente?.contato || cliente?.telefone ? (
@@ -218,7 +229,7 @@ export default async function DetalheItem({
             <input type="hidden" name="id" value={id} />
             <div className="campo" style={{ marginTop: 16 }}>
               <label htmlFor="novo_vencimento">Próximo vencimento</label>
-              <input id="novo_vencimento" name="novo_vencimento" type="date" required defaultValue={sugestao} />
+              <CampoData id="novo_vencimento" name="novo_vencimento" required defaultValue={sugestao} />
               <span className="dica">{sugestao ? `Sugerido pela repetição (${rotuloRecorrencia(item.recorrencia_meses).toLowerCase()}). Confira no documento novo.` : 'Informe a nova data que está no documento renovado.'}</span>
             </div>
             <div className="campo">

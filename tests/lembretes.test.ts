@@ -18,3 +18,20 @@ test('resumo inclui a próxima ação e o responsável com escape no HTML', () =
   assert.match(email.html,/Ana &amp; João/)
   assert.ok(!email.html.includes('<script>'))
 })
+
+test('vários avisos: avisa em cada dia escolhido e mantém os nomes antigos', () => {
+  const av = [7, 5, 3, 1]
+  assert.equal(marcoDoDia(8, 7, 'documento', undefined, av), null)
+  assert.equal(marcoDoDia(7, 7, 'documento', undefined, av), '7d')
+  assert.equal(marcoDoDia(6, 7, 'documento', undefined, av), '7d')
+  assert.equal(marcoDoDia(5, 7, 'documento', undefined, av), 'aviso-5')
+  assert.equal(marcoDoDia(3, 7, 'documento', undefined, av), 'aviso-3')
+  assert.equal(marcoDoDia(1, 7, 'documento', undefined, av), '1d')
+  assert.equal(marcoDoDia(0, 7, 'documento', undefined, av), 'hoje')
+  assert.equal(marcoDoDia(-1, 7, 'documento', undefined, av), 'atraso-0')
+  // Só 1 dia antes: nada antes disso
+  assert.equal(marcoDoDia(2, 1, 'documento', undefined, [1]), null)
+  assert.equal(marcoDoDia(1, 1, 'documento', undefined, [1]), '1d')
+  // Lista migrada [30, 7, 1] gera os mesmos marcos da regra antiga
+  for (const d of [40, 30, 20, 7, 4, 1, 0, -3]) assert.equal(marcoDoDia(d, 30, 'documento', undefined, [30, 7, 1]), marcoDoDia(d, 30, 'documento'))
+})

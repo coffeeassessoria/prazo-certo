@@ -203,6 +203,20 @@ input[type="file"] { padding: 9px var(--pc-space-3); }
 .campo.com-erro label { color: var(--pc-danger-text); }
 .check { display: flex; align-items: center; gap: var(--pc-space-3); font-weight: 400; cursor: pointer; min-height: var(--pc-touch); }
 
+/* ---------- Data digitável (CampoData) ---------- */
+.campo-data { position: relative; display: flex; flex-direction: column; gap: 6px; }
+.campo-data > input[type="text"] { padding-right: calc(var(--pc-touch) + var(--pc-space-1)); font-variant-numeric: tabular-nums; }
+.campo-data > .btn.icone.peq { position: absolute; top: 0; right: 0; width: var(--pc-touch); height: var(--pc-touch); min-height: 0; padding: 0; color: var(--pc-text-secondary); }
+.campo-data > .btn.icone.peq:hover { color: var(--pc-text); }
+.campo-data-nativo { position: absolute; top: 0; right: 0; width: var(--pc-touch); height: var(--pc-touch); opacity: 0; pointer-events: none; padding: 0; border: 0; }
+.campo-data.invalido > input[type="text"] { border-color: var(--pc-danger-border); background: var(--pc-danger-bg); }
+
+/* ---------- Seleção de vários avisos e perguntas do tipo ---------- */
+.avisos-outro { display: flex; gap: var(--pc-space-2); align-items: center; margin-top: var(--pc-space-3); }
+.avisos-outro input { width: 96px; }
+.pergunta-linha { display: grid; grid-template-columns: 1fr 160px auto; gap: var(--pc-space-2); align-items: center; margin-bottom: var(--pc-space-2); }
+@media (max-width: 767px) { .pergunta-linha { grid-template-columns: 1fr auto; } .pergunta-linha select { grid-column: 1; } }
+
 /* ---------- Upload de arquivo ---------- */
 .upload { display: block; border: 2px dashed var(--pc-border); border-radius: var(--pc-radius-md); background: var(--pc-surface-2); padding: var(--pc-space-8); text-align: center; cursor: pointer; transition: border-color var(--pc-duration-fast); font-weight: 400; }
 .upload:hover, .upload.arrastando, .upload:focus-within { border-color: var(--pc-brand-700); }

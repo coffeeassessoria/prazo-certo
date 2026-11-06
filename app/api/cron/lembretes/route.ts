@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const { data: itens, error: erroItens } = await admin
       .from('itens')
-      .select('id, titulo, tipo, vencimento, antecedencia_dias, proxima_acao, responsavel_id, clientes(nome)')
+      .select('id, titulo, tipo, vencimento, antecedencia_dias, avisos_dias, proxima_acao, responsavel_id, clientes(nome)')
       .eq('empresa_id', emp.id)
       .eq('status', 'ativo')
       .lte('vencimento', somarDias(hoje, 366))
@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
         proxima_acao: i.proxima_acao,
         responsavel_nome: responsaveis?.find(p => p.user_id === i.responsavel_id)?.nome || responsaveis?.find(p => p.user_id === i.responsavel_id)?.email || null,
         cliente_nome: (Array.isArray(i.clientes) ? i.clientes[0]?.nome : i.clientes?.nome) ?? null,
-        marco: marcoDoDia(diasAte(i.vencimento, hoje), i.antecedencia_dias, i.tipo, i.vencimento),
+        marco: marcoDoDia(diasAte(i.vencimento, hoje), i.antecedencia_dias, i.tipo, i.vencimento, i.avisos_dias),
       }))
       .filter((i) => i.marco) as (ItemLembrete & { marco: string })[]
     if (!candidatos.length) continue

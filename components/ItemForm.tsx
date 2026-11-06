@@ -1,13 +1,16 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { AlertCircle, BellRing, Check, Paperclip, Save } from 'lucide-react'
+import Link from 'next/link'
+import { AlertCircle, BellRing, Check, Paperclip, Plus, Save, UserPlus } from 'lucide-react'
 import { fmtData, hojeISO, RECORRENCIAS, somarDias, somarMeses, TIPOS } from '@/lib/datas'
-import type { Modelo } from '@/lib/modelos'
+import { avisosDoItem, normalizarAvisos, type Modelo, type Resposta } from '@/lib/modelos'
 import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
+import { CampoData } from '@/components/ui/CampoData'
 import { Upload } from '@/components/ui/Upload'
 
 type Cliente = { id: string; nome: string }
+type Colaborador = { id: string; nome: string; funcao?: string | null }
 export type ItemEdicao = {
   id?: string
   titulo?: string
@@ -16,66 +19,112 @@ export type ItemEdicao = {
   vencimento?: string
   recorrencia_meses?: number | null
   antecedencia_dias?: number
+  avisos_dias?: number[] | null
   cliente_id?: string | null
+  colaborador_id?: string | null
+  modelo?: string | null
+  dados?: Resposta[] | null
   anexo_nome?: string | null
 }
 
-const AVISOS = [7, 15, 30, 60, 90]
+const OPCOES_AVISO = [90, 60, 30, 15, 7, 5, 3, 2, 1]
 
 /** Datas em que o sistema vai avisar (mesma regra do envio diário, ver lib/lembretes.ts). */
-function datasDeAviso(venc: string, antecedencia: number, hoje: string): string[] {
+function datasDeAviso(venc: string, avisos: number[], hoje: string): string[] {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(venc)) return []
-  const marcos = [...new Set([antecedencia, 7, 1, 0])].filter((d) => d >= 0).sort((a, b) => b - a)
-  return marcos.map((d) => somarDias(venc, -d)).filter((d) => d >= hoje)
+  return [...avisos, 0].map((d) => somarDias(venc, -d)).filter((d) => d >= hoje)
+}
+
+/** Junta as perguntas do tipo com as respostas já gravadas (sem perder nenhuma). */
+function mesclarRespostas(m: Modelo | undefined, atuais: Resposta[]): Resposta[] {
+  const lista = [...atuais]
+  for (const c of m?.campos ?? []) {
+    if (!lista.some((r) => r.rotulo === c.rotulo)) lista.push({ ...c, valor: '' })
+  }
+  return lista
 }
 
 /** Cadastro guiado de vencimento (DS 2.0): 4 perguntas + detalhes opcionais. */
 export function ItemForm({
-  acao, clientes, item = {}, clientePadrao, modelos = [], antecedenciaPadrao = 30,
+  acao, clientes, colaboradores = [], item = {}, clientePadrao, modelos = [], modeloInicial, antecedenciaPadrao = 30, voltaTipo = '/itens/novo',
 }: {
   acao: (fd: FormData) => Promise<void>
   clientes: Cliente[]
+  colaboradores?: Colaborador[]
   item?: ItemEdicao
   clientePadrao?: string
   modelos?: Modelo[]
+  /** Tipo já escolhido ao abrir (ex.: voltando do cadastro de um tipo novo). */
+  modeloInicial?: string
   antecedenciaPadrao?: number
+  voltaTipo?: string
 }) {
   const hoje = hojeISO()
+  const inicial = !item.id ? modelos.find((m) => m.titulo === modeloInicial) : undefined
+  const modeloDoItem = modelos.find((m) => m.titulo === item.modelo)
   const [novoCliente, setNovoCliente] = useState(clientes.length === 0)
-  const [titulo, setTitulo] = useState(item.titulo ?? '')
-  const [tipo, setTipo] = useState(item.tipo ?? 'documento')
-  const [recorrencia, setRecorrencia] = useState(item.recorrencia_meses ? String(item.recorrencia_meses) : '')
+  const [novoColab, setNovoColab] = useState(false)
+  const [modeloSel, setModeloSel] = useState(item.modelo ?? inicial?.titulo ?? '')
+  const [titulo, setTitulo] = useState(item.titulo ?? inicial?.titulo ?? '')
+  const [tipo, setTipo] = useState(item.tipo ?? inicial?.tipo ?? 'documento')
+  const [recorrencia, setRecorrencia] = useState(
+    item.recorrencia_meses ? String(item.recorrencia_meses) : inicial?.recorrencia_meses ? String(inicial.recorrencia_meses) : '')
   const [vencimento, setVencimento] = useState(item.vencimento ?? '')
-  const [antecedencia, setAntecedencia] = useState(item.antecedencia_dias ?? antecedenciaPadrao)
+  const [avisos, setAvisos] = useState<number[]>(
+    item.id ? avisosDoItem(item) : inicial?.avisos?.length ? inicial.avisos : normalizarAvisos([antecedenciaPadrao, 7, 1]))
+  const [outroAviso, setOutroAviso] = useState('')
+  const [respostas, setRespostas] = useState<Resposta[]>(mesclarRespostas(modeloDoItem ?? inicial, item.dados ?? []))
   const [mais, setMais] = useState(!!(item.descricao || item.anexo_nome))
-  const [erros, setErros] = useState<{ titulo?: string; vencimento?: string }>({})
+  const [erros, setErros] = useState<{ titulo?: string; vencimento?: string; avisos?: string }>({})
+  const modeloAtual = modelos.find((m) => m.titulo === modeloSel)
 
   function usarModelo(m: Modelo) {
+    setModeloSel(m.titulo)
     setTitulo(m.titulo)
     setTipo(m.tipo)
     setRecorrencia(m.recorrencia_meses ? String(m.recorrencia_meses) : '')
-    setErros((e) => ({ ...e, titulo: undefined }))
+    if (m.avisos?.length) setAvisos(m.avisos)
+    setRespostas((r) => mesclarRespostas(m, r.filter((x) => x.valor)))
+    setErros((e) => ({ ...e, titulo: undefined, avisos: undefined }))
+  }
+
+  function alternarAviso(d: number) {
+    setAvisos((a) => (a.includes(d) ? a.filter((x) => x !== d) : normalizarAvisos([...a, d])))
+    setErros((e) => ({ ...e, avisos: undefined }))
+  }
+
+  function adicionarOutro() {
+    const n = normalizarAvisos([outroAviso])
+    if (n.length) { setAvisos((a) => normalizarAvisos([...a, ...n])); setOutroAviso(''); setErros((e) => ({ ...e, avisos: undefined })) }
+  }
+
+  function responder(rotulo: string, valor: string) {
+    setRespostas((r) => r.map((x) => (x.rotulo === rotulo ? { ...x, valor } : x)))
   }
 
   function validar(e: React.FormEvent<HTMLFormElement>) {
     const novos: typeof erros = {}
     if (!titulo.trim()) novos.titulo = 'Informe o que vence para continuar'
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(vencimento)) novos.vencimento = 'Informe a data de vencimento para continuar'
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(vencimento)) novos.vencimento = 'Digite a data de vencimento (dd/mm/aaaa) para continuar'
+    if (!avisos.length) novos.avisos = 'Escolha pelo menos um dia para avisar'
     setErros(novos)
     if (Object.keys(novos).length) {
       e.preventDefault()
-      document.getElementById(novos.titulo ? 'titulo' : 'vencimento')?.focus()
+      document.getElementById(novos.titulo ? 'titulo' : novos.vencimento ? 'vencimento' : 'avisos')?.focus()
     }
   }
 
-  const avisos = useMemo(() => datasDeAviso(vencimento, antecedencia, hoje), [vencimento, antecedencia, hoje])
+  const datas = useMemo(() => datasDeAviso(vencimento, avisos, hoje), [vencimento, avisos, hoje])
   const proximo = vencimento && recorrencia ? somarMeses(vencimento, Number(recorrencia)) : ''
-  const opcoesAviso = AVISOS.includes(antecedencia) ? AVISOS : [...AVISOS, antecedencia].sort((a, b) => a - b)
+  const opcoesAviso = [...new Set([...OPCOES_AVISO, ...avisos])].sort((a, b) => b - a)
 
   return (
     <form action={acao} onSubmit={validar} noValidate className="card">
       {item.id && <input type="hidden" name="id" value={item.id} />}
       <input type="hidden" name="tipo" value={tipo} />
+      <input type="hidden" name="modelo" value={modeloSel} />
+      <input type="hidden" name="avisos" value={avisos.join(',')} />
+      <input type="hidden" name="dados" value={JSON.stringify(respostas.filter((r) => r.valor.trim()))} />
 
       <section className="etapa">
         <h2><span className="num-etapa">1</span>O que vence?</h2>
@@ -84,7 +133,7 @@ export function ItemForm({
             <p className="dica" style={{ marginBottom: 8 }}>Toque em um atalho ou escreva abaixo.</p>
             <div className="chips compactos" style={{ marginBottom: 16 }}>
               {modelos.map((m) => {
-                const marcado = titulo === m.titulo
+                const marcado = modeloSel === m.titulo
                 return (
                   <button type="button" key={m.titulo} className="chip" aria-pressed={marcado} onClick={() => usarModelo(m)}>
                     <span className="chip-titulo">{marcado && <Check size={14} aria-hidden />}{m.titulo}</span>
@@ -93,6 +142,11 @@ export function ItemForm({
               })}
             </div>
           </>
+        )}
+        {!item.id && (
+          <p style={{ marginTop: -8, marginBottom: 16 }}>
+            <Link href={`/config/tipos?novo=1&volta=${encodeURIComponent(voltaTipo)}`} className="btn ghost peq"><Plus size={14} />Cadastrar novo tipo de documento</Link>
+          </p>
         )}
         <div className={`campo ${erros.titulo ? 'com-erro' : ''}`}>
           <label htmlFor="titulo">Nome do documento, contrato ou manutenção</label>
@@ -103,10 +157,29 @@ export function ItemForm({
             ? <span id="titulo-ajuda" className="erro-campo"><AlertCircle size={14} aria-hidden />{erros.titulo}</span>
             : <span id="titulo-ajuda" className="dica">Use um nome que você reconheça em campo.</span>}
         </div>
+        {respostas.length > 0 && (
+          <div className="linha" style={{ rowGap: 0 }}>
+            {respostas.map((r, i) => (
+              <div className="campo" key={r.rotulo}>
+                <label htmlFor={`resp-${i}`}>{r.rotulo} <span className="opcional">(opcional)</span></label>
+                {r.tipo === 'data' ? (
+                  <CampoData id={`resp-${i}`} value={r.valor} onChange={(v) => responder(r.rotulo, v)} />
+                ) : r.tipo === 'sim_nao' ? (
+                  <select id={`resp-${i}`} value={r.valor} onChange={(e) => responder(r.rotulo, e.target.value)}>
+                    <option value="">Não informado</option><option value="Sim">Sim</option><option value="Não">Não</option>
+                  </select>
+                ) : (
+                  <input id={`resp-${i}`} value={r.valor} inputMode={r.tipo === 'numero' ? 'decimal' : undefined}
+                    onChange={(e) => responder(r.rotulo, e.target.value)} />
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="etapa">
-        <h2><span className="num-etapa">2</span>De qual cliente?</h2>
+        <h2><span className="num-etapa">2</span>De quem é?</h2>
         <div className="campo">
           <label htmlFor="cliente">Cliente</label>
           {novoCliente ? (
@@ -123,6 +196,31 @@ export function ItemForm({
             </button>
           )}
         </div>
+        <div className="campo">
+          <label htmlFor="colaborador">Colaborador vinculado <span className="opcional">(opcional)</span></label>
+          {novoColab ? (
+            <div className="linha" style={{ rowGap: 0 }}>
+              <input id="colaborador" name="colaborador_novo" placeholder="Nome do colaborador" autoFocus />
+              <input name="colaborador_funcao" placeholder="Função (ex.: técnico de refrigeração)" aria-label="Função do colaborador" />
+            </div>
+          ) : colaboradores.length > 0 ? (
+            <select id="colaborador" name="colaborador_id" defaultValue={item.colaborador_id ?? ''}>
+              <option value="">Sem vínculo com colaborador</option>
+              {colaboradores.map((c) => <option key={c.id} value={c.id}>{c.nome}{c.funcao ? ` · ${c.funcao}` : ''}</option>)}
+            </select>
+          ) : null}
+          <span className="dica">
+            {modeloAtual?.colaborador
+              ? 'Este tipo costuma ser de um funcionário (ex.: seguro de vida nominal).'
+              : 'Use para documentos de um funcionário, como seguro de vida, ASO ou certificado de NR.'}
+          </span>
+          <span className="acoes">
+            <button type="button" className="btn ghost peq" onClick={() => setNovoColab(!novoColab)}>
+              {novoColab ? (colaboradores.length ? 'Escolher da lista de colaboradores' : 'Deixar sem colaborador') : <><UserPlus size={14} />{colaboradores.length ? 'É um colaborador novo' : 'Cadastrar colaborador'}</>}
+            </button>
+            {novoColab && <Link href="/colaboradores?novo=1" className="btn ghost peq" target="_blank">Abrir cadastro completo</Link>}
+          </span>
+        </div>
       </section>
 
       <section className="etapa">
@@ -130,11 +228,11 @@ export function ItemForm({
         <div className="linha">
           <div className={`campo ${erros.vencimento ? 'com-erro' : ''}`}>
             <label htmlFor="vencimento">Data de vencimento</label>
-            <input id="vencimento" name="vencimento" type="date" value={vencimento} aria-invalid={!!erros.vencimento} aria-describedby="venc-ajuda"
-              onChange={(e) => { setVencimento(e.target.value); setErros((x) => ({ ...x, vencimento: undefined })) }} />
+            <CampoData id="vencimento" name="vencimento" value={vencimento} invalido={!!erros.vencimento} describedBy="venc-ajuda"
+              onChange={(v) => { setVencimento(v); setErros((x) => ({ ...x, vencimento: undefined })) }} />
             {erros.vencimento
               ? <span id="venc-ajuda" className="erro-campo"><AlertCircle size={14} aria-hidden />{erros.vencimento}</span>
-              : <span id="venc-ajuda" className="dica">A data que está no documento ou combinada com o cliente.</span>}
+              : <span id="venc-ajuda" className="dica">Digite só os números (ex.: 06112026) ou toque no calendário.</span>}
           </div>
           <div className="campo">
             <label htmlFor="recorrencia">Precisa renovar de quanto em quanto tempo?</label>
@@ -150,17 +248,30 @@ export function ItemForm({
 
       <section className="etapa">
         <h2><span className="num-etapa">4</span>Quando avisar?</h2>
-        <div className="campo">
-          <label htmlFor="antecedencia">Primeiro aviso</label>
-          <select id="antecedencia" name="antecedencia_dias" value={antecedencia} onChange={(e) => setAntecedencia(Number(e.target.value))}>
-            {opcoesAviso.map((d) => <option key={d} value={d}>{d} dias antes</option>)}
-          </select>
-        </div>
+        <fieldset className={`campo ${erros.avisos ? 'com-erro' : ''}`} style={{ border: 0, padding: 0, margin: '0 0 20px' }}>
+          <legend className="rotulo-campo">Avisar quantos dias antes? Marque um ou mais</legend>
+          <div className="chips compactos" id="avisos" tabIndex={-1}>
+            {opcoesAviso.map((d) => (
+              <button type="button" key={d} className="chip" aria-pressed={avisos.includes(d)} onClick={() => alternarAviso(d)}>
+                <span className="chip-titulo">{avisos.includes(d) && <Check size={14} aria-hidden />}{d === 1 ? '1 dia' : `${d} dias`}</span>
+              </button>
+            ))}
+          </div>
+          <div className="avisos-outro">
+            <input type="number" inputMode="numeric" min={1} max={365} value={outroAviso} aria-label="Outro número de dias"
+              placeholder="Outro" onChange={(e) => setOutroAviso(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); adicionarOutro() } }} />
+            <button type="button" className="btn sec peq" onClick={adicionarOutro} disabled={!outroAviso}>Adicionar</button>
+          </div>
+          {erros.avisos
+            ? <span className="erro-campo"><AlertCircle size={14} aria-hidden />{erros.avisos}</span>
+            : <span className="dica">Ex.: só 1 dia antes, para documentos que não podem ser entregues antes nem depois.</span>}
+        </fieldset>
         <div className="previa" aria-live="polite">
-          {avisos.length ? (
+          {datas.length ? (
             <>
               <strong style={{ display: 'flex', gap: 8, alignItems: 'center' }}><BellRing size={16} aria-hidden />Você vai receber lembretes por e-mail em</strong>
-              <span className="datas">{avisos.map((d) => <span key={d} className="selo peq info">{fmtData(d)}</span>)}</span>
+              <span className="datas">{datas.map((d) => <span key={d} className="selo peq info">{fmtData(d)}</span>)}</span>
               <span className="dica">E, se passar do prazo sem renovar, uma vez por semana até resolver.</span>
             </>
           ) : vencimento && vencimento < hoje ? (

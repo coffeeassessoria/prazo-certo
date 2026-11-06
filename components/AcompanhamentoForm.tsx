@@ -6,6 +6,7 @@ import { Save } from 'lucide-react'
 import { hojeISO, fmtData, somarDias } from '@/lib/datas'
 import { CATEGORIAS, ETAPAS, MODELOS_CLIMATIZACAO, encerrada, type AcaoDemanda, type Categoria, type Etapa, type Responsavel, type Vinculo } from '@/lib/demandas'
 import { BotaoEnviar } from '@/components/ui/BotaoEnviar'
+import { CampoData } from '@/components/ui/CampoData'
 import { Aviso } from '@/components/ui/Aviso'
 
 export type AcompanhamentoEdicao = {
@@ -94,7 +95,7 @@ export function AcompanhamentoForm({ acao, clientes, responsaveis = [], vinculos
             <input id="dem-acao" name="proxima_acao" required maxLength={240} value={proxima} onChange={e => setProxima(e.target.value)} placeholder="Ex.: Ligar para confirmar a aprovação" />
           </div>
           <div className="campo"><label htmlFor="dem-data">Quando fazer o próximo retorno?</label>
-            <input id="dem-data" name="vencimento" type="date" required defaultValue={contato ? vencimento : (item.vencimento ?? somarDias(hoje, 3))}
+            <CampoData id="dem-data" name="vencimento" required defaultValue={contato ? vencimento : (item.vencimento ?? somarDias(hoje, 3))}
               min={!contato && item.vencimento && item.vencimento < hoje ? item.vencimento : hoje} />
             <span className="dica">A demanda aparece na lista do dia. O resumo por e-mail segue os lembretes configurados em Ajustes.</span>
           </div>

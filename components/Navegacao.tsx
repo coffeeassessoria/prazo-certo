@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { BellRing, BookOpen, MessageSquareText, History, FileText, Building2, LayoutDashboard, Menu as IcoMenu, Plus, Settings, ShieldCheck, Users, X, Palette } from 'lucide-react'
+import { BellRing, BookOpen, IdCard, MessageSquareText, History, FileText, Building2, LayoutDashboard, Menu as IcoMenu, Plus, Settings, ShieldCheck, Users, X, Palette } from 'lucide-react'
 
 function useAtual() {
   const path = usePathname()
@@ -35,6 +35,7 @@ export function Menu({ temEmpresa, superadmin, aoNavegar }: Props) {
           <Link href="/pmoc" {...a('/pmoc')} {...l}><FileText size={20} />Planos PMOC</Link>
           <Link href="/unidades" {...a('/unidades')} {...l}><Building2 size={20} />Unidades e equipamentos</Link>
           <Link href="/clientes" {...a('/clientes')} {...l}><Users size={20} />Clientes</Link>
+          <Link href="/colaboradores" {...a('/colaboradores')} {...l}><IdCard size={20} />Colaboradores</Link>
           <Link href="/?f=historico" {...a('/?f=historico')} {...l}><History size={20} />Histórico</Link>
           <Link href="/config" {...a('/config')} {...l}><Settings size={20} />Ajustes</Link>
           <a href="/guia" target="_blank" rel="noreferrer" onClick={aoNavegar}><BookOpen size={20} />Guia do usuário</a>
